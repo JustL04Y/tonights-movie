@@ -112,7 +112,7 @@ const I18N = (() => {
 
       'error.inputEmpty': 'Enter a Letterboxd username or paste a list link first.',
       'error.inputInvalid':
-        'That does not look like a Letterboxd username or list link. Use letters, numbers, dashes and underscores, or paste a list URL.',
+        "That doesn't look like a Letterboxd username or list link. Try just the username, or paste the full list URL.",
       'error.userNotFound': "Couldn't find that Letterboxd user. Check the username and try again.",
       'error.listNotFound': "Couldn't find that Letterboxd list. Check the link — or that it's public.",
       'error.privateWatchlist': 'That watchlist is private. Make it public on Letterboxd first.',
@@ -256,7 +256,7 @@ const I18N = (() => {
 
       'error.inputEmpty': 'أدخل اسم مستخدم أو الصق رابط قائمة على ليتربوكسد أولًا.',
       'error.inputInvalid':
-        'يبدو أن هذا ليس اسم مستخدم أو رابط قائمة صحيحًا في ليتربوكسد. استخدم حروفًا وأرقامًا وشرطات، أو الصق رابط قائمة كاملًا.',
+        'هذا لا يشبه اسم مستخدم أو رابط قائمة في ليتربوكسد. جرّب اسم المستخدم وحده أو الصق رابط القائمة كاملًا.',
       'error.userNotFound': 'ما لقينا مستخدم ليتربوكسد بهذا الاسم. تأكد من اسم المستخدم وحاول مرة أخرى.',
       'error.listNotFound': 'ما لقينا هذي القائمة. تأكد من الرابط أو أن القائمة عامة.',
       'error.privateWatchlist': 'قائمة المشاهدة هذه خاصة. اجعلها عامة على ليتربوكسد أولًا.',
