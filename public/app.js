@@ -258,6 +258,7 @@ const SERVER_ERROR_KEYS = {
   RATE_LIMITED: 'error.rateLimited',
   LOAD_FAILED: 'error.loadFailed',
   CANCELLED: 'error.loadFailed',
+  DEMO_MISSING: 'error.demoMissing',
 };
 
 function serverErrorKey(parsed) {
