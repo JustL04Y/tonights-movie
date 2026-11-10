@@ -1,5 +1,5 @@
 {
-  "name": "watchlist-reel",
+  "name": "tonights-reel",
   "version": "2.0.0",
   "private": true,
   "description": "A fast, simple random-film picker for public Letterboxd watchlists, with genre, rating, decade, and country filters.",

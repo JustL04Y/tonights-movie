@@ -1,4 +1,4 @@
-# Watchlist Reel
+# Tonight's Reel
 
 A fast, deliberately simple random-film picker for any public Letterboxd list.
 Enter a username (to pick from their watchlist) or paste any list URL — such as

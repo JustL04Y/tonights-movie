@@ -1,7 +1,7 @@
 'use strict';
 
 /* ─────────────────────────────────────────────────────────────
-   Watchlist Reel — simplified client
+   Tonight's Reel — simplified client
    One card, one filter panel, no dashboard.
    ───────────────────────────────────────────────────────────── */
 
@@ -77,9 +77,9 @@ const RATING_MAX = 5;
 const RUNTIME_SLIDER_MIN = 55;
 const RUNTIME_SLIDER_MAX = 300;
 const RUNTIME_STEP = 5;
-const USER_HISTORY_KEY = 'watchlist-reel:user-history';
+const USER_HISTORY_KEY = 'tonights-reel:user-history';
 const USER_HISTORY_LIMIT = 8;
-const THEME_KEY = 'watchlist-reel:theme';
+const THEME_KEY = 'tonights-reel:theme';
 // How long a failed synopsis translation waits before it may be retried.
 // Backs off so a transient provider outage heals itself while the film stays
 // on screen, instead of leaving the English synopsis up until the next pick.

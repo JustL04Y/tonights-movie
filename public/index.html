@@ -4,17 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" id="themeColor" content="#0c1014" />
-    <title>Watchlist Reel — pick a random film from your Letterboxd watchlist</title>
+    <title>Tonight's Reel — pick a random film from any Letterboxd list</title>
     <meta
       name="description"
-      content="Pick a random film from any public Letterboxd watchlist. Optional genre, rating, runtime, decade, and country filters. No login required."
+      content="Pick a random film from any public Letterboxd list — your watchlist or any curated list. Optional genre, rating, runtime, decade, and country filters. No login required."
     />
     <script>
       // Apply the saved language and theme before first paint to avoid a flash.
       (function () {
         try {
+          // One-time rename migration: the project used to be "Watchlist Reel".
+          ['lang', 'theme', 'user-history', 'last-user'].forEach(function (slot) {
+            var oldKey = 'watchlist-reel:' + slot;
+            var newKey = 'tonights-reel:' + slot;
+            if (newKey !== 'tonights-reel:last-user' && localStorage.getItem(newKey) === null && localStorage.getItem(oldKey) !== null) {
+              localStorage.setItem(newKey, localStorage.getItem(oldKey));
+            }
+            localStorage.removeItem(oldKey);
+          });
+
           var root = document.documentElement;
-          var storedLang = localStorage.getItem('watchlist-reel:lang');
+          var storedLang = localStorage.getItem('tonights-reel:lang');
           var tags = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
           var auto = tags.some(function (tag) {
             return /^ar\b/i.test(String(tag || ''));
@@ -25,7 +35,7 @@
           root.setAttribute('lang', lang);
           root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
           if (lang === 'ar') {
-            document.title = 'قائمة المشاهدة — فيلم عشوائي من قائمة ليتربوكسد';
+            document.title = 'عرض الليلة — فيلم عشوائي من أي قائمة ليتربوكسد';
           }
           var faces =
             lang === 'ar'
@@ -40,7 +50,7 @@
             preload.href = '/fonts/' + face + '.woff2';
             document.head.appendChild(preload);
           });
-          if (localStorage.getItem('watchlist-reel:theme') === 'light') {
+          if (localStorage.getItem('tonights-reel:theme') === 'light') {
             root.setAttribute('data-theme', 'light');
           }
         } catch (error) {
@@ -50,9 +60,9 @@
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/fonts/plex.css" />
-    <link rel="stylesheet" href="/styles.css?v=67" />
-    <script src="/i18n.js?v=67" defer></script>
-    <script src="/app.js?v=67" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=68" />
+    <script src="/i18n.js?v=68" defer></script>
+    <script src="/app.js?v=68" defer></script>
   </head>
   <body>
     <div class="backdrop" id="backdrop" aria-hidden="true"></div>
@@ -60,7 +70,7 @@
     <header class="topbar">
       <a class="brand" href="/" id="brandLink">
         <span class="brand-dot" aria-hidden="true"></span>
-        <span data-i18n-html="brand.name">Watchlist <em>Reel</em></span>
+        <span data-i18n-html="brand.name">Tonight's <em>Reel</em></span>
       </a>
       <div class="topbar-actions">
         <button class="icon-chip" id="themeToggle" type="button">
