@@ -255,6 +255,9 @@ const SERVER_ERROR_KEYS = {
   PRIVATE_WATCHLIST: 'error.privateWatchlist',
   EMPTY_WATCHLIST: 'error.emptyWatchlist',
   EMPTY_LIST: 'error.emptyList',
+  RATE_LIMITED: 'error.rateLimited',
+  LOAD_FAILED: 'error.loadFailed',
+  CANCELLED: 'error.loadFailed',
 };
 
 function serverErrorKey(parsed) {
