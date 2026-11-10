@@ -837,12 +837,8 @@ function updatePickNote() {
 }
 
 function pickFilm() {
-  if (!state.detailsComplete) {
-    // While details load, only the first fully-read pick is available.
-    if (state.current) renderCard(state.current);
-    return;
-  }
-
+  // Picking is allowed while details are still loading: basic films draw with
+  // a placeholder poster and renderCard() fetches full details on demand.
   const film = drawFilm();
   if (!film) {
     showEmpty();
@@ -1407,6 +1403,9 @@ function handleFilms(payload) {
   state.filmBySlug = new Map(state.films.map((film) => [film.slug, film]));
   state.total = Number(payload.total) || state.films.length;
   state.detailsComplete = false;
+  // A mid-flight rejoin replaces the film array, so any deck left over from a
+  // previous attempt holds dead basic-film objects. Drop it before first draw.
+  state.deck = [];
 
   showApp();
   hideEmpty();
@@ -1461,6 +1460,9 @@ function handleDone(payload) {
   syncControls();
   openActiveFilterSections();
   computePool();
+  // Picks made during the details phase drew from a deck of basic films; the
+  // freshly computed pool supersedes it, so the next pick starts a clean deck.
+  state.deck = [];
   hideEmpty();
 
   const enrichedCurrent = state.current ? state.filmBySlug.get(state.current.slug) : null;
@@ -1748,10 +1750,6 @@ function bindEvents() {
   });
 
   els.pickBtn.addEventListener('click', () => {
-    if (!state.detailsComplete) {
-      toast(t('toast.firstPick'));
-      return;
-    }
     if (!state.pool.length) computePool();
     pickFilm();
   });
@@ -1766,7 +1764,7 @@ function bindEvents() {
 
     if (event.key.toLowerCase() === 'r') {
       event.preventDefault();
-      if (state.detailsComplete) pickFilm();
+      pickFilm();
     }
   });
 

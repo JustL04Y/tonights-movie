@@ -119,7 +119,6 @@ const I18N = (() => {
       'error.demoMissing': 'The demo dataset is missing.',
 
       'toast.retry': 'Connection interrupted. Retrying…',
-      'toast.firstPick': 'The first pick is ready. More picks unlock as details finish.',
 
       'footer.text':
         'An independent project for film lovers by <a href="https://letterboxd.com/JustLOAY" target="_blank" rel="noreferrer">JustLOAY</a> — not affiliated with <a href="https://letterboxd.com" target="_blank" rel="noreferrer">Letterboxd</a>.',
@@ -258,7 +257,6 @@ const I18N = (() => {
       'error.demoMissing': 'بيانات الديمو غير موجودة.',
 
       'toast.retry': 'انقطع الاتصال. نحاول مرة أخرى…',
-      'toast.firstPick': 'الاختيار الأول جاهز. تفتح المزيد من الاختيارات عند اكتمال التفاصيل.',
 
       'footer.text':
         'مشروع مستقل لعشّاق السينما من إعداد <a href="https://letterboxd.com/JustLOAY" target="_blank" rel="noreferrer">JustLOAY</a> — غير تابع <a href="https://letterboxd.com" target="_blank" rel="noreferrer">لليتربوكسد</a>.',
