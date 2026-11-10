@@ -283,24 +283,64 @@ function startJob(sourceId, previous = null) {
       }
     }
 
+    // Progressive cold load: the first card appears after page 1 alone, and
+    // every later page streams its films into the app the user is already
+    // looking at. The pick is chosen from page 1 so it can start loading
+    // while the remaining pages arrive.
+    let pickItem = null;
+    let pick = null;
+    let pickPromise = null;
+
+    const emitFilmsSoFar = (items) => {
+      if (job.status !== 'running' || !items.length) return;
+      // Films already read in a previous run (the seed map) stream in fully
+      // enriched; brand-new ones stream as basics and enrich in background.
+      const films = items.map((item) => seeded.get(item.slug) || basicFilmFromItem(item));
+      emit('films', { films, total: films.length, pick: pick || films[0] });
+    };
+
+    const onPage = (items) => {
+      if (!pickItem) {
+        pickItem = items[Math.floor(Math.random() * items.length)];
+        pick = seeded.get(pickItem.slug) || null;
+        if (!pick) {
+          pickPromise = fetchFilmDetails(pickItem)
+            .then((film) => {
+              if (film.metaComplete) {
+                seeded.set(film.slug, film);
+                filmCache.set(film.slug, film);
+              }
+              return film;
+            })
+            .catch(() => basicFilmFromItem(pickItem));
+          pickPromise
+            .then((film) => {
+              pick = film;
+              if (job.status === 'running') emit('pick', { pick: film });
+            })
+            .catch(() => {});
+        }
+      }
+      emitFilmsSoFar(items);
+    };
+
     const scrapePromise =
       src.kind === 'list'
-        ? scrapeList(src.owner, src.slug, { pageConcurrency: PAGE_CONCURRENCY, onProgress })
-        : scrapeWatchlist(src.username, { pageConcurrency: PAGE_CONCURRENCY, onProgress });
+        ? scrapeList(src.owner, src.slug, { pageConcurrency: PAGE_CONCURRENCY, onProgress, onPage })
+        : scrapeWatchlist(src.username, { pageConcurrency: PAGE_CONCURRENCY, onProgress, onPage });
     const watchlist = await scrapePromise;
 
     const basics = watchlist.items.map(basicFilmFromItem);
-    const pickItem = watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
-
-    job.progress = { phase: 'details', completed: 0, total: basics.length, failed: 0 };
-
-    // Read the first pick and enrich the rest at the same time. The pick still
-    // arrives before the app appears, but the details pass no longer waits for
-    // that one page to finish, which saves a full round trip on a cold load.
-    let pick = seeded.get(pickItem.slug);
-    const pickPromise = pick
-      ? Promise.resolve(pick)
-      : fetchFilmDetails(pickItem)
+    if (!pickItem) {
+      // Defensive: onPage fires for page 1 unconditionally, so this only runs
+      // if a future refactor changes that contract.
+      pickItem = watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
+      pick = seeded.get(pickItem.slug) || null;
+    }
+    if (!pick) {
+      pickPromise =
+        pickPromise ||
+        fetchFilmDetails(pickItem)
           .then((film) => {
             if (film.metaComplete) {
               seeded.set(film.slug, film);
@@ -309,14 +349,18 @@ function startJob(sourceId, previous = null) {
             return film;
           })
           .catch(() => basicFilmFromItem(pickItem));
+    }
 
+    job.progress = { phase: 'details', completed: 0, total: basics.length, failed: 0 };
+
+    // Read the rest of the details in the background for the filters.
     const enrichedPromise = enrichFilms(watchlist.items, {
       concurrency: FILM_CONCURRENCY,
       initial: seeded,
       onProgress,
     });
 
-    pick = await pickPromise;
+    pick = pick || (await pickPromise);
 
     // The first pick is fully read before the app appears, so the landing ->
     // result transition feels immediate. Every other film is enriched in the
@@ -343,6 +387,9 @@ function startJob(sourceId, previous = null) {
     };
 
     job.basics = base;
+    // The authoritative full-list frame: also covers single-page lists and any
+    // rejoining client (replays job.basics). Progressive frames already drew
+    // the card, so this just tops up the pool the client holds.
     if (job.status === 'running') emit('films', base);
 
     const enriched = await enrichedPromise;
@@ -592,6 +639,17 @@ async function serveStatic(req, res, pathname) {
   }
 }
 
+// Popular official lists get warmed proactively, so the searches people make
+// most often are already hot the first time anyone asks. Slugs verified live;
+// override with POPULAR_LISTS="owner/list/slug,owner/list/slug".
+const POPULAR_LISTS = (
+  process.env.POPULAR_LISTS ||
+  'official/list/letterboxds-top-500-films,official/list/official-top-100-narrative-feature-films'
+)
+  .split(',')
+  .map((id) => id.trim())
+  .filter(Boolean);
+
 async function prewarmStaleCaches() {
   if (!PREWARM || prewarming) return;
   prewarming = true;
@@ -600,20 +658,42 @@ async function prewarmStaleCaches() {
     try {
       names = await fsp.readdir(CACHE_DIR);
     } catch {
-      return;
+      names = [];
     }
-    for (const name of names) {
-      if (!name.endsWith('.json')) continue;
-      const cacheFile = name.slice(0, -'.json'.length);
-      // "+" in a cache file can only come from a list id ("/" is not a legal
-      // filename character), so the mapping back is unambiguous.
-      const sourceId = cacheFile.includes('+') ? cacheFile.replace(/\+/g, '/') : cacheFile;
+    // Seeds: popular lists with no cache file yet (first boot or a wiped disk).
+    // With Redis enabled, a Redis-only copy still counts as present — the disk
+    // hydrates from it instead of re-scraping Letterboxd.
+    const seedIds = [];
+    for (const id of POPULAR_LISTS) {
+      const file = cacheFileFor(id);
+      if (file && !names.includes(`${file}.json`)) {
+        const cached = await readCached(id);
+        if (!cached) seedIds.push(id);
+      }
+    }
+    const fileIds = names
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => {
+        const cacheFile = name.slice(0, -'.json'.length);
+        // "+" in a cache file can only come from a list id ("/" is not a legal
+        // filename character), so the mapping back is unambiguous.
+        return cacheFile.includes('+') ? cacheFile.replace(/\+/g, '/') : cacheFile;
+      });
+    for (const sourceId of [...seedIds, ...fileIds]) {
       const src = parseSourceId(sourceId);
       if (!src || src.kind === 'demo' || jobs.has(sourceId)) continue;
       const cached = await readCached(sourceId);
+      if (!cached) {
+        if (seedIds.includes(sourceId)) {
+          console.log(`[prewarm] seeding popular list ${sourceId}`);
+          await startJob(sourceId).promise.catch(() => {});
+          await sleep(1500);
+        }
+        continue;
+      }
       // Fresh caches already answer immediately; only stale ones need the
       // network, and doing it now means the next visitor never sees a wait.
-      if (!cached || cached.fresh) continue;
+      if (cached.fresh) continue;
       console.log(`[prewarm] refreshing stale cache for ${sourceId}`);
       await startJob(sourceId, cached.payload).promise;
       await sleep(1500);

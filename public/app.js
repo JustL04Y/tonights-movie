@@ -1354,6 +1354,22 @@ function wireSource(sourceId) {
     }
   });
 
+  source.addEventListener('pick', (event) => {
+    if (state.source !== source) return;
+    try {
+      const film = JSON.parse(event.data)?.pick;
+      if (!film?.slug) return;
+      // Swap the basic entry for the fully read one wherever it lives, and
+      // refresh the card if it is the one on screen.
+      const index = state.films.findIndex((f) => f.slug === film.slug);
+      if (index >= 0) state.films[index] = film;
+      state.filmBySlug.set(film.slug, film);
+      if (state.current?.slug === film.slug) renderCard(film);
+    } catch {
+      // Ignore malformed frames.
+    }
+  });
+
   source.addEventListener('done', (event) => {
     if (state.source !== source) return;
     try {
@@ -1505,15 +1521,18 @@ function handleFilms(payload) {
   els.poolLabel.textContent = t(state.total === 1 ? 'app.poolOne' : 'app.poolMany');
 
   const initial = payload.pick || state.films[0] || null;
-  if (initial) {
+  // Progressive loads re-emit as list pages arrive: draw only the first card,
+  // and never yank a film the user already chose mid-load. Rejoins likewise
+  // redraw only when nothing is on screen yet.
+  if (initial && !state.current) {
     state.current = initial;
     state.picks = 1;
     renderCard(initial);
+    announce(t('announce.loaded', { total: state.total }));
   }
 
   updatePickNote();
   writeHash();
-  announce(t('announce.loaded', { total: state.total }));
 }
 
 function handleDone(payload) {
