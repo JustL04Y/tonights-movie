@@ -18,7 +18,13 @@ const {
 const { translate } = require('./lib/translate');
 
 const PORT = Number(process.env.PORT || 3000);
-const HOST = process.env.HOST || '127.0.0.1';
+// Render runs the app inside a container and requires binding to all
+// interfaces (0.0.0.0) so its port scan can find the service. Locally
+// we keep 127.0.0.1. Render injects RENDER/RENDER_EXTERNAL_URL into
+// every web service; an explicit HOST still wins (see render.yaml).
+const IS_RENDER =
+  process.env.RENDER === 'true' || Boolean(process.env.RENDER_EXTERNAL_URL);
+const HOST = process.env.HOST || (IS_RENDER ? '0.0.0.0' : '127.0.0.1');
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const CACHE_DIR = path.join(ROOT, 'data', 'watchlists');
