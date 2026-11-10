@@ -1,0 +1,15 @@
+{
+  "name": "watchlist-reel",
+  "version": "2.0.0",
+  "private": true,
+  "description": "A fast, simple random-film picker for public Letterboxd watchlists, with genre, rating, decade, and country filters.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build:demo": "node scripts/build-demo.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

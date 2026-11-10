@@ -1,0 +1,3289 @@
+{
+  "username": "demo",
+  "fetchedAt": "2026-11-06T16:48:12.719Z",
+  "source": "https://letterboxd.com/dave/watchlist/",
+  "pagesFetched": 3,
+  "listStatus": "ok",
+  "films": [
+    {
+      "slug": "black-bag-2025",
+      "title": "Black Bag",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/black-bag-2025/",
+      "overview": "When intelligence agent Kathryn Woodhouse is suspected of betraying the nation, her husband – also a legendary agent – faces the ultimate test of whether to be loyal to his marriage, or his country.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/1/6/7/5/5/1116755-black-bag-2025-0-600-0-900-crop.jpg?v=7dbc1baf6f",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/lu/oc/aq/ey/black-1200-1200-675-675-crop-000000.jpg?v=7e16e2aa78",
+      "rating": 3.41,
+      "ratingCount": 406213,
+      "runtime": 94,
+      "genres": [
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Steven Soderbergh"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "everytime",
+      "title": "Everytime",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/everytime/",
+      "overview": "A tragedy brings a mother, daughter, and teenage boy together. Struggling with blame and forgiveness, the unlikely trio take a trip to Tenerife for a family holiday that never happened. Under the glow of the sun, past and present quietly start to overlap.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/5/1/8/9/4/7/1518947-everytime-0-600-0-900-crop.jpg?v=5980567fe9",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/5/1/8/9/4/7/tmdb/ckFYFEIgqGF1u5mDMevwFqSyuSO-1200-1200-675-675-crop-000000.jpg?v=fe8ece2694",
+      "rating": 3.81,
+      "ratingCount": 10951,
+      "runtime": 124,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Austria",
+        "Germany"
+      ],
+      "languages": [
+        "German",
+        "Spanish",
+        "English"
+      ],
+      "directors": [
+        "Sandra Wollner"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "big-world-2024",
+      "title": "Big World",
+      "year": 2024,
+      "link": "https://letterboxd.com/film/big-world-2024/",
+      "overview": "Liu Chunhe, suffering from cerebral palsy, bravely breaks through the shackles of body and mind to realize the dream stage for his grandmother, while trying to find the coordinates of his own life. After experiencing a summer transformation, he finally embarked on a new journey.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/6/1/9/9/7/1161997-big-world-2024-0-600-0-900-crop.jpg?v=4aee34daa2",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/yw/2t/no/9t/big%20world-1200-1200-675-675-crop-000000.jpg?v=638af7fb37",
+      "rating": 4.21,
+      "ratingCount": 38314,
+      "runtime": 131,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Family",
+          "slug": "family"
+        }
+      ],
+      "countries": [
+        "China"
+      ],
+      "languages": [
+        "Chinese"
+      ],
+      "directors": [
+        "Yang Lina"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "meiyazhagan",
+      "title": "Meiyazhagan",
+      "year": 2024,
+      "link": "https://letterboxd.com/film/meiyazhagan/",
+      "overview": "Twenty-two years after losing his home, Arulmozhi Varman returns to his native Thanjavur to attend his cousin's wedding. Amidst the celebrations, Arul is reintroduced to an upbeat man whom he cannot recall. With the help of the unknown man, Arul reconnects with his past.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/2/4/2/2/9/1024229-meiyazhagan-0-600-0-900-crop.jpg?v=12411597ce",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/ed/xi/yx/bk/r85kYHJyoq8x8EVvbIgCmZo9doG-1200-1200-675-675-crop-000000.jpg?v=811ec35a55",
+      "rating": 4.24,
+      "ratingCount": 62243,
+      "runtime": 177,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Family",
+          "slug": "family"
+        }
+      ],
+      "countries": [
+        "India"
+      ],
+      "languages": [
+        "Tamil"
+      ],
+      "directors": [
+        "C. Prem Kumar"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "kumbalangi-nights",
+      "title": "Kumbalangi Nights",
+      "year": 2019,
+      "link": "https://letterboxd.com/film/kumbalangi-nights/",
+      "overview": "Four brothers living in the fishing hamlet of Kumbalangi share a love-hate relationship with each other. Their relationship progresses when Saji, Boney and Franky decide to help Bobby stand by his love.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/0/3/7/6/6/503766-kumbalangi-nights-0-600-0-900-crop.jpg?v=c0c5d758d8",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/6n/nb/li/xh/kumbangi-1200-1200-675-675-crop-000000.jpg?v=2aadbb3677",
+      "rating": 4.21,
+      "ratingCount": 35862,
+      "runtime": 135,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "India"
+      ],
+      "languages": [
+        "English",
+        "Malayalam",
+        "Tamil"
+      ],
+      "directors": [
+        "Madhu C. Narayanan"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "who-killed-captain-alex",
+      "title": "Who Killed Captain Alex?",
+      "year": 2010,
+      "link": "https://letterboxd.com/film/who-killed-captain-alex/",
+      "overview": "Recognized as Uganda’s first action film, Who Killed Captain Alex? is about the aftermath of a police raid in Kampala in which a police captain is killed.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/4/3/6/0/5/243605-who-killed-captain-alex--0-600-0-900-crop.jpg?v=5011bd5350",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/jv/a6/yz/az/who%20killed-1200-1200-675-675-crop-000000.jpg?v=8c36a3f9d6",
+      "rating": 4.17,
+      "ratingCount": 43407,
+      "runtime": 68,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Action",
+          "slug": "action"
+        }
+      ],
+      "countries": [
+        "Uganda"
+      ],
+      "languages": [
+        "English",
+        "Ganda",
+        "Swahili"
+      ],
+      "directors": [
+        "Nabwana IGG"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-ox-bow-incident",
+      "title": "The Ox-Bow Incident",
+      "year": 1943,
+      "link": "https://letterboxd.com/film/the-ox-bow-incident/",
+      "overview": "A posse discovers a trio of men they suspect of murder and cow theft and are split between handing them over to the law or lynching them on the spot.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/1/1/8/9/51189-the-ox-bow-incident-0-600-0-900-crop.jpg?v=db37898e79",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/sh/b5/vn/yo/the-ox-bow-incident-1200-1200-675-675-crop-000000.jpg?v=3abb902f86",
+      "rating": 4.16,
+      "ratingCount": 26632,
+      "runtime": 76,
+      "genres": [
+        {
+          "name": "Western",
+          "slug": "western"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Spanish"
+      ],
+      "directors": [
+        "William A. Wellman"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "a-bronx-tale",
+      "title": "A Bronx Tale",
+      "year": 1993,
+      "link": "https://letterboxd.com/film/a-bronx-tale/",
+      "overview": "Set in the Bronx during the tumultuous 1960s, an adolescent boy is torn between his honest, working-class father and a violent yet charismatic crime boss. Complicating matters is the youngster's growing attraction - forbidden in his neighborhood - for a beautiful black girl.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/5/0/9/3/2/50932-a-bronx-tale-0-600-0-900-crop.jpg?v=70eaa993de",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/cx/do/n5/um/a-bronx-tale-1200-1200-675-675-crop-000000.jpg?v=dbec412d62",
+      "rating": 4.17,
+      "ratingCount": 402901,
+      "runtime": 121,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Italian"
+      ],
+      "directors": [
+        "Robert De Niro"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "turtles-can-fly",
+      "title": "Turtles Can Fly",
+      "year": 2004,
+      "link": "https://letterboxd.com/film/turtles-can-fly/",
+      "overview": "Turtles Can Fly tells the story of a group of young children near the Turkey-Iraq border. They clean up mines and wait for the Saddam regime to fall.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/31/nu/yu/am/maoGbtfSERgqu6J9qvAz4fzse8Z-0-600-0-900-crop.jpg?v=981dfdaa8d",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/e0/jw/p5/ev/turtles%20can%20fly-1200-1200-675-675-crop-000000.jpg?v=1345e5cea6",
+      "rating": 4.24,
+      "ratingCount": 31253,
+      "runtime": 98,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Iran",
+        "France",
+        "Iraq"
+      ],
+      "languages": [
+        "Kurdish",
+        "English",
+        "Arabic"
+      ],
+      "directors": [
+        "Bahman Ghobadi"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "to-wong-foo-thanks-for-everything-julie-newmar",
+      "title": "To Wong Foo, Thanks for Everything! Julie Newmar",
+      "year": 1995,
+      "link": "https://letterboxd.com/film/to-wong-foo-thanks-for-everything-julie-newmar/",
+      "overview": "Manhattan drag queens Vida Boheme and Noxeema Jackson impress regional judges in competition, securing berths in the Nationals in Los Angeles. When the two meet pathetic drag novice Chi-Chi Rodriguez — one of the losers that evening — the charmed Vida and Noxeema agree to take the hopeless youngster under their joined wing. Soon the three set off on a madcap road trip across America and struggle to make it to Los Angeles in time.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/7/3/5/4/47354-to-wong-foo-thanks-for-everything-julie-newmar-0-600-0-900-crop.jpg?v=92ec18458b",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/b8/hw/gy/c4/to-wong-foo-thanks-julie-newmar-1200-1200-675-675-crop-000000.jpg?v=2e6dd094f7",
+      "rating": 4.17,
+      "ratingCount": 173943,
+      "runtime": 108,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Beeban Kidron"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-taste-of-tea",
+      "title": "The Taste of Tea",
+      "year": 2004,
+      "link": "https://letterboxd.com/film/the-taste-of-tea/",
+      "overview": "A spell of time in the life of a family in rural Tochigi prefecture. Yoshiko is not an ordinary housewife, instead working on an animated film project. Uncle Ayano, a successful music producer, is looking to get his head together after living in Tokyo. Meanwhile, Sachiko is concerned with why she seems to be followed by a giant version of herself. As the lazy days pass by, each member of the family is followed in a series of episodic vignettes.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/2/4/5/9/42459-the-taste-of-tea-0-600-0-900-crop.jpg?v=e6ebb5f211",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/dx/r1/j2/5q/taste-of-tea-1200-1200-675-675-crop-000000.jpg?v=048a955bd5",
+      "rating": 4.21,
+      "ratingCount": 33186,
+      "runtime": 143,
+      "genres": [
+        {
+          "name": "Fantasy",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Katsuhito Ishii"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-sword-of-doom",
+      "title": "The Sword of Doom",
+      "year": 1966,
+      "link": "https://letterboxd.com/film/the-sword-of-doom/",
+      "overview": "Ryunosuke, a gifted swordsman plying his trade during the turbulent final days of Shogunate rule, has no moral code and kills without remorse. It’s a way of life that leads to madness.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/3/9/3/6/3/39363-the-sword-of-doom-0-600-0-900-crop.jpg?v=97b875d3c7",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/5v/9m/65/8g/sword-of-doom-1200-1200-675-675-crop-000000.jpg?v=a2b364df61",
+      "rating": 4.14,
+      "ratingCount": 29726,
+      "runtime": 122,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Kihachi Okamoto"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "punishment-park",
+      "title": "Punishment Park",
+      "year": 1971,
+      "link": "https://letterboxd.com/film/punishment-park/",
+      "overview": "In this fictional documentary, U.S. prisons are at capacity, and President Nixon declares a state of emergency. All new prisoners, most of whom are connected to the antiwar movement, are now given the choice of jail time or spending three days in Punishment Park, where they will be hunted for sport by federal authorities. The prisoners invariably choose the latter option, but learn that, between the desert heat and the brutal police officers, their chances of survival are slim.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/3/5/2/6/4/35264-punishment-park-0-600-0-900-crop.jpg?v=8756e64afb",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/kz/jr/6a/g7/punishment-park-1200-1200-675-675-crop-000000.jpg?v=1d4a132c71",
+      "rating": 4.15,
+      "ratingCount": 35702,
+      "runtime": 88,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Peter Watkins"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "love-letter",
+      "title": "Love Letter",
+      "year": 1995,
+      "link": "https://letterboxd.com/film/love-letter/",
+      "overview": "Hiroko attends the memorial service of her fiancé, Itsuki Fujii, who died in a mountain-climbing incident. Although Itsuki's mother says that their old house is gone, Hiroko records the address listed under his name in his yearbook and sends him a letter. Surprisingly, she receives a reply, and discovers it came from his old classmate, a girl who also happens to be called Itsuki Fujii.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/8/3/6/8/18368-love-letter-0-600-0-900-crop.jpg?v=10b4042163",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/t9/8v/zc/kc/love%20letter-1200-1200-675-675-crop-000000.jpg?v=f89eae0676",
+      "rating": 4.15,
+      "ratingCount": 59666,
+      "runtime": 117,
+      "genres": [
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Shunji Iwai"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "cria",
+      "title": "Cria!",
+      "year": 1976,
+      "link": "https://letterboxd.com/film/cria/",
+      "overview": "In Madrid, the orphan sisters Irene, Ana and Maite are raised by their austere aunt Paulina together with their mute and crippled grandmother after the death of their mother and their military father Anselmo. Ana is a melancholic girl, fascinated by death, after seeing her mother having a painful death and her father dead in bed.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/9/9/1/13991-cria--0-600-0-900-crop.jpg?v=e040a4f888",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/n0/gr/q1/mv/cria-cuervos-1200-1200-675-675-crop-000000.jpg?v=909b4b9565",
+      "rating": 4.2,
+      "ratingCount": 35169,
+      "runtime": 105,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Spain"
+      ],
+      "languages": [
+        "Spanish"
+      ],
+      "directors": [
+        "Carlos Saura"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-history-of-concrete",
+      "title": "The History of Concrete",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-history-of-concrete/",
+      "overview": "After attending a workshop on how to write and sell a Hallmark movie, filmmaker John Wilson tries to use the same formula to sell a documentary about concrete.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/6/4/8/3/5/1464835-the-history-of-concrete-0-600-0-900-crop.jpg?v=a9805b24e4",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/4/6/4/8/3/5/tmdb/2QWJHuCeYyFvDRY5CGJ4nlmaqYn-1200-1200-675-675-crop-000000.jpg?v=e4602d7104",
+      "rating": 3.93,
+      "ratingCount": 53876,
+      "runtime": 101,
+      "genres": [
+        {
+          "name": "Documentary",
+          "slug": "documentary"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Chinese"
+      ],
+      "directors": [
+        "John Wilson"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "a-ghost-story-2017",
+      "title": "A Ghost Story",
+      "year": 2017,
+      "link": "https://letterboxd.com/film/a-ghost-story-2017/",
+      "overview": "Recently deceased, a white-sheeted ghost returns to his suburban home to console his bereft wife, only to find that in his spectral state he has become unstuck in time, forced to watch passively as the life he knew and the woman he loves slowly slip away.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/zx/51/yo/oc/ydENrBUenr4khaP6tj4JZn1CpMs-0-600-0-900-crop.jpg?v=8a56a47391",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/5f/ik/y7/hz/a-ghost-story-1200-1200-675-675-crop-000000.jpg?v=f40c8fbd19",
+      "rating": 3.76,
+      "ratingCount": 357531,
+      "runtime": 93,
+      "genres": [
+        {
+          "name": "Fantasy",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "David Lowery"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "naza",
+      "title": "NAZA",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/naza/",
+      "overview": "Filmed at night from Tel Aviv rooftops, this investigative documentary examines the civilian casualties of Israel's military operations in Gaza and the systems behind targeted killings of Palestinians.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/6/2/0/2/0/6/1620206-naza-0-600-0-900-crop.jpg?v=c34667d5c5",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/4g/94/d6/gn/qkuEfYYOZTW6ymbZMeyJeYQaMd7-1200-1200-675-675-crop-000000.jpg?v=48df2c0386",
+      "rating": 4.55,
+      "ratingCount": 51757,
+      "runtime": 77,
+      "genres": [
+        {
+          "name": "Documentary",
+          "slug": "documentary"
+        },
+        {
+          "name": "War",
+          "slug": "war"
+        }
+      ],
+      "countries": [
+        "USA",
+        "UK"
+      ],
+      "languages": [
+        "Hebrew",
+        "English",
+        "Arabic"
+      ],
+      "directors": [
+        "Yuval Abraham",
+        "Rachel Szor"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "you-can-see-everything",
+      "title": "You Can See Everything",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/you-can-see-everything/",
+      "overview": "Thirty-four days before she's sent to prison, notorious Silicon Valley founder Elizabeth Holmes invites a skeptical film crew to document her every move. What begins as an intimate portrait of an enigmatic felon becomes a mind-bending three-year journey into the abyss.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/6/2/9/4/4/3/1629443-you-can-see-everything-0-600-0-900-crop.jpg?v=84f6724d74",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/wr/rf/xg/hl/IMG_2387-1200-1200-675-675-crop-000000.jpg?v=cfa3502c10",
+      "rating": 4.58,
+      "ratingCount": 669780,
+      "runtime": 174,
+      "genres": [
+        {
+          "name": "Documentary",
+          "slug": "documentary"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Nathan Fielder",
+        "Lance Oppenheim"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "still-night-burning-house",
+      "title": "Still Night, Burning House",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/still-night-burning-house/",
+      "overview": "In her deeply personal debut feature, award-winning filmmaker Carol Nguyen charts her family’s first reunion since her uncle’s mysterious death. Travelling together to Vietnam, the family embarks on a revelatory—and at times uncanny—journey through intergenerational trauma and many-layered loss. With care and probing curiosity, Nguyen guides her loved ones as they navigate unsealed medical records and a decades-long silence, ultimately leading them back to each other. A metaphysical poem for complex mourning, Still Night, Burning House shows how storytelling can transform grief into collective healing.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/7/4/7/2/3/1474723-still-night-burning-house-0-600-0-900-crop.jpg?v=4fc634ca19",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/4/7/4/7/2/3/1474723-still-night-burning-house-0-230-0-345-crop.jpg?v=4fc634ca19",
+      "rating": 3.58,
+      "ratingCount": 219,
+      "runtime": 76,
+      "genres": [
+        {
+          "name": "Documentary",
+          "slug": "documentary"
+        }
+      ],
+      "countries": [
+        "Canada"
+      ],
+      "languages": [
+        "English",
+        "Vietnamese"
+      ],
+      "directors": [
+        "Carol Nguyen"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "it-ends",
+      "title": "It Ends",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/it-ends/",
+      "overview": "A group of recent grads head out on a late night drive for grub, hoping to enjoy one final hangout before their paths diverge. Instead, they accidentally turn onto a never-ending, two-lane hellscape surrounded by untold horrors and cosmic forces beyond their understanding. Cramped together inside a Jeep Cherokee and with the miles stretching infinitely ahead, they face a choice: embrace their new existence or fight to escape it.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/0/1/5/4/3/1301543-it-ends-0-600-0-900-crop.jpg?v=246cf9efcb",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/6s/nw/3k/i2/blIQ1Xlc3gfOHqWc67ULnyYGEAe-1200-1200-675-675-crop-000000.jpg?v=68470cf57d",
+      "rating": 3.28,
+      "ratingCount": 104561,
+      "runtime": 89,
+      "genres": [
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        },
+        {
+          "name": "Horror",
+          "slug": "horror"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Alexander Ullom"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "kill-bill-the-whole-bloody-affair",
+      "title": "Kill Bill: The Whole Bloody Affair",
+      "year": 2004,
+      "link": "https://letterboxd.com/film/kill-bill-the-whole-bloody-affair/",
+      "overview": "A former assassin, known simply as The Bride, wakes from a coma four years after her jealous ex-lover Bill attempts to murder her on her wedding day. Fueled by an insatiable desire for revenge, she vows to get even with every person who contributed to the loss of her unborn child, her entire wedding party, and four years of her life. After devising a hit list, The Bride sets off on her quest, enduring unspeakable injury and unscrupulous enemies.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/3/4/8/4/3/9/348439-kill-bill-the-whole-bloody-affair-0-600-0-900-crop.jpg?v=5d08ead101",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/o0/kh/h8/na/wba-1200-1200-675-675-crop-000000.jpg?v=addf08cc56",
+      "rating": 4.54,
+      "ratingCount": 333945,
+      "runtime": 254,
+      "genres": [
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "Chinese",
+        "English",
+        "French",
+        "Japanese",
+        "Spanish"
+      ],
+      "directors": [
+        "Quentin Tarantino"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-housemaid",
+      "title": "The Housemaid",
+      "year": 1960,
+      "link": "https://letterboxd.com/film/the-housemaid/",
+      "overview": "A piano composer's family moves into a new house; when his pregnant wife collapses from working to support the family, he hires a housemaid to help with housework.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/2/2/5/7/7/22577-the-housemaid-0-600-0-900-crop.jpg?v=1a62ff16ab",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/wf/uu/59/o2/housemaid-1200-1200-675-675-crop-000000.jpg?v=560a981a6c",
+      "rating": 3.75,
+      "ratingCount": 28184,
+      "runtime": 112,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "South Korea"
+      ],
+      "languages": [
+        "Korean"
+      ],
+      "directors": [
+        "Kim Ki-young"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "misty-green",
+      "title": "Misty Green",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/misty-green/",
+      "overview": "Years after her Hollywood breakthrough, a talented actress whose career has stalled fights for her second act.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/6/7/0/1/0/1267010-misty-green-0-600-0-900-crop.jpg?v=373ce51408",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/hk/9v/jo/dg/xvUUS1Z8bhfSIE72BBDy4m70CVx-1200-1200-675-675-crop-000000.jpg?v=82b1335979",
+      "rating": 2.9,
+      "ratingCount": 3306,
+      "runtime": 103,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Chris Rock"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "tender-loving-care-2026",
+      "title": "Tender Loving Care",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/tender-loving-care-2026/",
+      "overview": "Amy, a government child protection worker, moves back with her upbeat best friend Rosie, a social services officer facing daily anger and resentment. Amy's aging parents worry about her happiness while dealing with their own crisis.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/5/7/3/9/7/1257397-tender-loving-care-2026-0-600-0-900-crop.jpg?v=3638738dc9",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/5/7/3/9/7/tmdb/b9Tjrzu74ghlONvgNHXJpislPXe-1200-1200-675-675-crop-000000.jpg?v=1ebbfcc620",
+      "rating": 3.88,
+      "ratingCount": 4980,
+      "runtime": 104,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "UK",
+        "USA",
+        "Singapore"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Mike Leigh"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-beloved-2026",
+      "title": "The Beloved",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-beloved-2026/",
+      "overview": "The acclaimed film director Esteban Martínez is a legend both for his films and for his past marked by violence and excess. For his new project, he offers his daughter Emilia a role under the pretext of helping her with her stalled acting career. Living together on set will foster a closeness they haven’t shared for years, but it will also reopen old wounds that never healed.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/6/8/3/5/7/968357-the-beloved-2026-0-600-0-900-crop.jpg?v=4479b11471",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/yp/ic/a3/9p/7jdH0I7Vf3HtjFTIuoxvkjLwT4C-1200-1200-675-675-crop-000000.jpg?v=63da465341",
+      "rating": 3.84,
+      "ratingCount": 54636,
+      "runtime": 136,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Spain",
+        "France"
+      ],
+      "languages": [
+        "Spanish",
+        "English"
+      ],
+      "directors": [
+        "Rodrigo Sorogoyen"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "clarissa-2026",
+      "title": "Clarissa",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/clarissa-2026/",
+      "overview": "Across a single day in Lagos, Nigeria, Clarissa prepares to host a high society party at her home, as her complicated past begins to consume her, in the form of now-distant friends and loves from her youth. Simultaneously, Septimus, a young soldier, is haunted by his own memories of the horrors he has witnessed and endured. As the perspectives traverse past and present, across the bourgeois class and those too easily forgotten by society, a delicate portrait of contemporary Nigeria emerges.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/9/7/6/7/4/1497674-clarissa-2026-0-600-0-900-crop.jpg?v=5b3697c703",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/4/9/7/6/7/4/tmdb/lMl7a0kjsLbJIqYfmO7eNa1gzl-1200-1200-675-675-crop-000000.jpg?v=c5bf9e0400",
+      "rating": 3.58,
+      "ratingCount": 2936,
+      "runtime": 135,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Nigeria"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Chuko Esiri",
+        "Arie Esiri"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "elsinore",
+      "title": "Elsinore",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/elsinore/",
+      "overview": "The deeply emotional and inspirational true story of Ian Charleson, a gifted actor whose greatest challenge becomes his greatest triumph. Facing his own mortality with unflinching honesty, wit, and grace, Charleson delivers a courageous performance that becomes a source of healing and inspiration for those around him.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/6/7/5/9/6/1467596-elsinore-0-600-0-900-crop.jpg?v=858fb58a95",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/4/6/7/5/9/6/tmdb/6pMg3GaEamYdBvsuJfHPc12KXAz-1200-1200-675-675-crop-000000.jpg?v=b90eb6c108",
+      "rating": 3.86,
+      "ratingCount": 6253,
+      "runtime": 111,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Italy",
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Simon Stone"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "hexed-2026",
+      "title": "Hexed",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/hexed-2026/",
+      "overview": "An impulsive and unconventional teenage girl named Billie discovers secret magical abilities which, once unleashed, hurtle her into a spectacle-filled journey out of suburbia and into a vast witch realm called Hexe. Forced to team up with her cautious mother, Alice, they uncover family mysteries that could change the world of witches forever.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/1/3/2/3/5/1413235-hexed-2026-0-600-0-900-crop.jpg?v=99f7a80a78",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/zy/yh/bf/en/wbxR0gBZKZWlLk1R9mmHkyYbG-1200-1200-675-675-crop-000000.jpg?v=c91085df5b",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": 103,
+      "genres": [
+        {
+          "name": "Family",
+          "slug": "family"
+        },
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Adventure",
+          "slug": "adventure"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Fantasy",
+          "slug": "fantasy"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Thai"
+      ],
+      "directors": [
+        "Jason Hand",
+        "Fawn Veerasunthorn"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "ink-2026",
+      "title": "Ink",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/ink-2026/",
+      "overview": "A group of misfits and visionaries had an idea for a new kind of news - one that would give the people what they want, and would change the face of the world we live in today.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/0/7/5/9/2/1407592-ink-2026-0-600-0-900-crop.jpg?v=39004eea0a",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/jl/8h/b4/5q/IMG_2222-1200-1200-675-675-crop-000000.jpg?v=8e6eab91b3",
+      "rating": 3.44,
+      "ratingCount": 7218,
+      "runtime": 116,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "UK",
+        "USA",
+        "France"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Danny Boyle"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "possible-love",
+      "title": "Possible Love",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/possible-love/",
+      "overview": "A laid-off worker and his wife cross paths with a documentary filmmaker and her spouse and confront their hidden desires.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/6/0/3/7/2/1360372-possible-love-0-600-0-900-crop.jpg?v=74d3cd22dc",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/hx/g5/zb/v0/uuQ36iMfWcNJfCHF8DB5ubN1NgC-1200-1200-675-675-crop-000000.jpg?v=40c1948443",
+      "rating": 4.16,
+      "ratingCount": 18336,
+      "runtime": 165,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "South Korea",
+        "USA"
+      ],
+      "languages": [
+        "Korean",
+        "English"
+      ],
+      "directors": [
+        "Lee Chang-dong"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "shaun-the-sheep-the-beast-of-mossy-bottom",
+      "title": "Shaun the Sheep: The Beast of Mossy Bottom",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/shaun-the-sheep-the-beast-of-mossy-bottom/",
+      "overview": "On Halloween Eve at Mossy Bottom Farm, excitement turns to dismay when the clumsy Farmer ruins the pumpkin patch. Shaun tries fixing it with science experiments, but things go awry when a wild beast appears in the woods.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/5/3/9/6/8/1353968-shaun-the-sheep-the-beast-of-mossy-bottom-0-600-0-900-crop.jpg?v=aab6cd0ba2",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/cr/ee/15/i9/rn7vuYXYM3cCCcgxW2d6fcV8Weh-1200-1200-675-675-crop-000000.jpg?v=cb5d8fde94",
+      "rating": 3.58,
+      "ratingCount": 27024,
+      "runtime": 81,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Family",
+          "slug": "family"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        }
+      ],
+      "countries": [
+        "UK",
+        "France"
+      ],
+      "languages": [],
+      "directors": [
+        "Steve Cox",
+        "Matthew Walker"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "gentle-monster",
+      "title": "Gentle Monster",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/gentle-monster/",
+      "overview": "After relocating with her family to the countryside, a renowned pianist uncovers a life-shattering truth that forces her to confront the complexities of love, trust, and deception.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/5/0/2/3/7/1350237-gentle-monster-0-600-0-900-crop.jpg?v=3a8449b8da",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/mm/84/5x/4d/p9cdAwkoPkmSC370arNTcDCpZYX-1200-1200-675-675-crop-000000.jpg?v=174adb9bbe",
+      "rating": 3.35,
+      "ratingCount": 9359,
+      "runtime": 114,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Austria",
+        "Germany",
+        "France",
+        "Sweden",
+        "Singapore",
+        "Finland"
+      ],
+      "languages": [
+        "German",
+        "English",
+        "French"
+      ],
+      "directors": [
+        "Marie Kreutzer"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-only-living-pickpocket-in-new-york",
+      "title": "The Only Living Pickpocket in New York",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-only-living-pickpocket-in-new-york/",
+      "overview": "Harry Lehman is an aging pickpocket who plies his trade with ever-diminishing returns in a drastically changed New York. Wallets stuffed with cash have been replaced by easily cancelled credit cards, and Harry struggles to make ends meet as he cares for his disabled wife, Rosie. When he unwittingly purloins and fences a valuable USB stick, Harry finds himself in a race against time to return the loot or face the rage of a vengeful crime family.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/0e/eb/nv/t8/pick-0-600-0-900-crop.jpg?v=e4ffe8cc42",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/tl/fw/t7/f2/pickpocket4-1200-1200-675-675-crop-000000.jpg?v=bd8d7672de",
+      "rating": 3.46,
+      "ratingCount": 31639,
+      "runtime": 88,
+      "genres": [
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Noah Segan"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "coward-2026",
+      "title": "Coward",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/coward-2026/",
+      "overview": "Surrounded by brutality but bound by tenderness, two World War I soldiers find a fragile sanctuary of love and art amid the shadows of the Belgian trenches.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/1/5/7/5/5/1315755-coward-2026-0-600-0-900-crop.jpg?v=a27931f2cf",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/9j/tx/s3/22/coward-1200-1200-675-675-crop-000000.jpg?v=ddb497e7a2",
+      "rating": 3.91,
+      "ratingCount": 16565,
+      "runtime": 127,
+      "genres": [
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "War",
+          "slug": "war"
+        }
+      ],
+      "countries": [
+        "Belgium",
+        "France",
+        "Netherlands",
+        "UK"
+      ],
+      "languages": [
+        "Dutch",
+        "French"
+      ],
+      "directors": [
+        "Lukas Dhont"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "resident-evil-2026",
+      "title": "Resident Evil",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/resident-evil-2026/",
+      "overview": "Medical courier Bryan unwittingly finds himself fighting for survival as one fateful, horrifying night collapses around him in chaos.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/0/2/7/1/7/1302717-untitled-resident-evil-reboot-0-600-0-900-crop.jpg?v=a688bf1bc7",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/c7/2d/gq/lu/resi-1200-1200-675-675-crop-000000.jpg?v=8d3221cbed",
+      "rating": 3.74,
+      "ratingCount": 1826025,
+      "runtime": 94,
+      "genres": [
+        {
+          "name": "Horror",
+          "slug": "horror"
+        },
+        {
+          "name": "Adventure",
+          "slug": "adventure"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Germany",
+        "France"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Zach Cregger"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "tangles",
+      "title": "Tangles",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/tangles/",
+      "overview": "A young woman is forced to return to the conservative small town where her bizarre family lives to take care of her mother, having to deal with the cruel reality of her mom's Alzheimer disease and become the daughter they need.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/9/7/7/9/8/1197798-tangles-0-600-0-900-crop.jpg?v=2a0828a7bd",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/1/9/7/7/9/8/tmdb/Ar7KkxfRHA9XTn3aS9SgnUCM5jk-1200-1200-675-675-crop-000000.jpg?v=d3e3bf009b",
+      "rating": 4.18,
+      "ratingCount": 3895,
+      "runtime": 102,
+      "genres": [
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Canada"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Leah Nelson"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-devil-wears-prada-2",
+      "title": "The Devil Wears Prada 2",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-devil-wears-prada-2/",
+      "overview": "Andy Sachs returns to Runway as Miranda Priestly navigates a new media landscape and Runway's position within. The duo reconnect with former assistant Emily Charlton, now the head of a luxury brand that possesses funding which could ensure Runway's survival.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/9/5/5/8/6/1195586-the-devil-wears-prada-2-0-600-0-900-crop.jpg?v=0d955add69",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/1/9/5/5/8/6/tmdb/2cr7imTLVSSrzgL3bFKAMCMdgKw-1200-1200-675-675-crop-000000.jpg?v=92afd53341",
+      "rating": 3.08,
+      "ratingCount": 1705129,
+      "runtime": 119,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Italian"
+      ],
+      "directors": [
+        "David Frankel"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "i-play-rocky",
+      "title": "I Play Rocky",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/i-play-rocky/",
+      "overview": "The electrifying true story about an unknown actor with an unshakable belief that he wasn't just meant to write Rocky—he was meant to be Rocky Balboa. Told \"no\" at every turn, Sylvester Stallone bets everything on himself, holding the line on playing the lead against seemingly impossible odds.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/7/0/2/2/8/1170228-i-play-rocky-0-600-0-900-crop.jpg?v=d568ec1f72",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/tu/40/a3/6v/oleqnn5d81MG3Oy1gfqjsbBkA9F-1200-1200-675-675-crop-000000.jpg?v=7e57154009",
+      "rating": 3.65,
+      "ratingCount": 9258,
+      "runtime": 128,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Australia"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Peter Farrelly"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "rose-2026",
+      "title": "Rose",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/rose-2026/",
+      "overview": "In the early 17th century, a soldier arrives at an isolated Protestant village in Germany claiming to be the heir to an abandoned farmstead. Even though he proves to be a good man, the villagers' suspicions about his identity grow and they force a reckoning.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/6/3/5/0/7/1063507-rose-2026-0-600-0-900-crop.jpg?v=b2291a7e52",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/vm/7o/h1/fg/rose-1200-1200-675-675-crop-000000.jpg?v=2712df37a1",
+      "rating": 3.87,
+      "ratingCount": 33222,
+      "runtime": 94,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        },
+        {
+          "name": "War",
+          "slug": "war"
+        }
+      ],
+      "countries": [
+        "Austria",
+        "Germany"
+      ],
+      "languages": [
+        "German"
+      ],
+      "directors": [
+        "Markus Schleinzer"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "madden-2026",
+      "title": "Madden",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/madden-2026/",
+      "overview": "Chronicles John Madden's incredible journey alongside best friend and true original Al Davis—from a Super Bowl-winning partnership with the Raiders, to becoming football’s most recognizable voice, to building the worldwide Madden NFL video game.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/2/0/2/3/9/1020239-madden-2026-0-600-0-900-crop.jpg?v=e57ac54c27",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/0/2/0/2/3/9/1020239-madden-2026-0-230-0-345-crop.jpg?v=e57ac54c27",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": 110,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "David O. Russell"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "prima-facie-2026",
+      "title": "Prima Facie",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/prima-facie-2026/",
+      "overview": "Tessa is a brilliant British defence barrister dominating London’s ruthless courtrooms. Fierce, witty, and self-made, she defends men accused of sexual assault — until she is assaulted herself by a colleague from a powerful legal dynasty. Suddenly, the system she trusted turns against her. As she faces the same tactics she once used in court, Tessa’s faith in justice unravels. Once in control, now exposed and disbelieved, she must fight to reclaim her voice and sense of self.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/1/5/7/2/5/1015725-prima-facie-2026-0-600-0-900-crop.jpg?v=9e723bfabf",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/tt/6v/u7/n3/cIgv4DNXpIMpBMGCdm8i5sdnPJI-1200-1200-675-675-crop-000000.jpg?v=fdb732e7b4",
+      "rating": 3.18,
+      "ratingCount": 1511,
+      "runtime": 109,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Australia",
+        "UK"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Susanna White"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-end-of-oak-street",
+      "title": "The End of Oak Street",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-end-of-oak-street/",
+      "overview": "After a mysterious cosmic event rips Oak Street from suburbia and transports their neighborhood to someplace unknown, the Platt family soon discovers that their very survival depends on them sticking together as they navigate their now unrecognizable surroundings.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/9/2/9/6/2/992962-the-end-of-oak-street-0-600-0-900-crop.jpg?v=b06dbfb4c9",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/9/9/2/9/6/2/tmdb/mJDCrEFKHUqoZe4xyI8CE47pw7P-1200-1200-675-675-crop-000000.jpg?v=8ab201f560",
+      "rating": 2.98,
+      "ratingCount": 711794,
+      "runtime": 100,
+      "genres": [
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Portuguese",
+        "Spanish"
+      ],
+      "directors": [
+        "David Robert Mitchell"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "backrooms-2026",
+      "title": "Backrooms",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/backrooms-2026/",
+      "overview": "A strange doorway appears in the basement of a furniture showroom.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/7/6/4/1/9/976419-backrooms-2026-0-600-0-900-crop.jpg?v=f7a99e3fc8",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/9/7/6/4/1/9/tmdb/nwlTTCHTIBtkvb70762Ug25khlV-1200-1200-675-675-crop-000000.jpg?v=ffeffd44cc",
+      "rating": 3.3,
+      "ratingCount": 3455849,
+      "runtime": 111,
+      "genres": [
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Horror",
+          "slug": "horror"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Canada"
+      ],
+      "languages": [
+        "English",
+        "Japanese",
+        "Polish"
+      ],
+      "directors": [
+        "Kane Parsons"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "being-heumann",
+      "title": "Being Heumann",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/being-heumann/",
+      "overview": "Scrappy, defiant, and done being treated like a burden, Judy Heumann turns her outrage into a revolution. In 1977, she and more than 100 disability rights protestors send a very loud message: The system is broken—not us.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/4/7/8/1/2/947812-being-heumann-0-600-0-900-crop.jpg?v=27bf7ba446",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/9/4/7/8/1/2/947812-being-heumann-0-230-0-345-crop.jpg?v=27bf7ba446",
+      "rating": 3.66,
+      "ratingCount": 2793,
+      "runtime": 127,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Sian Heder"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "iron-boy",
+      "title": "Iron Boy",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/iron-boy/",
+      "overview": "In rural France, 10-year-old Christophe tries to live up to his rigid and distant father on the family farm. But the young boy starts to lean over and collapse without warning — on the tractor, at school, at dinner... A doctor finds the solution: Christophe must wear an iron corset to keep himself upright. Forced to reinvent his life away from the farm, Christophe discovers a new passion for music, meets a new friend, and follows her into his first mischief. But will any of this really fix what is out of balance?",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/5/1/7/4/7/851747-iron-boy-0-600-0-900-crop.jpg?v=da60ad7b48",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/8/5/1/7/4/7/tmdb/3e0Lzs4vDSHjRULFw6vPI4jyHd6-1200-1200-675-675-crop-000000.jpg?v=7466dfe5fb",
+      "rating": 4.16,
+      "ratingCount": 26748,
+      "runtime": 90,
+      "genres": [
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Family",
+          "slug": "family"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "France",
+        "Belgium"
+      ],
+      "languages": [
+        "French"
+      ],
+      "directors": [
+        "Louis Clichy"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "tuner",
+      "title": "Tuner",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/tuner/",
+      "overview": "A talented piano tuner's life is turned upside down when he discovers that his meticulous skills for tuning pianos can equally be applied to cracking safes.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/3/4/8/7/8/1234878-tuner-0-600-0-900-crop.jpg?v=075156069b",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/fd/v7/zf/ch/sT5Inhc0aaReSZoufWgfJTQUbKp-1200-1200-675-675-crop-000000.jpg?v=7e2e733f70",
+      "rating": 3.74,
+      "ratingCount": 211351,
+      "runtime": 108,
+      "genres": [
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Music",
+          "slug": "music"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "Canada",
+        "USA"
+      ],
+      "languages": [
+        "Hebrew",
+        "English"
+      ],
+      "directors": [
+        "Daniel Roher"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "carolina-caroline",
+      "title": "Carolina Caroline",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/carolina-caroline/",
+      "overview": "A young woman, desperate to leave her small town, runs away with a charming con man, embarking on a crime and passion-filled journey through the Southeast to find her estranged mother.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/0/9/4/4/0/1209440-carolina-caroline-0-600-0-900-crop.jpg?v=c959b8da6d",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/x0/8q/fy/x5/112sW296vEx3d71C8fzOqoFIomN-1200-1200-675-675-crop-000000.jpg?v=f0bcac6485",
+      "rating": 3.47,
+      "ratingCount": 38802,
+      "runtime": 107,
+      "genres": [
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Adam Rehmeier"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "la-bola-negra",
+      "title": "La Bola Negra",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/la-bola-negra/",
+      "overview": "The intertwined lives of three men in three different eras, three lives intimately linked by sexuality and desire, pain, and legacy.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/0/2/0/3/0/1302030-la-bola-negra-0-600-0-900-crop.jpg?v=d8dd544a16",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/bn/s6/4i/13/8TzXngI47d60TFnM5i91PAlXdKo-1200-1200-675-675-crop-000000.jpg?v=84dd117ec3",
+      "rating": 4.45,
+      "ratingCount": 261413,
+      "runtime": 159,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "War",
+          "slug": "war"
+        }
+      ],
+      "countries": [
+        "Spain",
+        "France"
+      ],
+      "languages": [
+        "Spanish",
+        "English"
+      ],
+      "directors": [
+        "Javier Ambrossi",
+        "Javier Calvo"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "silent-friend",
+      "title": "Silent Friend",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/silent-friend/",
+      "overview": "On the grounds of a medieval German university town looms an imposing Ginkgo biloba, a tree whose longevity stands in marked contrast to three intimate, human-scaled stories. In 1908, the university’s first female student gains admission into the prestigious botany department, confronting the sexism of both professors and peers. In 1972, amidst counterculture movements, a reserved student finds his attention captured by a fellow housemate and the geranium plant she studies. In 2020, during the COVID-19 pandemic, a neuroscientist from Hong Kong secures the help of a renowned botanist for an experiment on the old ginkgo tree.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/5/5/8/1/2/1055812-silent-friend-0-600-0-900-crop.jpg?v=d46efdd929",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/6p/x9/tw/6z/e40FMjHg2RoypsjxygoTFB5jLUd-1200-1200-675-675-crop-000000.jpg?v=d7aeb598f5",
+      "rating": 3.76,
+      "ratingCount": 27126,
+      "runtime": 147,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "France",
+        "Germany",
+        "Hungary",
+        "China",
+        "Belgium"
+      ],
+      "languages": [
+        "Chinese",
+        "German",
+        "English"
+      ],
+      "directors": [
+        "Ildikó Enyedi"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "teenage-sex-and-death-at-camp-miasma",
+      "title": "Teenage Sex and Death at Camp Miasma",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/teenage-sex-and-death-at-camp-miasma/",
+      "overview": "After years of slapdash sequels and waning fandom, the Camp Miasma slasher franchise is handed over to an enthusiastic young director for resurrection. But when she visits the original's star, a now-reclusive actress shrouded in mystery, the two women fall into a blood-soaked world of desire, fear, and delirium.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/2/3/8/6/7/1123867-teenage-sex-and-death-at-camp-miasma-0-600-0-900-crop.jpg?v=f6059120f8",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/7m/h0/iq/dx/5dbLRlAeIh4U3hyj4i4S4shv9AW-1200-1200-675-675-crop-000000.jpg?v=4f87c8fe02",
+      "rating": 3.63,
+      "ratingCount": 492246,
+      "runtime": 112,
+      "genres": [
+        {
+          "name": "Horror",
+          "slug": "horror"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        }
+      ],
+      "countries": [
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Jane Schoenbrun"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "broken-english-2025",
+      "title": "Broken English",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/broken-english-2025/",
+      "overview": "A survivor, provocateur and true original, Marianne has spent more than six decades defying expectations — releasing over thirty-five albums while constantly reinventing herself. Made with her full involvement, Broken English is an intimate and unflinching exploration of a fractured yet unbreakable life shaped by fame, creativity and relentless public scrutiny.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/9/3/0/5/8/1393058-broken-english-2025-0-600-0-900-crop.jpg?v=c496ee8e4d",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/iq/w4/pw/im/dqZ5ul44D3l94WbJHcWeIeY2SQj-1200-1200-675-675-crop-000000.jpg?v=b650950863",
+      "rating": 3.48,
+      "ratingCount": 2567,
+      "runtime": 99,
+      "genres": [
+        {
+          "name": "Music",
+          "slug": "music"
+        },
+        {
+          "name": "Documentary",
+          "slug": "documentary"
+        }
+      ],
+      "countries": [
+        "UK"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Jane Pollard",
+        "Iain Forsyth"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "godzilla-minus-zero",
+      "title": "Godzilla Minus Zero",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/godzilla-minus-zero/",
+      "overview": "War reduced Japan to zero, and Godzilla plunged it into minus. Two years have passed since then, and the country has faced agonizing struggles to achieve recovery and finally reclaim its daily life. Just as humanity managed to cling to a hard-won peace, a new threat strikes, crushing hope in an instant. There is no third time. Everything ends here.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/6/6/6/8/4/1266684-godzilla-minus-zero-0-600-0-900-crop.jpg?v=38989be61d",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/6/6/6/8/4/tmdb/me4VDyWuOVzeEoT4sAFiNwkmmw8-1200-1200-675-675-crop-000000.jpg?v=070fff48e5",
+      "rating": 4.17,
+      "ratingCount": 69118,
+      "runtime": 135,
+      "genres": [
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "Horror",
+          "slug": "horror"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese",
+        "English"
+      ],
+      "directors": [
+        "Takashi Yamazaki"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "ray-gunn",
+      "title": "Ray Gunn",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/ray-gunn/",
+      "overview": "In Metropia, a gigantic city in an alternate future as seen from 1939, private eye Raymond Gunn is drawn into a case involving aliens, murder and a multimedia star named Venus Nova.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/4/4/9/1/6/844916-ray-gunn-0-600-0-900-crop.jpg?v=fa18cd163d",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/8/4/4/9/1/6/tmdb/10p8h0doqOobWCcdLXpHfU1WPma-1200-1200-675-675-crop-000000.jpg?v=205f7078dc",
+      "rating": 3.72,
+      "ratingCount": 3914,
+      "runtime": 119,
+      "genres": [
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Brad Bird"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "wild-horse-nine",
+      "title": "Wild Horse Nine",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/wild-horse-nine/",
+      "overview": "Shortly before the 1973 Chilean coup, CIA agents Chris and Lee are dispatched from Santiago to Easter Island by their bureau chief, MJ. Amongst the Island's iconic statues, and as the longtime partners wrestle with their dark pasts and present conspiracies, Chris's newfound bond with a pair of rebellious students threatens to send everyone’s trip to this remote paradise sideways.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/0/2/6/3/2/802632-wild-horse-nine-0-600-0-900-crop.jpg?v=eade7a541c",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/8/0/2/6/3/2/tmdb/tk3NDKJYKBAUOKJaH0qshGwCV01-1200-1200-675-675-crop-000000.jpg?v=1693d6f7b7",
+      "rating": 4.14,
+      "ratingCount": 46289,
+      "runtime": 117,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Spanish"
+      ],
+      "directors": [
+        "Martin McDonagh"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "werwulf",
+      "title": "Werwulf",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/werwulf/",
+      "overview": "A tale of devotion, damnation and the devil within.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/0/1/6/2/2/1301622-werwulf-0-600-0-900-crop.jpg?v=4e6ed23ff0",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/eu/sz/is/6g/jmW9NkzbpI9vhyxJU2x644Nj7VU-1200-1200-675-675-crop-000000.jpg?v=10defc5f45",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": 120,
+      "genres": [
+        {
+          "name": "Horror",
+          "slug": "horror"
+        }
+      ],
+      "countries": [
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Robert Eggers"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-debut-2026",
+      "title": "The Debut",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-debut-2026/",
+      "overview": "When Mona Friedman is cast in a bit part at a small community theater, she transforms from a shy, unassuming housewife into a zealous method actor willing to do anything to protect the artistic integrity of her marginal role—even if it means waging war against the show’s domineering director.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/7/5/4/9/7/1275497-untitled-jesse-eisenberg-musical-comedy-0-600-0-900-crop.jpg?v=06eb654267",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/7/5/4/9/7/tmdb/ebGTlQygbCgnjA8sECPMbMmjIpc-1200-1200-675-675-crop-000000.jpg?v=55a353701e",
+      "rating": 4.09,
+      "ratingCount": 11735,
+      "runtime": 105,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Music",
+          "slug": "music"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Jesse Eisenberg"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "sheep-in-the-box",
+      "title": "Sheep in the Box",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/sheep-in-the-box/",
+      "overview": "In the near future, architect Otone Komoto is married to Kensuke, who runs a construction company. The married couple decide to welcome a humanoid robot into their home as their son.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/2/8/0/6/8/1428068-sheep-in-the-box-0-600-0-900-crop.jpg?v=a0cc7b97fb",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/4/2/8/0/6/8/tmdb/amb1K8scReOvlUjRAyntKoZ7MLJ-1200-1200-675-675-crop-000000.jpg?v=406e7b5262",
+      "rating": 2.97,
+      "ratingCount": 13142,
+      "runtime": 126,
+      "genres": [
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Hirokazu Kore-eda"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "saturn-return-2",
+      "title": "Saturn Return",
+      "year": null,
+      "link": "https://letterboxd.com/film/saturn-return-2/",
+      "overview": "A Chicago love story follows two college sweethearts over a decade as they navigate the complexities of adulthood and fate tests their youthful dreams.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/1/6/7/3/4/1416734-saturn-return-2-0-600-0-900-crop.jpg?v=c8d0788638",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/4/1/6/7/3/4/1416734-saturn-return-2-0-230-0-345-crop.jpg?v=c8d0788638",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Greg Kwedar"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "parallel-tales",
+      "title": "Parallel Tales",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/parallel-tales/",
+      "overview": "In search of inspiration for her new novel, Sylvie spies on her neighbors in the building across the street using a telescope. When she hires young Adam to help her with her daily routine, she has no idea that he will turn her life and her work upside down, until the fiction she had imagined surpasses the reality of them all.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/4/4/1/1/3/1044113-parallel-tales-0-600-0-900-crop.jpg?v=483e8b4370",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/hl/2p/vd/vk/8mQayOm0n013Y36Rahd3O9OAuHT-1200-1200-675-675-crop-000000.jpg?v=5d80ba9d64",
+      "rating": 2.92,
+      "ratingCount": 15323,
+      "runtime": 139,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "France",
+        "Belgium",
+        "Italy",
+        "USA",
+        "Saudi Arabia"
+      ],
+      "languages": [
+        "French"
+      ],
+      "directors": [
+        "Asghar Farhadi"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "paper-tiger-2026",
+      "title": "Paper Tiger",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/paper-tiger-2026/",
+      "overview": "Two brothers become entangled in a scheme that turns out to be too good to be true. As they try to navigate their way through the dangerous world of the Russian mafia, family bonds begin to fray with life-altering consequences.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/6/7/0/5/0/1267050-paper-tiger-2026-0-600-0-900-crop.jpg?v=f384179489",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/2/6/7/0/5/0/tmdb/1VhgzeA0tBbd7GtAw1d2nL3UUBk-1200-1200-675-675-crop-000000.jpg?v=44fca37f1b",
+      "rating": 3.44,
+      "ratingCount": 12617,
+      "runtime": 115,
+      "genres": [
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Crime",
+          "slug": "crime"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Brazil",
+        "Italy",
+        "France",
+        "Cyprus",
+        "UK",
+        "Qatar"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "James Gray"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "look-back-2026",
+      "title": "Look Back",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/look-back-2026/",
+      "overview": "Popular, outgoing Fujino is celebrated by her classmates for her funny comics in the class newspaper. One day, her teacher asks her to share the space with Kyomoto, a truant recluse whose beautiful artwork sparks a competitive fervor in Fujino. What starts as jealousy transforms when Fujino realizes their shared passion for drawing.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/4/6/1/4/3/9/1461439-look-back-2026-0-600-0-900-crop.jpg?v=6bc3925bb9",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/le/q4/xj/18/xQrRw33fihQ2CvuOmqYwJDGOSLO-1200-1200-675-675-crop-000000.jpg?v=8dddcdca06",
+      "rating": 3.94,
+      "ratingCount": 11112,
+      "runtime": 100,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Hirokazu Kore-eda"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "josephine-2026",
+      "title": "Josephine",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/josephine-2026/",
+      "overview": "After eight-year-old Josephine accidentally witnesses a brutal assault, she begins acting out violently to protect herself. This emotional trauma leads to conflicts between her parents as they search for justice and a way to feel safe again.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/8/1/5/8/1/1181581-josephine-2026-0-600-0-900-crop.jpg?v=db27ed760e",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/1/8/1/5/8/1/tmdb/mFC8CT6L6PaoPc3s8WpvALPNLRD-1200-1200-675-675-crop-000000.jpg?v=17c81171b9",
+      "rating": 4.05,
+      "ratingCount": 9816,
+      "runtime": 119,
+      "genres": [
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Beth de Araújo"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "jack-of-spades-1",
+      "title": "Jack of Spades",
+      "year": null,
+      "link": "https://letterboxd.com/film/jack-of-spades-1/",
+      "overview": "Esther, a compassionate woman in her thirties, has spent years caring for her elderly cousin on a bleak country estate. Esther's quiet life is disrupted by the sudden arrival of Jasper, a charismatic traveler with a murky past. Jasper claims to be the long-lost son and heir who was presumed dead thirty years earlier. As Esther navigates her growing bond with him, she becomes entangled in a web of secrets, inheritance schemes, and a deep reflection on truth, love, and the complex choices of middle age.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/6/2/8/3/2/1362832-jack-of-spades-1-0-600-0-900-crop.jpg?v=7dba8ff5bb",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/3/6/2/8/3/2/1362832-jack-of-spades-1-0-230-0-345-crop.jpg?v=7dba8ff5bb",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Mystery",
+          "slug": "mystery"
+        }
+      ],
+      "countries": [
+        "USA",
+        "UK"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Joel Coen"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "i-love-boosters",
+      "title": "I Love Boosters",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/i-love-boosters/",
+      "overview": "A fearless crew of inventive young women turn shoplifting into a radical act of defiance.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/1/0/8/1/0/1110810-i-love-boosters-0-600-0-900-crop.jpg?v=a760551168",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/1/1/0/8/1/0/tmdb/2fuXHiUrCMp100jC6e4k2H222Jn-1200-1200-675-675-crop-000000.jpg?v=a98801a6d1",
+      "rating": 3.78,
+      "ratingCount": 226443,
+      "runtime": 113,
+      "genres": [
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Boots Riley"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "sorry-to-bother-you",
+      "title": "Sorry to Bother You",
+      "year": 2018,
+      "link": "https://letterboxd.com/film/sorry-to-bother-you/",
+      "overview": "In an alternate present-day version of Oakland, black telemarketer Cassius Green discovers a magical key to professional success – which propels him into a macabre universe.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/pi/8d/sk/jg/wdiJKxlyg3bzqZgRsNcIfoaQs1O-0-600-0-900-crop.jpg?v=f85a9cc2f4",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/ou/ct/uo/mt/sorry-to-bother-you-1200-1200-675-675-crop-000000.jpg?v=005084f098",
+      "rating": 3.73,
+      "ratingCount": 552649,
+      "runtime": 112,
+      "genres": [
+        {
+          "name": "Fantasy",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Boots Riley"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-take-1",
+      "title": "The Take",
+      "year": null,
+      "link": "https://letterboxd.com/film/the-take-1/",
+      "overview": "An unconventional heist movie about three people locked in a deadly game of cons and double crosses.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/6/2/4/7/7/0/624770-the-take-1-0-600-0-900-crop.jpg?v=c242b48220",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/6/2/4/7/7/0/624770-the-take-1-0-230-0-345-crop.jpg?v=c242b48220",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Crime",
+          "slug": "crime"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Fernando Meirelles"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-great-beyond",
+      "title": "The Great Beyond",
+      "year": 2027,
+      "link": "https://letterboxd.com/film/the-great-beyond/",
+      "overview": "An author of popular fantasy novels discovers that the mythical world he’s known for creating is actually real.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/7/0/9/8/3/1170983-the-great-beyond-0-600-0-900-crop.jpg?v=8adcc2b1be",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/1/7/0/9/8/3/1170983-the-great-beyond-0-230-0-345-crop.jpg?v=8adcc2b1be",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Adventure",
+          "slug": "adventure"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Action",
+          "slug": "action"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "J.J. Abrams"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-entertainment-system-is-down",
+      "title": "The Entertainment System Is Down",
+      "year": null,
+      "link": "https://letterboxd.com/film/the-entertainment-system-is-down/",
+      "overview": "Set on a long-haul flight where the entertainment systems fail, an eclectic group of international passengers are forced to face the horror of being bored.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/0/7/3/2/8/807328-the-entertainment-system-is-down-0-600-0-900-crop.jpg?v=694f466a95",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/8/0/7/3/2/8/807328-the-entertainment-system-is-down-0-230-0-345-crop.jpg?v=694f466a95",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "Sweden",
+        "Denmark",
+        "Norway",
+        "UK",
+        "France",
+        "Germany",
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Ruben Östlund"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "dune-part-three",
+      "title": "Dune: Part Three",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/dune-part-three/",
+      "overview": "Nearly two decades after he seized control of the Imperium, Paul Atreides is now a ruthless Emperor, and must face the consequences of his reign as old allies return, terrifying new threats emerge, and betrayal lurks in every shadow. Haunted by visions of Imperial collapse and the reappearance of his long-lost love, Paul is drawn into a sweeping conspiracy, with Chani at the heart of its unfolding mystery. As enemies close in, Paul must confront the true cost of power and the fate of those he loves the most.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/5/7/4/6/1/1057461-dune-part-three-0-600-0-900-crop.jpg?v=f577c5b9e7",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/0/5/7/4/6/1/tmdb/fgISFNlz8ZBplHa5cNXDsPe6VYK-1200-1200-675-675-crop-000000.jpg?v=36c20f30db",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": 150,
+      "genres": [
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Adventure",
+          "slug": "adventure"
+        }
+      ],
+      "countries": [
+        "USA",
+        "United Arab Emirates"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Denis Villeneuve"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "cry-to-heaven",
+      "title": "Cry to Heaven",
+      "year": null,
+      "link": "https://letterboxd.com/film/cry-to-heaven/",
+      "overview": "Set in 18th-century Venice, the paths of two unlikely collaborators: a Venetian noble and a castrated singer from Calabria, both tries to succeed in the world of the opera.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/2/9/4/6/6/4/1294664-cry-to-heaven-0-600-0-900-crop.jpg?v=675e8ed5bf",
+      "backdrop": "https://a.ltrbxd.com/resized/film-poster/1/2/9/4/6/6/4/1294664-cry-to-heaven-0-230-0-345-crop.jpg?v=675e8ed5bf",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Music",
+          "slug": "music"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Italy"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Tom Ford"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "behemoth-2026",
+      "title": "Behemoth!",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/behemoth-2026/",
+      "overview": "Gifted cellist Alex Serian returns home to Los Angeles after 20 years on the road. Music, which has been the constant, all-consuming river of his life, begins to carry Alex on an adventure that will change him forever.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/2/9/5/3/4/1329534-behemoth-2026-0-600-0-900-crop.jpg?v=52065abd13",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/3/2/9/5/3/4/tmdb/1ZEuaTo0pwpg3Gnzs52vwq3CeSX-1200-1200-675-675-crop-000000.jpg?v=6de3fa5756",
+      "rating": 3.55,
+      "ratingCount": 6196,
+      "runtime": 127,
+      "genres": [
+        {
+          "name": "Music",
+          "slug": "music"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Tony Gilroy"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "artificial-2026",
+      "title": "Artificial",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/artificial-2026/",
+      "overview": "In November 2023, amidst the height of a global AI boom, OpenAI co-founder Ilya Sutskever teamed with the company board to make one of the defining decisions that has drastically reshaped the company as we know it, the firing of current CEO Sam Altman. This controversial decision would lead to immense backlash, ultimately resulting in Altman's return five days later.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/6/8/6/7/2/1368672-artificial-2026-0-600-0-900-crop.jpg?v=0f0f8a33a3",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/rf/go/af/0v/or81MQagASpU9WeLxEA3GuG3iFk-1200-1200-675-675-crop-000000.jpg?v=5178a8d559",
+      "rating": 3.78,
+      "ratingCount": 3259,
+      "runtime": 140,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "Italy",
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Luca Guadagnino"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "the-further-mis-adventures-of-cliff-booth",
+      "title": "The Further Mis-Adventures of Cliff Booth",
+      "year": 2026,
+      "link": "https://letterboxd.com/film/the-further-mis-adventures-of-cliff-booth/",
+      "overview": "Eight years after the events of Once Upon a Time in... Hollywood, Cliff Booth returns to a changing Los Angeles. Now working as a fixer in the shadows of the Hollywood studio system, Cliff finds himself entangled in a dangerous web of secrets, crimes and betrayals that will test everything he knows about loyalty and survival.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/3/3/4/3/3/9/1334339-the-further-mis-adventures-of-cliff-booth-0-600-0-900-crop.jpg?v=60142816e0",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/3/3/4/3/3/9/tmdb/qqPspJFy0XrEoVTKZdp0Em7kej6-1200-1200-675-675-crop-000000.jpg?v=1ccb2cda8c",
+      "rating": null,
+      "ratingCount": null,
+      "runtime": null,
+      "genres": [
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        }
+      ],
+      "countries": [
+        "USA"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "David Fincher"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "bloody-sunday",
+      "title": "Bloody Sunday",
+      "year": 2002,
+      "link": "https://letterboxd.com/film/bloody-sunday/",
+      "overview": "The dramatised story of the Irish civil rights protest march on January 30 1972 which ended in a massacre by British troops.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/4/9/5/1/1/49511-bloody-sunday-0-600-0-900-crop.jpg?v=58350c030e",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/bq/1c/21/uk/bloody-sunday-1200-1200-675-675-crop-000000.jpg?v=900205c36c",
+      "rating": 3.9,
+      "ratingCount": 13013,
+      "runtime": 107,
+      "genres": [
+        {
+          "name": "History",
+          "slug": "history"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Ireland",
+        "UK"
+      ],
+      "languages": [
+        "English",
+        "Irish"
+      ],
+      "directors": [
+        "Paul Greengrass"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "united-93",
+      "title": "United 93",
+      "year": 2006,
+      "link": "https://letterboxd.com/film/united-93/",
+      "overview": "A real-time account of the events on United Flight 93, one of the planes hijacked on 9/11 that crashed near Shanksville, Pennsylvania when passengers foiled the terrorist plot.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/iq/av/dq/1y/pHp3DlbGDcLSKAahCwGR9bzhbZs-0-600-0-900-crop.jpg?v=a90f76e413",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/1w/45/p0/84/united-93-1200-1200-675-675-crop-000000.jpg?v=c7f54daf26",
+      "rating": 3.76,
+      "ratingCount": 70861,
+      "runtime": 111,
+      "genres": [
+        {
+          "name": "History",
+          "slug": "history"
+        },
+        {
+          "name": "Thriller",
+          "slug": "thriller"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "France",
+        "UK",
+        "USA"
+      ],
+      "languages": [
+        "English",
+        "Arabic",
+        "German"
+      ],
+      "directors": [
+        "Paul Greengrass"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "good-luck-have-fun-dont-die",
+      "title": "Good Luck, Have Fun, Don't Die",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/good-luck-have-fun-dont-die/",
+      "overview": "A 'Man from the Future' arrives at an LA diner where he must recruit the precise combination of disgruntled patrons to join him on a one-night quest to save the world from the terminal threat of a rogue artificial intelligence.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/0/9/2/3/7/1009237-good-luck-have-fun-dont-die-0-600-0-900-crop.jpg?v=be79007f48",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/0/0/9/2/3/7/tmdb/pIISC3AFeMS20ieUfevg8CDWsst-1200-1200-675-675-crop-000000.jpg?v=8295f27487",
+      "rating": 3.37,
+      "ratingCount": 334629,
+      "runtime": 134,
+      "genres": [
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "Science Fiction",
+          "slug": "science-fiction"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "USA",
+        "Germany"
+      ],
+      "languages": [
+        "English"
+      ],
+      "directors": [
+        "Gore Verbinski"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "chainsaw-man-the-movie-reze-arc",
+      "title": "Chainsaw Man – The Movie: Reze Arc",
+      "year": 2025,
+      "link": "https://letterboxd.com/film/chainsaw-man-the-movie-reze-arc/",
+      "overview": "In a brutal war between devils, hunters, and secret enemies, a mysterious girl named Reze has stepped into Denji's world, and he faces his deadliest battle yet, fueled by love in a world where survival knows no rules.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/1/0/2/6/7/3/1102673-chainsaw-man-the-movie-reze-arc-0-600-0-900-crop.jpg?v=d9227a11bd",
+      "backdrop": "https://a.ltrbxd.com/resized/alternative-backdrop/1/1/0/2/6/7/3/tmdb/r3d74bF46TkiNX8kyOk1AeD9k0n-1200-1200-675-675-crop-000000.jpg?v=c6e65acea8",
+      "rating": 4.36,
+      "ratingCount": 703437,
+      "runtime": 100,
+      "genres": [
+        {
+          "name": "Fantasy",
+          "slug": "fantasy"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        },
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "Animation",
+          "slug": "animation"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Tatsuya Yoshihara"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "souleymanes-story",
+      "title": "Souleymane's Story",
+      "year": 2024,
+      "link": "https://letterboxd.com/film/souleymanes-story/",
+      "overview": "As he pedals through the streets of Paris to deliver meals, Souleymane recounts his story. In two days, he has to go through his asylum application interview, the key to obtaining papers, but Souleymane is not ready.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/1/0/4/5/1/5/6/1045156-souleymanes-story-0-600-0-900-crop.jpg?v=1f995b49ce",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/he/s0/qz/sh/soulemaynes-story-1200-1200-675-675-crop-000000.jpg?v=278ac8df77",
+      "rating": 4.12,
+      "ratingCount": 112701,
+      "runtime": 94,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "France"
+      ],
+      "languages": [
+        "English",
+        "French",
+        "Fula",
+        "Turkish"
+      ],
+      "directors": [
+        "Boris Lojkine"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "theres-still-tomorrow",
+      "title": "There's Still Tomorrow",
+      "year": 2023,
+      "link": "https://letterboxd.com/film/theres-still-tomorrow/",
+      "overview": "In postwar Rome, a working-class woman dreams of a better future for herself and her daughter while facing abuse at the hands of her domineering husband. When a mysterious letter arrives, she discovers the courage to change the circumstances of her life.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/2/5/0/3/7/925037-there-s-still-tomorrow-0-600-0-900-crop.jpg?v=00e897185a",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/6p/sg/u3/rc/there",
+      "rating": 4.15,
+      "ratingCount": 140071,
+      "runtime": 118,
+      "genres": [
+        {
+          "name": "History",
+          "slug": "history"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        },
+        {
+          "name": "Drama",
+          "slug": "drama"
+        }
+      ],
+      "countries": [
+        "Italy"
+      ],
+      "languages": [
+        "Italian",
+        "English"
+      ],
+      "directors": [
+        "Paola Cortellesi"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "haikyu-the-dumpster-battle",
+      "title": "HAIKYU!! The Dumpster Battle",
+      "year": 2024,
+      "link": "https://letterboxd.com/film/haikyu-the-dumpster-battle/",
+      "overview": "Shoyo Hinata joins Karasuno High's volleyball club to be like his idol, a former Karasuno player known as the 'Little Giant'. But Hinata soon learns that he must team up with his middle school nemesis, Tobio Kageyama. Their clashing styles form a surprising weapon, but can their newfound teamwork defeat their rival Nekoma High in the highly anticipated 'Dumpster Battle', the long awaited ultimate showdown between two opposing underdog teams?",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/9/1/1/9/6/6/911966-haikyu-the-dumpster-battle-0-600-0-900-crop.jpg?v=eb94163e7b",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/zv/4e/a2/nk/haikyuu-1200-1200-675-675-crop-000000.jpg?v=45b7039270",
+      "rating": 4.22,
+      "ratingCount": 131232,
+      "runtime": 84,
+      "genres": [
+        {
+          "name": "Animation",
+          "slug": "animation"
+        },
+        {
+          "name": "Comedy",
+          "slug": "comedy"
+        }
+      ],
+      "countries": [
+        "Japan"
+      ],
+      "languages": [
+        "Japanese"
+      ],
+      "directors": [
+        "Susumu Mitsunaka"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "joyland-2022",
+      "title": "Joyland",
+      "year": 2022,
+      "link": "https://letterboxd.com/film/joyland-2022/",
+      "overview": "As a patriarchal family yearns for the birth of a son to continue their family line, their youngest son secretly joins an erotic dance theatre and falls for its transgender starlet.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/8/6/6/2/7/5/866275-joyland-0-600-0-900-crop.jpg?v=b0167b7240",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/4r/dw/fq/g3/joyland-1200-1200-675-675-crop-000000.jpg?v=3c79ab43a2",
+      "rating": 4.2,
+      "ratingCount": 59075,
+      "runtime": 127,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Romance",
+          "slug": "romance"
+        }
+      ],
+      "countries": [
+        "Pakistan",
+        "USA"
+      ],
+      "languages": [
+        "Urdu",
+        "Punjabi"
+      ],
+      "directors": [
+        "Saim Sadiq"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "a-taxi-driver",
+      "title": "A Taxi Driver",
+      "year": 2017,
+      "link": "https://letterboxd.com/film/a-taxi-driver/",
+      "overview": "May, 1980. Man-seob is a taxi driver in Seoul who lives from hand to mouth, raising his young daughter alone. One day, he hears that there is a foreigner who will pay big money for a drive down to Gwangju city. Not knowing that he’s a German journalist with a hidden agenda, Man-seob takes the job.",
+      "poster": "https://a.ltrbxd.com/resized/film-poster/3/6/9/8/5/6/369856-a-taxi-driver-0-600-0-900-crop.jpg?v=8787b2effd",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/qm/t4/w1/mc/a-taxi-driver-1200-1200-675-675-crop-000000.jpg?v=05a0e60dd4",
+      "rating": 4.24,
+      "ratingCount": 131645,
+      "runtime": 138,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Action",
+          "slug": "action"
+        },
+        {
+          "name": "History",
+          "slug": "history"
+        }
+      ],
+      "countries": [
+        "South Korea"
+      ],
+      "languages": [
+        "Korean",
+        "Japanese",
+        "English",
+        "German"
+      ],
+      "directors": [
+        "Jang Hoon"
+      ],
+      "metaComplete": true
+    },
+    {
+      "slug": "embrace-of-the-serpent",
+      "title": "Embrace of the Serpent",
+      "year": 2015,
+      "link": "https://letterboxd.com/film/embrace-of-the-serpent/",
+      "overview": "The epic story of the first contact, encounter, approach, betrayal and, eventually, life-transcending friendship, between Karamakate, an Amazonian shaman, last survivor of his people, and two scientists that, over the course of 40 years, travel through the Amazon in search of a sacred plant that can heal them. Inspired by the journals of the first explorers of the Colombian Amazon, Theodor Koch-Grunberg and Richard Evans Schultes.",
+      "poster": "https://a.ltrbxd.com/resized/sm/upload/c6/7z/8l/s2/2QZPAzKzQ3T2yWFfmmjSibRSLUu-0-600-0-900-crop.jpg?v=7fa1307f22",
+      "backdrop": "https://a.ltrbxd.com/resized/sm/upload/3o/6p/7u/7w/embrace-of-the-serpent-1200-1200-675-675-crop-000000.jpg?v=3763a3d3a8",
+      "rating": 4.22,
+      "ratingCount": 44355,
+      "runtime": 125,
+      "genres": [
+        {
+          "name": "Drama",
+          "slug": "drama"
+        },
+        {
+          "name": "Adventure",
+          "slug": "adventure"
+        }
+      ],
+      "countries": [
+        "Argentina",
+        "Colombia",
+        "Venezuela"
+      ],
+      "languages": [
+        "Catalan",
+        "German",
+        "Latin",
+        "Portuguese",
+        "Spanish"
+      ],
+      "directors": [
+        "Ciro Guerra"
+      ],
+      "metaComplete": true
+    }
+  ],
+  "stats": {
+    "total": 84,
+    "withMetadata": 84,
+    "rated": 73,
+    "averageRating": 3.85,
+    "averageRuntime": 116,
+    "totalRuntime": 149,
+    "genres": [
+      {
+        "name": "Drama",
+        "count": 57
+      },
+      {
+        "name": "Comedy",
+        "count": 22
+      },
+      {
+        "name": "Crime",
+        "count": 13
+      },
+      {
+        "name": "Thriller",
+        "count": 12
+      },
+      {
+        "name": "History",
+        "count": 11
+      },
+      {
+        "name": "Science Fiction",
+        "count": 11
+      },
+      {
+        "name": "Romance",
+        "count": 10
+      },
+      {
+        "name": "Action",
+        "count": 8
+      },
+      {
+        "name": "Animation",
+        "count": 7
+      },
+      {
+        "name": "Mystery",
+        "count": 7
+      },
+      {
+        "name": "Horror",
+        "count": 6
+      },
+      {
+        "name": "Adventure",
+        "count": 5
+      },
+      {
+        "name": "Documentary",
+        "count": 5
+      },
+      {
+        "name": "Family",
+        "count": 5
+      },
+      {
+        "name": "Fantasy",
+        "count": 5
+      },
+      {
+        "name": "Music",
+        "count": 5
+      },
+      {
+        "name": "War",
+        "count": 4
+      },
+      {
+        "name": "Western",
+        "count": 1
+      }
+    ],
+    "countries": [
+      {
+        "name": "USA",
+        "count": 52
+      },
+      {
+        "name": "UK",
+        "count": 17
+      },
+      {
+        "name": "France",
+        "count": 15
+      },
+      {
+        "name": "Japan",
+        "count": 8
+      },
+      {
+        "name": "Germany",
+        "count": 7
+      },
+      {
+        "name": "Italy",
+        "count": 6
+      },
+      {
+        "name": "Belgium",
+        "count": 4
+      },
+      {
+        "name": "Canada",
+        "count": 4
+      },
+      {
+        "name": "Austria",
+        "count": 3
+      },
+      {
+        "name": "South Korea",
+        "count": 3
+      },
+      {
+        "name": "Spain",
+        "count": 3
+      },
+      {
+        "name": "Australia",
+        "count": 2
+      },
+      {
+        "name": "China",
+        "count": 2
+      },
+      {
+        "name": "India",
+        "count": 2
+      },
+      {
+        "name": "Singapore",
+        "count": 2
+      },
+      {
+        "name": "Sweden",
+        "count": 2
+      },
+      {
+        "name": "Argentina",
+        "count": 1
+      },
+      {
+        "name": "Brazil",
+        "count": 1
+      },
+      {
+        "name": "Colombia",
+        "count": 1
+      },
+      {
+        "name": "Cyprus",
+        "count": 1
+      },
+      {
+        "name": "Denmark",
+        "count": 1
+      },
+      {
+        "name": "Finland",
+        "count": 1
+      },
+      {
+        "name": "Hungary",
+        "count": 1
+      },
+      {
+        "name": "Iran",
+        "count": 1
+      },
+      {
+        "name": "Iraq",
+        "count": 1
+      },
+      {
+        "name": "Ireland",
+        "count": 1
+      },
+      {
+        "name": "Netherlands",
+        "count": 1
+      },
+      {
+        "name": "Nigeria",
+        "count": 1
+      },
+      {
+        "name": "Norway",
+        "count": 1
+      },
+      {
+        "name": "Pakistan",
+        "count": 1
+      },
+      {
+        "name": "Qatar",
+        "count": 1
+      },
+      {
+        "name": "Saudi Arabia",
+        "count": 1
+      },
+      {
+        "name": "Uganda",
+        "count": 1
+      },
+      {
+        "name": "United Arab Emirates",
+        "count": 1
+      },
+      {
+        "name": "Venezuela",
+        "count": 1
+      }
+    ],
+    "languages": [
+      {
+        "name": "English",
+        "count": 66
+      },
+      {
+        "name": "Japanese",
+        "count": 11
+      },
+      {
+        "name": "Spanish",
+        "count": 9
+      },
+      {
+        "name": "German",
+        "count": 7
+      },
+      {
+        "name": "French",
+        "count": 6
+      },
+      {
+        "name": "Chinese",
+        "count": 4
+      },
+      {
+        "name": "Arabic",
+        "count": 3
+      },
+      {
+        "name": "Italian",
+        "count": 3
+      },
+      {
+        "name": "Korean",
+        "count": 3
+      },
+      {
+        "name": "Hebrew",
+        "count": 2
+      },
+      {
+        "name": "Portuguese",
+        "count": 2
+      },
+      {
+        "name": "Tamil",
+        "count": 2
+      },
+      {
+        "name": "Catalan",
+        "count": 1
+      },
+      {
+        "name": "Dutch",
+        "count": 1
+      },
+      {
+        "name": "Fula",
+        "count": 1
+      },
+      {
+        "name": "Ganda",
+        "count": 1
+      },
+      {
+        "name": "Irish",
+        "count": 1
+      },
+      {
+        "name": "Kurdish",
+        "count": 1
+      },
+      {
+        "name": "Latin",
+        "count": 1
+      },
+      {
+        "name": "Malayalam",
+        "count": 1
+      },
+      {
+        "name": "Polish",
+        "count": 1
+      },
+      {
+        "name": "Punjabi",
+        "count": 1
+      },
+      {
+        "name": "Swahili",
+        "count": 1
+      },
+      {
+        "name": "Thai",
+        "count": 1
+      },
+      {
+        "name": "Turkish",
+        "count": 1
+      },
+      {
+        "name": "Urdu",
+        "count": 1
+      },
+      {
+        "name": "Vietnamese",
+        "count": 1
+      }
+    ],
+    "decades": [
+      {
+        "decade": 1940,
+        "count": 1
+      },
+      {
+        "decade": 1960,
+        "count": 2
+      },
+      {
+        "decade": 1970,
+        "count": 2
+      },
+      {
+        "decade": 1990,
+        "count": 3
+      },
+      {
+        "decade": 2000,
+        "count": 5
+      },
+      {
+        "decade": 2010,
+        "count": 6
+      },
+      {
+        "decade": 2020,
+        "count": 60
+      }
+    ]
+  },
+  "demo": true,
+  "demoFrom": "dave"
+}

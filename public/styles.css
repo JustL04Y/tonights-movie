@@ -1,0 +1,1734 @@
+:root {
+  color-scheme: dark;
+
+  --bg: #0c1014;
+  --bg-2: #11161c;
+  --panel: rgba(22, 28, 35, 0.88);
+  --panel-solid: #161c23;
+  --line: rgba(255, 255, 255, 0.09);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --text: #eef2f5;
+  --muted: #9aa7b4;
+  --muted-2: #7e8b98;
+  --text-soft: #c7d1db;
+  --text-soft-2: #d3dce5;
+  --text-soft-3: #cfd9e2;
+  --green: #00e054;
+  --green-hover: #1cf06d;
+  --green-soft: rgba(0, 224, 84, 0.14);
+  --green-soft-hover: rgba(0, 224, 84, 0.2);
+  --green-soft-active: rgba(0, 224, 84, 0.26);
+  --green-line: rgba(0, 224, 84, 0.48);
+  --green-text: #c0ffd5;
+  --green-text-soft: rgba(192, 255, 213, 0.7);
+  --on-green: #03130a;
+  --gold: #f5c451;
+  --danger: #ff9a8f;
+  --radius: 18px;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  --shadow-panel: 0 18px 50px rgba(0, 0, 0, 0.22);
+  --shadow-poster: 0 18px 40px rgba(0, 0, 0, 0.35);
+  --poster-hover-shadow: 0 16px 34px rgba(0, 0, 0, 0.32);
+  --poster-hover-ring: rgba(0, 224, 84, 0.16);
+  --surface-1: rgba(255, 255, 255, 0.025);
+  --surface-2: rgba(255, 255, 255, 0.035);
+  --surface-3: rgba(255, 255, 255, 0.04);
+  --surface-4: rgba(255, 255, 255, 0.05);
+  --surface-5: rgba(255, 255, 255, 0.07);
+  --surface-6: rgba(255, 255, 255, 0.08);
+  --surface-7: rgba(255, 255, 255, 0.1);
+  --track: rgba(255, 255, 255, 0.08);
+  --spinner-track: rgba(255, 255, 255, 0.18);
+  --card-grad-a: rgba(255, 255, 255, 0.05);
+  --card-grad-b: rgba(255, 255, 255, 0.018);
+  --poster-line: rgba(255, 255, 255, 0.08);
+  --underline: rgba(255, 255, 255, 0.22);
+  --chip-border: rgba(255, 255, 255, 0.09);
+  --rating-border: rgba(255, 255, 255, 0.22);
+  --toast-bg: #1b232b;
+  --placeholder-a: #1b232c;
+  --placeholder-b: #10151a;
+  --placeholder-text: #c2ccd6;
+  --rating-bg: rgba(0, 0, 0, 0.9);
+  --rating-text: #eef2f5;
+  --footer-link: #aab6c2;
+  --backdrop-opacity: 0.55;
+  --backdrop-brightness: 0.34;
+  --body-glow-a: rgba(0, 224, 84, 0.07);
+  --body-glow-b: rgba(64, 188, 244, 0.05);
+  /* One superfamily for both scripts. IBM Plex Sans Arabic ships Latin
+     glyphs drawn on the IBM Plex Sans skeleton, so English and Arabic keep
+     the same voice, weight and vertical rhythm; hierarchy comes from size,
+     weight and colour instead of switching typefaces. */
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+  --font-display: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Warm paper, pulled back toward neutral so the tint reads as "off-white"
+     rather than brown. The page, cards and ink still share a slight warmth. */
+  --bg: #f5f3ef;
+  --bg-2: #eeece7;
+  --panel: #fffefc;
+  --panel-solid: #fffefc;
+  --line: rgba(50, 44, 34, 0.13);
+  --line-strong: rgba(50, 44, 34, 0.3);
+  --text: #1c1a17;
+  --muted: #5d5850;
+  --muted-2: #67625a;
+  --text-soft: #3a362f;
+  --text-soft-2: #332f2a;
+  --text-soft-3: #36322c;
+  --green: #0f7d3c;
+  --green-hover: #0b6a32;
+  --green-soft: rgba(15, 125, 60, 0.12);
+  --green-soft-hover: rgba(15, 125, 60, 0.18);
+  --green-soft-active: rgba(15, 125, 60, 0.24);
+  --green-line: rgba(15, 125, 60, 0.5);
+  --green-text: #0b5b2c;
+  --green-text-soft: rgba(11, 91, 44, 0.8);
+  --on-green: #fffefc;
+  --gold: #8a5a0e;
+  --danger: #a83226;
+  --shadow: 0 1px 2px rgba(50, 44, 34, 0.06), 0 18px 40px rgba(50, 44, 34, 0.11);
+  --shadow-panel: 0 1px 2px rgba(50, 44, 34, 0.06), 0 12px 30px rgba(50, 44, 34, 0.09);
+  --shadow-poster: 0 14px 32px rgba(50, 44, 34, 0.18);
+  --poster-hover-shadow: 0 14px 30px rgba(50, 44, 34, 0.18);
+  --poster-hover-ring: rgba(15, 125, 60, 0.22);
+  --surface-1: rgba(50, 44, 34, 0.025);
+  --surface-2: rgba(50, 44, 34, 0.035);
+  --surface-3: rgba(50, 44, 34, 0.05);
+  --surface-4: rgba(50, 44, 34, 0.065);
+  --surface-5: rgba(50, 44, 34, 0.085);
+  --surface-6: rgba(50, 44, 34, 0.11);
+  --surface-7: rgba(50, 44, 34, 0.14);
+  --track: rgba(50, 44, 34, 0.1);
+  --spinner-track: rgba(50, 44, 34, 0.22);
+  --card-grad-a: rgba(255, 254, 252, 0.94);
+  --card-grad-b: rgba(255, 254, 252, 0.72);
+  --poster-line: rgba(50, 44, 34, 0.16);
+  --underline: rgba(50, 44, 34, 0.3);
+  --chip-border: rgba(50, 44, 34, 0.2);
+  --rating-border: rgba(255, 254, 252, 0.24);
+  --toast-bg: #fffefc;
+  --placeholder-a: #f6f4f0;
+  --placeholder-b: #eae7e1;
+  --placeholder-text: #46423b;
+  --rating-bg: rgba(24, 21, 17, 0.92);
+  --rating-text: #f5f3ef;
+  --footer-link: #4c4840;
+  --backdrop-opacity: 0.18;
+  --backdrop-brightness: 1.12;
+  --body-glow-a: rgba(224, 168, 96, 0.09);
+  --body-glow-b: rgba(15, 125, 60, 0.05);
+}
+
+/* Arabic text inside an English page (synopsis, language chip) keeps the same face. */
+:is(.overview, .lang-chip)[lang="ar"] {
+  font-family: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-height: 100%;
+  background: var(--bg);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+  font-family: var(--font-sans);
+  background:
+    radial-gradient(1100px 580px at 50% -12%, var(--body-glow-a), transparent 62%),
+    radial-gradient(900px 520px at 108% 108%, var(--body-glow-b), transparent 60%),
+    var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.backdrop {
+  position: fixed;
+  inset: -8%;
+  z-index: -1;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: blur(54px) saturate(0.85) brightness(var(--backdrop-brightness));
+  opacity: 0;
+  transform: scale(1.08);
+  transition: opacity 0.5s ease, background-image 0.4s ease;
+  pointer-events: none;
+}
+
+.backdrop.is-on {
+  opacity: var(--backdrop-opacity);
+}
+
+.topbar {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 22px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.brand em {
+  color: var(--green);
+  font-style: normal;
+}
+
+.brand-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #b8ffd2, var(--green) 55%, #008a34);
+  box-shadow: 0 0 18px rgba(0, 224, 84, 0.45);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.icon-chip:hover,
+.icon-chip:focus-visible {
+  background: var(--surface-5);
+  border-color: var(--line-strong);
+  color: var(--text);
+  outline: none;
+}
+
+.icon-chip:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.icon-chip svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-chip .icon-moon,
+:root[data-theme="light"] .icon-chip .icon-sun {
+  display: none;
+}
+
+:root[data-theme="light"] .icon-chip .icon-moon {
+  display: block;
+}
+
+.lang-chip {
+  width: auto;
+  min-width: 34px;
+  padding: 0 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.user-chip {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border: 1px solid var(--line);
+  background: var(--surface-3);
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 7px 13px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.user-chip:hover,
+.user-chip:focus-visible {
+  background: var(--surface-6);
+  border-color: var(--line-strong);
+  color: var(--text);
+  outline: none;
+}
+
+main {
+  flex: 1;
+  width: min(100% - 40px, 780px);
+  margin: 0 auto;
+}
+
+/* Landing */
+
+.landing {
+  max-width: 620px;
+  margin: 0 auto;
+  padding: clamp(44px, 11vh, 108px) 0 76px;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 18px;
+  color: var(--green);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.landing h1 {
+  margin: 0 0 24px;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8.5vw, 5.1rem);
+  font-weight: 600;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.landing h1 em {
+  color: var(--green);
+  font-style: normal;
+}
+
+.lede {
+  max-width: 470px;
+  margin: 0 auto 30px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.65;
+}
+
+.load-form {
+  display: flex;
+  gap: 10px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.input-shell {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-3);
+  padding: 0 14px;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.input-shell:focus-within {
+  /* The focus ring lives on the shell itself so it hugs the rounded corners;
+     the inner input draws no ring of its own. */
+  border-color: var(--green);
+  box-shadow: 0 0 0 1px var(--green);
+  background: var(--surface-4);
+}
+
+.input-shell input:focus-visible {
+  outline: none;
+}
+
+/* The datalist dropdown opens on focus; Chrome's ▼ indicator is visual
+   noise inside the shell, so it goes. */
+.input-shell input[list]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+
+.input-shell .at {
+  color: var(--muted-2);
+  font-size: 0.95rem;
+}
+
+.input-shell input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.98rem;
+  padding: 14px 9px;
+}
+
+.input-shell input::placeholder {
+  color: var(--muted-2);
+}
+
+.landing-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 20px;
+}
+
+.hint {
+  color: var(--muted-2);
+  font-size: 0.78rem;
+}
+
+.load-error {
+  margin: 16px auto 0;
+  max-width: 480px;
+  color: var(--danger);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Buttons and links */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 11px 18px;
+  background: var(--surface-4);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.btn:hover {
+  background: var(--surface-6);
+}
+
+.btn:focus-visible,
+.chip:focus-visible,
+.active-chip:focus-visible,
+.link-btn:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+.btn.primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--on-green);
+}
+
+.btn.primary:hover {
+  background: var(--green-hover);
+  border-color: var(--green-hover);
+}
+
+.btn.ghost {
+  border-color: var(--line);
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn.ghost:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-6);
+}
+
+.btn.big {
+  min-height: 52px;
+  padding: 15px 26px;
+  border-radius: 14px;
+  font-size: 1rem;
+}
+
+.btn.big svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn.letterboxd {
+  border-color: var(--green-line);
+  background: var(--green-soft);
+  color: var(--green-text);
+}
+
+/* The external-link glyph sits at the inline-end in both directions; only the
+   arrow is mirrored in RTL so it points away from the text. */
+.btn.letterboxd svg {
+  order: 1;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn.letterboxd:hover {
+  border-color: var(--green-line);
+  background: var(--green-soft-hover);
+  color: var(--green-text);
+}
+
+.btn.letterboxd:active {
+  background: var(--green-soft-active);
+}
+
+.btn.letterboxd:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+html[dir="rtl"] .btn.letterboxd svg {
+  transform: scaleX(-1);
+}
+
+.link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-decoration-color: var(--underline);
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  color: var(--text);
+}
+
+/* Loading */
+
+.loading {
+  min-height: 58vh;
+  display: grid;
+  place-items: center;
+  padding: 40px 0;
+}
+
+.loading-inner {
+  width: min(100%, 460px);
+  text-align: center;
+}
+
+.loading h2 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.loading-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.progress-track {
+  height: 6px;
+  margin: 24px 0 10px;
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+}
+
+.progress-track.slim {
+  height: 3px;
+  margin: 0;
+  flex: 1;
+}
+
+.progress-fill {
+  width: 2%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--green);
+  box-shadow: 0 0 14px rgba(0, 224, 84, 0.35);
+  transition: width 0.28s ease;
+}
+
+.progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: var(--muted-2);
+  font-size: 0.78rem;
+}
+
+.spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border: 2px solid var(--spinner-track);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.spinner.small {
+  width: 14px;
+  height: 14px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* App */
+
+.app {
+  padding: 8px 0 70px;
+}
+
+.app-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.app-kicker {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.app-kicker strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pool-line {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.pool-line strong {
+  color: var(--text);
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-inline-end: 3px;
+}
+
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-inline-start: 5px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--green);
+  color: var(--on-green);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.active-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.active-chips:empty {
+  display: none;
+}
+
+.active-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--green-line);
+  border-radius: 999px;
+  background: var(--green-soft);
+  color: var(--green-text);
+  padding: 4px 9px;
+  font-size: 0.73rem;
+  cursor: pointer;
+}
+
+.active-chip .x {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.active-chip:hover .x {
+  color: var(--text);
+}
+
+.details-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-1);
+  color: var(--muted-2);
+  font-size: 0.76rem;
+}
+
+/* Filter panel */
+
+.filter-panel {
+  /* One spacing unit drives every row, the header and the footer, so the
+     last row never gains extra space from the layout below it. */
+  --filter-label-size: 0.8125rem;
+  --filter-value-size: 0.8125rem;
+  --filter-row-height: 3.5rem;
+  --filter-pad: 0.875rem;
+
+  margin: 16px 0 22px;
+  padding: 0 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(18px);
+  overflow: hidden;
+  animation: panel-in 0.18s ease;
+}
+
+/* Light theme: flat surface instead of a translucent sheet over the page glow,
+   with a slightly firmer edge so the panel does not melt into the warm page. */
+:root[data-theme="light"] .filter-panel {
+  backdrop-filter: none;
+  border-color: rgba(50, 44, 34, 0.2);
+}
+
+.filter-panel-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Full-bleed: cancel the panel's inline padding so the hover fill reaches
+     the rounded edge instead of stopping 18px short. */
+  margin-inline: -18px;
+  padding: var(--filter-pad) 20px;
+  list-style: none;
+  border-radius: calc(var(--radius) - 1px);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+/* Once open, the header sits above the body, so only its top corners round. */
+.filter-panel[open] > .filter-panel-summary {
+  border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
+}
+
+.filter-panel-summary:hover {
+  background: var(--surface-2);
+}
+
+.filter-panel-summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-panel-summary:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.filter-heading {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.filter-panel-state {
+  margin-inline-start: auto;
+  color: var(--muted-2);
+  font-size: 0.75rem;
+}
+
+.filter-panel-state.is-set {
+  color: var(--green-text);
+}
+
+.filter-panel[open] > .filter-panel-summary .summary-chevron {
+  transform: rotate(-135deg);
+}
+
+.filter-panel-body {
+  /* Match the header's full-bleed layout; the panel clips the rounded edges. */
+  margin-inline: -18px;
+  padding-bottom: 0;
+}
+
+/* Smooth open/close for the filter panel and each filter section.
+   Heights are animated in app.js; browsers without support still work. */
+
+.filter-panel[open] > .filter-panel-body,
+.filter-block[open] > .filter-content {
+  overflow: hidden;
+}
+
+.filter-panel.is-collapsing > .filter-panel-summary .summary-chevron,
+.filter-block.is-collapsing .summary-chevron {
+  transform: rotate(-135deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-panel .summary-chevron,
+  .filter-block .summary-chevron,
+  .filter-block[data-filter="genre"] .filter-summary .segmented {
+    transition: none;
+  }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+}
+
+.filter-loading {
+  /* The body is full-bleed, so this block adds the same 20px insets the
+     filter rows use, plus the panel's own rhythm above and below. */
+  padding: var(--filter-pad) 20px 20px;
+}
+
+.filter-loading-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-loading-head p {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.filter-note {
+  margin: 10px 0 0;
+  color: var(--muted-2);
+  font-size: 0.75rem;
+  line-height: 1.55;
+}
+
+.filter-unavailable {
+  color: var(--danger);
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+.filter-label {
+  color: var(--muted-2);
+  font-size: var(--filter-label-size);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.segmented {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+}
+
+.segmented button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-2);
+  padding: 5px 11px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented button.is-active {
+  background: var(--surface-7);
+  color: var(--text);
+}
+
+.filter-summary .segmented button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  min-height: 26px;
+  padding: 2px 9px;
+  font-size: var(--filter-label-size);
+}
+
+/* Same soft fill as the rows and the panel header. */
+.filter-summary .segmented button:not(.is-active):hover {
+  background: var(--surface-5);
+  color: var(--text);
+}
+
+.filter-block[data-filter="genre"] .filter-summary .segmented {
+  opacity: 1;
+  transform: translateX(0);
+  visibility: visible;
+  transition:
+    opacity 0.18s ease 0.03s,
+    transform 0.18s ease 0.03s,
+    visibility 0s;
+}
+
+.filter-block[data-filter="genre"]:not([open]) .filter-summary .segmented,
+.filter-block[data-filter="genre"].is-collapsing .filter-summary .segmented {
+  opacity: 0;
+  transform: translateX(-6px);
+  visibility: hidden;
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease,
+    visibility 0s linear 0.14s;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+  max-height: 176px;
+  overflow: auto;
+  padding: 1px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-soft-2);
+  padding: 6px 11px;
+  font-size: var(--filter-value-size);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.chip:hover {
+  background: var(--surface-5);
+}
+
+.chip .n {
+  color: var(--muted-2);
+  font-size: 0.6875rem;
+}
+
+.chip.is-active {
+  border-color: var(--green-line);
+  background: var(--green-soft);
+  color: var(--green-text);
+}
+
+.chip.is-active .n {
+  color: var(--green-text-soft);
+}
+
+/* Sliders (rating, runtime) */
+
+.filter-slider {
+  margin-top: 10px;
+}
+
+.filter-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.filter-slider-output {
+  color: var(--text);
+  font-size: var(--filter-value-size);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+}
+
+.filter-slider-output.is-set {
+  color: var(--green-text);
+}
+
+.filter-slider-hint {
+  color: var(--muted-2);
+  font-size: 0.75rem;
+  line-height: 1.35;
+  text-align: end;
+}
+
+/* The filled part of the track is painted with a gradient whose width comes
+   from --fill (set in app.js), so it works the same in both themes. */
+.range {
+  --fill: 0%;
+
+  display: block;
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--green);
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--green), var(--green)) 0 50% / var(--fill) 100% no-repeat,
+    var(--surface-4);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.range::-webkit-slider-thumb {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  margin-top: -5px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+  transition: transform 0.12s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-4);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+/* Firefox fills the track itself and already respects the text direction. */
+.range::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--green);
+}
+
+.range::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 35%);
+  transition: transform 0.12s ease;
+}
+
+.range:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  border-radius: 999px;
+}
+
+/* In RTL the native track is reversed, so the filled part starts at the end. */
+html[dir="rtl"] .range::-webkit-slider-runnable-track {
+  background-position: 100% 50%, 0 50%;
+}
+
+.range-scale {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 2px;
+  color: var(--muted-2);
+  font-size: 0.6875rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.range-scale span:last-child {
+  text-align: end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .range::-webkit-slider-thumb,
+  .range::-moz-range-thumb {
+    transition: none;
+  }
+
+  .range:active::-webkit-slider-thumb {
+    transform: none;
+  }
+}
+
+.filter-block {
+  border-top: 1px solid var(--line);
+}
+
+.filter-block:first-of-type {
+  border-top: 0;
+}
+
+.filter-summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--filter-row-height);
+  margin-inline: 0;
+  padding: 0 20px;
+  list-style: none;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.filter-summary:hover {
+  background: var(--surface-2);
+}
+
+.filter-summary::-webkit-details-marker {
+  display: none;
+}
+
+.filter-summary:hover .filter-label {
+  color: var(--text);
+}
+
+.filter-summary:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+.filter-summary-value {
+  margin-inline-start: auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: var(--filter-value-size);
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: end;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-summary-value.is-set {
+  color: var(--green-text);
+}
+
+.summary-chevron {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  border-right: 1.5px solid var(--muted);
+  border-bottom: 1.5px solid var(--muted);
+  transform: rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.filter-block[open] .summary-chevron {
+  transform: rotate(-135deg);
+}
+
+.filter-content {
+  padding: 0 20px var(--filter-pad);
+}
+
+.filter-content .chips {
+  margin-top: 10px;
+}
+
+/* The footer is a row too: same height, same insets, same rhythm. */
+.filter-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-top: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.filter-foot .link-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--filter-row-height);
+  margin-inline: 0;
+  padding: 0 20px;
+  border-radius: 0;
+  color: var(--green-text);
+  font-size: var(--filter-value-size);
+  font-weight: 600;
+  line-height: 1.4;
+  text-align: start;
+  text-decoration: underline;
+  text-decoration-color: var(--green-line);
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.filter-foot .link-btn:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.filter-foot .link-btn:focus-visible {
+  outline-offset: -2px;
+  border-radius: 0;
+}
+
+/* Film card */
+
+.spotlight {
+  margin-top: 18px;
+}
+
+.film-card {
+  display: grid;
+  grid-template-columns: 238px minmax(0, 1fr);
+  gap: 32px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, var(--card-grad-a), var(--card-grad-b));
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(10px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+/* Light theme: an opaque card with a real 1px edge, so it separates from the
+   page instead of dissolving into it. */
+:root[data-theme="light"] .film-card {
+  background: var(--panel-solid);
+  border-color: var(--line-strong);
+  backdrop-filter: none;
+}
+
+.film-card.is-changing {
+  opacity: 0;
+  transform: translateY(7px);
+}
+
+.poster-wrap {
+  position: relative;
+  align-self: start;
+}
+
+.poster-wrap img,
+.poster-placeholder {
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    filter 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .poster-wrap:hover img,
+  .poster-wrap:hover .poster-placeholder {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow:
+      var(--poster-hover-shadow),
+      0 0 0 1px var(--poster-hover-ring);
+    filter: saturate(1.03) brightness(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster-wrap:hover img,
+  .poster-wrap:hover .poster-placeholder {
+    transform: none;
+    filter: none;
+  }
+}
+
+.poster-wrap img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 1px solid var(--poster-line);
+  box-shadow: var(--shadow-poster);
+}
+
+.poster-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    radial-gradient(circle at 30% 20%, var(--green-soft), transparent 55%),
+    linear-gradient(160deg, var(--placeholder-a), var(--placeholder-b));
+  color: var(--placeholder-text);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.rating-badge {
+  position: absolute;
+  inset-inline-start: 10px;
+  bottom: 10px;
+  padding: 5px 10px;
+  border: 1px solid var(--rating-border);
+  border-radius: 999px;
+  background: var(--rating-bg);
+  color: var(--rating-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(14px) saturate(1.15);
+}
+
+.rating-badge .star {
+  color: var(--gold);
+}
+
+.film-body {
+  min-width: 0;
+  align-self: center;
+}
+
+.film-kicker {
+  margin: 0 0 10px;
+  color: var(--green);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.film-title {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.4vw, 3rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+}
+
+.film-meta {
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.film-meta .dot {
+  margin: 0 7px;
+  opacity: 0.45;
+}
+
+.film-meta .year {
+  color: var(--text-soft-3);
+}
+
+.genre-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.genre-tag {
+  border: 1px solid var(--chip-border);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-soft-3);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.overview {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-width: 60ch;
+  margin: 0 0 22px;
+  color: var(--text-soft);
+  font-size: 0.94rem;
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.details-note {
+  color: var(--muted-2);
+  font-size: 0.78rem;
+}
+
+.pick-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 26px;
+}
+
+.pick-note {
+  margin: 0;
+  color: var(--muted-2);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+/* The note is only shown while details are loading; an empty note should not
+   leave an extra gap under the pick button. */
+.pick-note:empty {
+  display: none;
+}
+
+/* Empty state */
+
+.empty {
+  padding: 70px 20px;
+  text-align: center;
+}
+
+.empty-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.empty-sub {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Footer */
+
+.site-footer {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 24px 40px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  border-top: 1px solid var(--line);
+  color: var(--muted-2);
+  font-size: 0.74rem;
+  line-height: 1.6;
+}
+
+.site-footer a {
+  color: var(--footer-link);
+  text-decoration-color: var(--underline);
+  text-underline-offset: 3px;
+}
+
+.site-footer a:hover {
+  color: var(--text);
+}
+
+/* Toast */
+
+.toast {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 24px;
+  z-index: 20;
+  width: fit-content;
+  max-width: min(90vw, 440px);
+  margin-inline: auto;
+  padding: 10px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--toast-bg);
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(18px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.toast.is-on {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive */
+
+@media (max-width: 720px) {
+  .topbar {
+    padding: 16px 14px;
+  }
+
+  main {
+    width: calc(100% - 28px);
+  }
+
+  .landing {
+    padding-top: 44px;
+  }
+
+  .load-form {
+    flex-direction: column;
+  }
+
+  .load-form .btn {
+    width: 100%;
+  }
+
+  .app-head {
+    align-items: flex-start;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    padding: 24px 16px 34px;
+  }
+}
+
+/* The card stacks at 640px, not 720px: below that the two-column grid is too
+   tight for a 238px poster plus readable text. */
+@media (max-width: 640px) {
+  .film-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 18px;
+  }
+
+  .poster-wrap {
+    width: min(220px, 68vw);
+    margin: 0 auto;
+  }
+
+  .film-body {
+    text-align: start;
+  }
+
+  .film-title {
+    font-size: clamp(1.85rem, 8vw, 2.4rem);
+  }
+}
+
+@media (max-width: 390px) {
+  .landing h1 {
+    font-size: 2.65rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* RTL + Arabic typography */
+
+html[dir="rtl"] .filter-block[data-filter="genre"]:not([open]) .filter-summary .segmented,
+html[dir="rtl"] .filter-block[data-filter="genre"].is-collapsing .filter-summary .segmented {
+  transform: translateX(6px);
+}
+
+/* The chevron is rotation-only; mirroring it in RTL turns the closed
+   "down" arrow into a sideways one, so RTL keeps the same geometry. */
+
+html[dir="rtl"] #usernameInput {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Arabic has no uppercase, so an identical pixel size reads smaller than the
+   Latin labels. One step up (~1–2px) restores the optical match; tracking stays
+   at zero and the display weight stays heavier. */
+
+:root[lang="ar"] .brand,
+:root[lang="ar"] .eyebrow,
+:root[lang="ar"] .filter-label,
+:root[lang="ar"] .film-kicker,
+:root[lang="ar"] .app-kicker {
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+:root[lang="ar"] .landing h1,
+:root[lang="ar"] .film-title,
+:root[lang="ar"] .loading h2,
+:root[lang="ar"] .empty-title,
+:root[lang="ar"] .filter-heading {
+  font-weight: 700;
+}
+
+:root[lang="ar"] .landing h1,
+:root[lang="ar"] .film-title,
+:root[lang="ar"] .filter-heading {
+  letter-spacing: 0;
+}
+
+:root[lang="ar"] .filter-label,
+:root[lang="ar"] .filter-summary .segmented button {
+  font-size: 0.875rem;
+}
+
+:root[lang="ar"] .filter-panel-state {
+  font-size: 0.8125rem;
+}
+
+:root[lang="ar"] .filter-summary-value,
+:root[lang="ar"] .filter-slider-output,
+:root[lang="ar"] .chip,
+:root[lang="ar"] .filter-foot .link-btn {
+  font-size: 0.875rem;
+}
+
+:root[lang="ar"] .filter-slider-hint {
+  font-size: 0.8125rem;
+}
+
+:root[lang="ar"] .range-scale {
+  font-size: 0.75rem;
+}
+
+:root[lang="ar"] .chip .n {
+  font-size: 0.75rem;
+}
+
+:root[lang="ar"] .genre-tag {
+  font-size: 0.8rem;
+}
+
+:root[lang="ar"] .film-kicker {
+  font-size: 0.78rem;
+}
+
+:root[lang="ar"] .film-meta {
+  font-size: 0.9rem;
+}
+
+:root[lang="ar"] .details-note {
+  font-size: 0.84rem;
+}
+
+:root[lang="ar"] .overview {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+

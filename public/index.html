@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" id="themeColor" content="#0c1014" />
+    <title>Watchlist Reel — pick a random film from your Letterboxd watchlist</title>
+    <meta
+      name="description"
+      content="Pick a random film from any public Letterboxd watchlist. Optional genre, rating, runtime, decade, and country filters. No login required."
+    />
+    <script>
+      // Apply the saved language and theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var root = document.documentElement;
+          var storedLang = localStorage.getItem('watchlist-reel:lang');
+          var tags = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+          var auto = tags.some(function (tag) {
+            return /^ar\b/i.test(String(tag || ''));
+          })
+            ? 'ar'
+            : 'en';
+          var lang = storedLang === 'ar' || storedLang === 'en' ? storedLang : auto;
+          root.setAttribute('lang', lang);
+          root.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+          if (lang === 'ar') {
+            document.title = 'قائمة المشاهدة — فيلم عشوائي من قائمة ليتربوكسد';
+          }
+          var faces =
+            lang === 'ar'
+              ? ['plex-arabic-400', 'plex-arabic-700']
+              : ['plex-latin-400', 'plex-latin-600', 'plex-latin-700'];
+          faces.forEach(function (face) {
+            var preload = document.createElement('link');
+            preload.rel = 'preload';
+            preload.as = 'font';
+            preload.type = 'font/woff2';
+            preload.crossOrigin = 'anonymous';
+            preload.href = '/fonts/' + face + '.woff2';
+            document.head.appendChild(preload);
+          });
+          if (localStorage.getItem('watchlist-reel:theme') === 'light') {
+            root.setAttribute('data-theme', 'light');
+          }
+        } catch (error) {
+          // Storage can be unavailable; the defaults are fine.
+        }
+      })();
+    </script>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/fonts/plex.css" />
+    <link rel="stylesheet" href="/styles.css?v=66" />
+    <script src="/i18n.js?v=66" defer></script>
+    <script src="/app.js?v=66" defer></script>
+  </head>
+  <body>
+    <div class="backdrop" id="backdrop" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="/" id="brandLink">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span data-i18n-html="brand.name">Watchlist <em>Reel</em></span>
+      </a>
+      <div class="topbar-actions">
+        <button class="icon-chip" id="themeToggle" type="button">
+          <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"></path>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+          </svg>
+        </button>
+        <button class="icon-chip lang-chip" id="langToggle" type="button" lang="en">ع</button>
+        <button class="user-chip hidden" id="userChip" type="button" data-i18n-title="user.title"></button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Landing -->
+      <section id="landingView" class="landing">
+        <p class="eyebrow" data-i18n="landing.eyebrow">A Letterboxd watchlist picker</p>
+        <h1 data-i18n-html="landing.title">Stop scrolling.<br /><em>Start watching.</em></h1>
+        <p class="lede" data-i18n="landing.lede">
+          Pick one random film from your Letterboxd watchlist. Add a few filters if tonight has a mood.
+        </p>
+
+        <form id="loadForm" class="load-form" autocomplete="off">
+          <label class="sr-only" for="usernameInput" data-i18n="landing.usernameLabel">Letterboxd username</label>
+          <div class="input-shell">
+            <span class="at" aria-hidden="true">@</span>
+            <input
+              id="usernameInput"
+              name="username"
+              type="text"
+              inputmode="text"
+              spellcheck="false"
+              placeholder="your-letterboxd-name"
+              data-i18n-placeholder="landing.placeholder"
+              maxlength="30"
+              list="userSuggestions"
+            />
+          </div>
+          <datalist id="userSuggestions"></datalist>
+          <button class="btn primary" type="submit" data-i18n="landing.submit">Load watchlist</button>
+        </form>
+
+        <p id="loadError" class="load-error" role="alert" hidden></p>
+
+        <div class="landing-actions">
+          <button class="link-btn" id="demoBtn" type="button" data-i18n="landing.demo">Try the 84-film demo</button>
+          <span class="hint" data-i18n="landing.hint">Public watchlists only · no login</span>
+        </div>
+      </section>
+
+      <!-- Loading -->
+      <section id="loadingView" class="loading hidden" aria-live="polite">
+        <div class="loading-inner">
+          <p class="eyebrow" data-i18n="loading.eyebrow">One moment</p>
+          <h2 id="loadingTitle" data-i18n="loading.title">Reading your watchlist…</h2>
+          <p class="loading-sub" id="loadingSub" data-i18n="loading.sub">
+            Loading every watchlist page — not just the first one.
+          </p>
+          <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-meta">
+            <span id="progressCount" data-i18n="loading.starting">Starting…</span>
+            <button class="link-btn" id="cancelLoad" type="button" data-i18n="loading.cancel">Cancel</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- App -->
+      <section id="appView" class="app hidden">
+        <div class="app-head">
+          <div class="app-id">
+            <p class="app-kicker">
+              <span id="kickerPrefix"></span><strong id="usernameOut"></strong><span id="kickerSuffix"></span>
+            </p>
+            <p class="pool-line"><strong id="matchCount">0</strong> <span id="poolLabel"></span></p>
+            <div class="active-chips" id="activeChips"></div>
+          </div>
+        </div>
+
+        <div class="details-strip" id="detailsStrip">
+          <span class="spinner small" aria-hidden="true"></span>
+          <span id="detailsText"></span>
+          <div class="progress-track slim" aria-hidden="true"><div class="progress-fill" id="detailsFill"></div></div>
+        </div>
+
+        <details class="filter-panel" id="filterPanel">
+          <summary class="filter-panel-summary">
+            <span class="filter-heading" data-i18n="app.filters">Filters</span>
+            <span class="filter-panel-state" id="filterPanelState"></span>
+            <span class="summary-chevron" aria-hidden="true"></span>
+          </summary>
+
+          <div class="filter-panel-body">
+            <div class="filter-loading" id="filterLoading">
+              <div class="filter-loading-head">
+                <span class="spinner small" aria-hidden="true"></span>
+                <p data-i18n="app.filterLoadingTitle">Reading film details so filters can work.</p>
+              </div>
+              <p class="filter-note" data-i18n="app.filterLoadingNote">
+                You can already pick a film — filters unlock when the details finish.
+              </p>
+            </div>
+
+            <div id="filterBody" class="hidden">
+              <details class="filter-block" data-filter="genre">
+                <summary class="filter-summary">
+                  <span class="filter-label" data-i18n="app.genre">Genre</span>
+                  <span class="segmented" role="group" aria-label="Genre match mode" data-mode-for="genreMode" data-i18n-aria-label="app.genreMode">
+                    <button type="button" data-mode-value="any" class="is-active" data-i18n="app.modeAny">Any</button>
+                    <button type="button" data-mode-value="all" data-i18n="app.modeAll">All</button>
+                  </span>
+                  <span class="filter-summary-value" id="genreSummary"></span>
+                  <span class="summary-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="filter-content">
+                  <div class="chips" id="genreChips"></div>
+                </div>
+              </details>
+
+              <details class="filter-block" data-filter="rating">
+                <summary class="filter-summary">
+                  <span class="filter-label" id="ratingLabel" data-i18n="app.rating">Rating</span>
+                  <span class="filter-summary-value" id="ratingSummary"></span>
+                  <span class="summary-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="filter-content">
+                  <div class="filter-slider">
+                    <div class="filter-slider-head">
+                      <output class="filter-slider-output" id="ratingOutput" for="ratingRange">Any</output>
+                      <span class="filter-slider-hint" id="ratingHint" data-i18n="app.ratingHint">Lowest rating</span>
+                    </div>
+                    <input
+                      class="range"
+                      type="range"
+                      id="ratingRange"
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      value="0"
+                      aria-labelledby="ratingLabel"
+                      aria-describedby="ratingHint"
+                    />
+                    <div class="range-scale" aria-hidden="true">
+                      <span data-i18n="app.any">Any</span>
+                      <span>★ 5</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <details class="filter-block" data-filter="runtime">
+                <summary class="filter-summary">
+                  <span class="filter-label" id="runtimeLabel" data-i18n="app.runtime">Runtime</span>
+                  <span class="filter-summary-value" id="runtimeSummary"></span>
+                  <span class="summary-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="filter-content">
+                  <div class="filter-slider" id="runtimeSlider">
+                    <div class="filter-slider-head">
+                      <output class="filter-slider-output" id="runtimeOutput" for="runtimeRange">Any</output>
+                      <span class="filter-slider-hint" id="runtimeHint" data-i18n="app.runtimeHint">
+                        Longest allowed
+                      </span>
+                    </div>
+                    <input
+                      class="range"
+                      type="range"
+                      id="runtimeRange"
+                      min="55"
+                      max="240"
+                      step="5"
+                      value="55"
+                      aria-labelledby="runtimeLabel"
+                      aria-describedby="runtimeHint"
+                    />
+                    <div class="range-scale" aria-hidden="true">
+                      <span data-i18n="app.any">Any</span>
+                      <span id="runtimeScaleMax"></span>
+                    </div>
+                  </div>
+                  <p class="filter-note hidden" id="runtimeEmpty" data-i18n="app.noRuntime">
+                    No runtime data was available for these films.
+                  </p>
+                </div>
+              </details>
+
+              <details class="filter-block" data-filter="decade">
+                <summary class="filter-summary">
+                  <span class="filter-label" data-i18n="app.decade">Decade</span>
+                  <span class="filter-summary-value" id="decadeSummary"></span>
+                  <span class="summary-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="filter-content">
+                  <div class="chips" id="decadeChips"></div>
+                </div>
+              </details>
+
+              <details class="filter-block" data-filter="country">
+                <summary class="filter-summary">
+                  <span class="filter-label" data-i18n="app.country">Country</span>
+                  <span class="filter-summary-value" id="countrySummary"></span>
+                  <span class="summary-chevron" aria-hidden="true"></span>
+                </summary>
+                <div class="filter-content">
+                  <div class="chips" id="countryChips"></div>
+                </div>
+              </details>
+
+              <div class="filter-foot">
+                <button class="link-btn" id="clearFilters" type="button" data-i18n="app.clearAll">Clear all filters</button>
+              </div>
+            </div>
+
+            <div class="filter-unavailable hidden" id="filterUnavailable" data-i18n="app.filterUnavailable">
+              Film details could not be read, so filters are unavailable. Picking still works.
+            </div>
+          </div>
+        </details>
+
+        <div id="spotlight" class="spotlight"></div>
+
+        <div class="pick-bar" id="pickBar">
+          <button class="btn primary big" id="pickBtn" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"></path>
+            </svg>
+            <span data-i18n="app.pickAnother">Pick another film</span>
+          </button>
+          <p class="pick-note" id="pickNote"></p>
+        </div>
+
+        <div class="empty hidden" id="emptyState">
+          <p class="empty-title" data-i18n="app.emptyTitle">No films match those filters.</p>
+          <p class="empty-sub" data-i18n="app.emptySub">Try a lower rating or choose fewer genres.</p>
+          <button class="btn ghost" id="emptyReset" type="button" data-i18n="app.clear">Clear filters</button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span data-i18n-html="footer.text"
+        >An independent project for film lovers by
+        <a href="https://letterboxd.com/JustLOAY" target="_blank" rel="noreferrer">JustLOAY</a> — not affiliated with
+        <a href="https://letterboxd.com" target="_blank" rel="noreferrer">Letterboxd</a>.</span
+      >
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="sr-only" id="srStatus" role="status" aria-live="polite"></div>
+  </body>
+</html>

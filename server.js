@@ -1,0 +1,542 @@
+'use strict';
+
+const http = require('node:http');
+const fs = require('node:fs');
+const fsp = require('node:fs/promises');
+const path = require('node:path');
+const {
+  BASE,
+  scrapeWatchlist,
+  enrichFilms,
+  fetchFilmDetails,
+  computeStats,
+  basicFilmFromItem,
+  normalizeUsername,
+  isValidUsername,
+} = require('./lib/letterboxd');
+const { translate } = require('./lib/translate');
+
+const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || '127.0.0.1';
+const ROOT = __dirname;
+const PUBLIC_DIR = path.join(ROOT, 'public');
+const CACHE_DIR = path.join(ROOT, 'data', 'watchlists');
+const DEMO_PATH = path.join(ROOT, 'data', 'demo.json');
+// Serve a cache as-is for two hours so a newly added film shows up within
+// roughly two hours (plus the prewarm sweep), without a manual refresh button.
+const CACHE_TTL_MINUTES = Number(process.env.CACHE_TTL_MINUTES) > 0 ? Number(process.env.CACHE_TTL_MINUTES) : 120;
+const CACHE_TTL_MS = Math.max(5, CACHE_TTL_MINUTES) * 60 * 1000;
+// Film details can be reused from an older cache file, but only for a week so
+// ratings and metadata do not drift forever on lists that are never re-read.
+const SEED_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
+const CACHE_VERSION = 2;
+const PAGE_CONCURRENCY = Math.max(1, Number(process.env.PAGE_CONCURRENCY || 12));
+const FILM_CONCURRENCY = Math.max(1, Number(process.env.FILM_CONCURRENCY || 32));
+// Refresh stale caches in the background instead of making the next visitor
+// wait for a cold/warm rebuild. Set PREWARM=0 to disable.
+const PREWARM = process.env.PREWARM !== '0';
+const PREWARM_INTERVAL_MS = 1000 * 60 * 30;
+
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.svg': 'image/svg+xml',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.ico': 'image/x-icon',
+  '.woff2': 'font/woff2',
+};
+
+const jobs = new Map();
+const filmCache = new Map();
+let prewarming = false;
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function cachePath(username) {
+  return path.join(CACHE_DIR, `${username}.json`);
+}
+
+async function readCached(username) {
+  try {
+    const raw = await fsp.readFile(cachePath(username), 'utf8');
+    const parsed = JSON.parse(raw);
+    if (parsed.version !== CACHE_VERSION) return null;
+    const age = Date.now() - new Date(parsed.fetchedAt).getTime();
+    return { payload: parsed, fresh: Number.isFinite(age) && age >= 0 && age < CACHE_TTL_MS };
+  } catch {
+    return null;
+  }
+}
+
+async function writeCache(payload) {
+  await fsp.mkdir(CACHE_DIR, { recursive: true });
+  const target = cachePath(payload.username);
+  const tmp = `${target}.${process.pid}.tmp`;
+  await fsp.writeFile(tmp, JSON.stringify(payload), 'utf8');
+  await fsp.rename(tmp, target);
+}
+
+async function readDemo() {
+  const raw = await fsp.readFile(DEMO_PATH, 'utf8');
+  const payload = JSON.parse(raw);
+  return { ...payload, version: CACHE_VERSION, username: 'demo', demo: true, detailsComplete: true };
+}
+
+function sendJson(res, status, body) {
+  const text = JSON.stringify(body);
+  res.writeHead(status, {
+    'Content-Type': MIME['.json'],
+    'Content-Length': Buffer.byteLength(text),
+    'Cache-Control': 'no-store',
+    'Access-Control-Allow-Origin': '*',
+  });
+  res.end(text);
+}
+
+function sseSend(res, event, data) {
+  if (res.writableEnded || res.destroyed) return;
+  res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+
+function startJob(username, previous = null) {
+  const job = {
+    username,
+    listeners: new Set(),
+    progress: { phase: 'starting', message: 'Opening the projection booth…' },
+    startedAt: Date.now(),
+    status: 'running',
+    basics: null,
+    result: null,
+    error: null,
+  };
+  jobs.set(username, job);
+
+  let lastDetailReport = 0;
+  const emit = (event, data) => {
+    for (const listener of job.listeners) listener(event, data);
+  };
+  const onProgress = (progress) => {
+    job.progress = progress;
+    if (progress.phase === 'details') {
+      const now = Date.now();
+      if (progress.completed !== progress.total && now - lastDetailReport < 500) return;
+      lastDetailReport = now;
+    }
+    emit('progress', progress);
+  };
+
+  job.promise = (async () => {
+    // Reuse every film detail we already read for this user (in-memory or in
+    // the previous cache file). A refresh then only fetches new films instead
+    // of re-reading hundreds of unchanged film pages.
+    const seeded = new Map(filmCache);
+    const previousAge = Date.now() - new Date(previous?.fetchedAt || 0).getTime();
+    const canSeed = Number.isFinite(previousAge) && previousAge >= 0 && previousAge < SEED_MAX_AGE_MS;
+    if (canSeed) {
+      for (const film of previous.films || []) {
+        if (film?.slug && film.metaComplete && !seeded.has(film.slug)) seeded.set(film.slug, film);
+      }
+    }
+
+    const watchlist = await scrapeWatchlist(username, {
+      pageConcurrency: PAGE_CONCURRENCY,
+      onProgress,
+    });
+
+    const basics = watchlist.items.map(basicFilmFromItem);
+    const pickItem = watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
+
+    job.progress = { phase: 'details', completed: 0, total: basics.length, failed: 0 };
+
+    // Read the first pick and enrich the rest at the same time. The pick still
+    // arrives before the app appears, but the details pass no longer waits for
+    // that one page to finish, which saves a full round trip on a cold load.
+    let pick = seeded.get(pickItem.slug);
+    const pickPromise = pick
+      ? Promise.resolve(pick)
+      : fetchFilmDetails(pickItem)
+          .then((film) => {
+            if (film.metaComplete) {
+              seeded.set(film.slug, film);
+              filmCache.set(film.slug, film);
+            }
+            return film;
+          })
+          .catch(() => basicFilmFromItem(pickItem));
+
+    const enrichedPromise = enrichFilms(watchlist.items, {
+      concurrency: FILM_CONCURRENCY,
+      initial: seeded,
+      onProgress,
+    });
+
+    pick = await pickPromise;
+
+    // The first pick is fully read before the app appears, so the landing ->
+    // result transition feels immediate. Every other film is enriched in the
+    // background for filters.
+    const basicsWithPick = basics.map((film) => (film.slug === pick.slug ? pick : film));
+    const base = {
+      version: CACHE_VERSION,
+      username,
+      fetchedAt: new Date().toISOString(),
+      source: `${BASE}/${username}/watchlist/`,
+      pagesFetched: watchlist.pagesFetched,
+      pagesTotal: watchlist.pagesTotal,
+      listStatus: watchlist.lastListStatus,
+      failedPages: watchlist.failedPages,
+      truncated: watchlist.truncated,
+      total: basics.length,
+      films: basicsWithPick,
+      stats: computeStats(basicsWithPick),
+      detailsComplete: false,
+      pick,
+    };
+
+    job.basics = base;
+    if (job.status === 'running') emit('films', base);
+
+    const enriched = await enrichedPromise;
+
+    for (const film of enriched) {
+      if (film.metaComplete) filmCache.set(film.slug, film);
+    }
+
+    const enrichedPick = enriched.find((film) => film.slug === pick.slug);
+    const payload = {
+      ...base,
+      fetchedAt: new Date().toISOString(),
+      films: enriched,
+      stats: computeStats(enriched),
+      detailsComplete: true,
+      // Prefer the fully read pick; the background pass may have raced it and
+      // fallen back to a title-only entry.
+      pick: enrichedPick?.metaComplete ? enrichedPick : pick,
+    };
+
+    job.status = 'done';
+    job.result = payload;
+    await writeCache(payload).catch((error) => {
+      console.warn(`[cache] could not write ${username}:`, error.message);
+    });
+    emit('done', { cached: false, ...payload });
+    return payload;
+  })()
+    .catch((error) => {
+      if (job.status === 'done') return null;
+      job.status = 'error';
+      job.error = {
+        message: error.message || 'Could not load that watchlist.',
+        code: error.code || 'LOAD_FAILED',
+      };
+      emit('error', job.error);
+      return null;
+    })
+    .finally(() => {
+      setTimeout(() => {
+        if (jobs.get(username) === job) jobs.delete(username);
+      }, 30000).unref?.();
+    });
+
+  return job;
+}
+
+async function handleWatchlistStream(req, res, usernameRaw, url) {
+  const username = normalizeUsername(usernameRaw);
+  if (!isValidUsername(username)) {
+    sendJson(res, 400, { error: 'Enter a valid Letterboxd username (letters, numbers, dashes, underscores).' });
+    return;
+  }
+
+  const openedAt = Date.now();
+  const streamLog = (msg) => console.log(`[sse] ${username}: ${msg} (+${Math.round((Date.now() - openedAt) / 1000)}s)`);
+  res.on('close', () => streamLog(`closed (${res.writableEnded ? 'ended' : 'broken'})`));
+  req.on('error', (err) => streamLog(`req error: ${err.message}`));
+  res.on('error', (err) => streamLog(`res error: ${err.message}`));
+  streamLog('connected');
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache, no-transform',
+    Connection: 'keep-alive',
+    'X-Accel-Buffering': 'no',
+    'Access-Control-Allow-Origin': '*',
+  });
+  res.write(': connected\n\n');
+
+  if (username === 'demo') {
+    try {
+      const demo = await readDemo();
+      sseSend(res, 'done', { cached: false, ...demo });
+    } catch {
+      sseSend(res, 'error', { message: 'The demo dataset is missing. Run npm run build:demo.', code: 'DEMO_MISSING' });
+    }
+    res.end();
+    return;
+  }
+
+  const refresh = url.searchParams.get('refresh') === '1';
+
+  const cached = await readCached(username);
+  if (!refresh && cached?.fresh) {
+    sseSend(res, 'done', { cached: true, ...cached.payload });
+    res.end();
+    return;
+  }
+
+  let job = jobs.get(username);
+  if (!job || (refresh && job.status !== 'running')) {
+    job = startJob(username, cached?.payload || null);
+  }
+
+  let heartbeat = null;
+  let finished = false;
+  const cleanup = () => {
+    if (heartbeat) clearInterval(heartbeat);
+    job.listeners.delete(listener);
+  };
+  const listener = (event, data) => {
+    if (event === 'error') streamLog(`sending error event: ${data?.message}`);
+    sseSend(res, event, data);
+    if (event === 'done' || event === 'error') {
+      finished = true;
+      cleanup();
+      if (!res.writableEnded) res.end();
+    }
+  };
+
+  job.listeners.add(listener);
+  heartbeat = setInterval(() => {
+    if (!res.writableEnded) res.write(': ping\n\n');
+  }, 15000);
+  heartbeat.unref?.();
+
+  req.on('close', cleanup);
+
+  // A tab that joins mid-flight gets the basics immediately, then the same
+  // aggregate progress and final payload as the first tab.
+  if (job.status === 'done' && job.result) {
+    listener('done', { cached: false, ...job.result });
+    return;
+  }
+  if (job.status === 'error' && job.error) {
+    listener('error', job.error);
+    return;
+  }
+  if (job.basics) sseSend(res, 'films', job.basics);
+  if (job.progress && !finished) sseSend(res, 'progress', job.progress);
+}
+
+async function handleWatchlist(req, res, usernameRaw) {
+  const username = normalizeUsername(usernameRaw);
+  if (!isValidUsername(username)) {
+    sendJson(res, 400, { error: 'Enter a valid Letterboxd username.' });
+    return;
+  }
+  if (username === 'demo') {
+    try {
+      sendJson(res, 200, await readDemo());
+    } catch {
+      sendJson(res, 500, { error: 'Demo dataset missing. Run npm run build:demo.' });
+    }
+    return;
+  }
+  const cached = await readCached(username);
+  if (!cached) {
+    sendJson(res, 404, { error: 'Not cached yet. Use the streaming endpoint.', code: 'NOT_CACHED' });
+    return;
+  }
+  sendJson(res, 200, { ...cached.payload, cached: true, stale: !cached.fresh });
+}
+
+async function handleFilm(req, res, slug) {
+  if (!/^[a-z0-9-]{1,200}$/.test(slug)) {
+    sendJson(res, 400, { error: 'Invalid film slug.' });
+    return;
+  }
+
+  const cached = filmCache.get(slug);
+  if (cached) {
+    sendJson(res, 200, { ...cached, cached: true });
+    return;
+  }
+
+  try {
+    const film = await fetchFilmDetails({
+      slug,
+      link: `${BASE}/film/${slug}/`,
+      fallbackTitle: slug.replace(/-/g, ' '),
+      fallbackYear: null,
+    });
+    if (film.metaComplete) filmCache.set(slug, film);
+    sendJson(res, 200, film);
+  } catch (error) {
+    if (error?.status === 404) {
+      sendJson(res, 404, { error: 'Film not found.' });
+    } else if (error?.status === 403 || error?.status === 429) {
+      sendJson(res, 429, { error: 'Letterboxd is rate limiting requests. Try again shortly.' });
+    } else {
+      sendJson(res, 502, { error: 'Could not read that film page right now.' });
+    }
+  }
+}
+
+async function handleTranslate(req, res, url) {
+  const lang = String(url.searchParams.get('lang') || '').toLowerCase();
+  const text = String(url.searchParams.get('q') || '').trim();
+
+  if (lang !== 'ar') {
+    sendJson(res, 400, { error: 'Unsupported language.' });
+    return;
+  }
+  if (!text) {
+    sendJson(res, 400, { error: 'Missing text.' });
+    return;
+  }
+  if (text.length > 4000) {
+    sendJson(res, 413, { error: 'Text too long.' });
+    return;
+  }
+
+  const translated = await translate(text, 'ar');
+  if (!translated) {
+    sendJson(res, 503, { error: 'Translation unavailable.' });
+    return;
+  }
+  sendJson(res, 200, { lang: 'ar', text: translated });
+}
+
+async function serveStatic(req, res, pathname) {
+  let relative = decodeURIComponent(pathname);
+  if (relative === '/') relative = '/index.html';
+  const filePath = path.join(PUBLIC_DIR, path.normalize(relative).replace(/^([/\\])+/, ''));
+  if (!filePath.startsWith(PUBLIC_DIR)) {
+    sendJson(res, 403, { error: 'Forbidden' });
+    return;
+  }
+  try {
+    const stat = await fsp.stat(filePath);
+    if (!stat.isFile()) throw new Error('not a file');
+    const ext = path.extname(filePath).toLowerCase();
+    const headers = {
+      'Content-Type': MIME[ext] || 'application/octet-stream',
+      'Content-Length': stat.size,
+      // Assets are not content-hashed, so revalidate them on every load.
+      'Cache-Control': 'no-cache',
+    };
+    res.writeHead(200, headers);
+    fs.createReadStream(filePath).pipe(res);
+  } catch {
+    if (!path.extname(pathname)) {
+      // Single-page fallback for pretty URLs.
+      const indexPath = path.join(PUBLIC_DIR, 'index.html');
+      const stat = await fsp.stat(indexPath);
+      res.writeHead(200, { 'Content-Type': MIME['.html'], 'Content-Length': stat.size, 'Cache-Control': 'no-cache' });
+      fs.createReadStream(indexPath).pipe(res);
+      return;
+    }
+    sendJson(res, 404, { error: 'Not found' });
+  }
+}
+
+async function prewarmStaleCaches() {
+  if (!PREWARM || prewarming) return;
+  prewarming = true;
+  try {
+    let names = [];
+    try {
+      names = await fsp.readdir(CACHE_DIR);
+    } catch {
+      return;
+    }
+    for (const name of names) {
+      if (!name.endsWith('.json')) continue;
+      const username = name.slice(0, -'.json'.length);
+      if (!isValidUsername(username) || jobs.has(username)) continue;
+      const cached = await readCached(username);
+      // Fresh caches already answer immediately; only stale ones need the
+      // network, and doing it now means the next visitor never sees a wait.
+      if (!cached || cached.fresh) continue;
+      console.log(`[prewarm] refreshing stale cache for ${username}`);
+      await startJob(username, cached.payload).promise;
+      await sleep(1500);
+    }
+  } finally {
+    prewarming = false;
+  }
+}
+
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  if (url.pathname.startsWith('/api/')) console.log(`[req] ${req.method} ${url.pathname}${url.search}`);
+
+  try {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      sendJson(res, 405, { error: 'Method not allowed' });
+      return;
+    }
+
+    if (url.pathname === '/api/health') {
+      sendJson(res, 200, { ok: true, uptime: Math.round(process.uptime()), jobs: jobs.size });
+      return;
+    }
+
+    if (url.pathname === '/api/demo') {
+      sendJson(res, 200, await readDemo());
+      return;
+    }
+
+    const streamMatch = /^\/api\/watchlist\/([^/]+)\/stream\/?$/.exec(url.pathname);
+    if (streamMatch) {
+      await handleWatchlistStream(req, res, streamMatch[1], url);
+      return;
+    }
+
+    const listMatch = /^\/api\/watchlist\/([^/]+)\/?$/.exec(url.pathname);
+    if (listMatch) {
+      await handleWatchlist(req, res, listMatch[1]);
+      return;
+    }
+
+    const filmMatch = /^\/api\/film\/([^/]+)\/?$/.exec(url.pathname);
+    if (filmMatch) {
+      await handleFilm(req, res, filmMatch[1]);
+      return;
+    }
+
+    if (url.pathname === '/api/translate') {
+      await handleTranslate(req, res, url);
+      return;
+    }
+
+    await serveStatic(req, res, url.pathname);
+  } catch (error) {
+    console.error('[server]', error);
+    if (!res.headersSent) {
+      sendJson(res, 500, { error: 'Something went wrong on the server.' });
+    } else {
+      res.end();
+    }
+  }
+});
+
+// Diagnostics: surface process-level failures instead of dying silently.
+process.on('uncaughtException', (err) => console.error('[uncaughtException]', err));
+process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', err));
+
+server.listen(PORT, HOST, () => {
+  console.log(`\n  Watchlist Reel running at http://${HOST}:${PORT}\n`);
+  console.log('  Demo dataset: (click "Try the demo" or load username "demo")');
+  console.log('  Live mode reads every public watchlist page, then enriches film details in the background.');
+  console.log('  The first result appears as soon as the watchlist list is ready; filters unlock when details finish.');
+  if (PREWARM) {
+    console.log('  Stale caches refresh in the background (PREWARM=0 disables this).\n');
+    setTimeout(prewarmStaleCaches, 5000).unref?.();
+    setInterval(prewarmStaleCaches, PREWARM_INTERVAL_MS).unref?.();
+  } else {
+    console.log('  Background prewarm disabled (PREWARM=0).\n');
+  }
+});
