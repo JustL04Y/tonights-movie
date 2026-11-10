@@ -13,9 +13,9 @@ const I18N = (() => {
 
   const dict = {
     en: {
-      'meta.title': "Tonight's Reel — pick a random film from any Letterboxd list",
+      'meta.title': "Tonight's Reel — random film picker for any Letterboxd list",
       'meta.description':
-        'Pick a random film from any public Letterboxd list — your watchlist or any curated list. Optional genre, rating, runtime, decade, and country filters. No login required.',
+        'Free random film picker for Letterboxd: pick from any public watchlist or list, with genre, rating, runtime, decade and country filters. No login required.',
 
       'brand.name': "Tonight's <em>Reel</em>",
       'theme.toLight': 'Switch to light theme',
@@ -24,7 +24,7 @@ const I18N = (() => {
       'user.title': 'Load a different list',
       'user.listChip': 'list: {name}',
 
-      'landing.eyebrow': 'A Letterboxd list picker',
+      'landing.eyebrow': 'A random film picker for Letterboxd',
       'landing.title': 'Stop scrolling.<br /><em>Start watching.</em>',
       'landing.lede':
         'Pick one random film from any public Letterboxd list — your watchlist or any curated list. Add a few filters if tonight has a mood.',
@@ -150,9 +150,9 @@ const I18N = (() => {
     },
 
     ar: {
-      'meta.title': 'عرض الليلة — فيلم عشوائي من أي قائمة ليتربوكسد',
+      'meta.title': 'عرض الليلة — اختيار فيلم عشوائي من أي قائمة ليتربوكسد',
       'meta.description':
-        'اختر فيلمًا عشوائيًا من أي قائمة عامة على ليتربوكسد — قائمة مشاهدتك أو أي قائمة أخرى. فلاتر اختيارية للتصنيف والتقييم والمدة والعقد والبلد، بدون تسجيل دخول.',
+        'مجاني: اختر فيلمًا عشوائيًا من أي قائمة مشاهدة أو قائمة أفلام عامة على ليتربوكسد، مع فلاتر للتصنيف والتقييم والمدة والعقد والبلد. بدون تسجيل دخول.',
 
       'brand.name': 'عرض <em>الليلة</em>',
       'theme.toLight': 'التبديل إلى الوضع الفاتح',
@@ -161,7 +161,7 @@ const I18N = (() => {
       'user.title': 'تحميل قائمة أخرى',
       'user.listChip': 'قائمة: {name}',
 
-      'landing.eyebrow': 'مُختار أفلام من قوائم ليتربوكسد',
+      'landing.eyebrow': 'اختيار فيلم عشوائي من قوائم ليتربوكسد',
       'landing.title': 'توقّف عن التمرير.<br /><em>ابدأ المشاهدة.</em>',
       'landing.lede':
         'اختر فيلمًا عشوائيًا واحدًا من أي قائمة عامة على ليتربوكسد — قائمة مشاهدتك أو أي قائمة أخرى. أضف بعض الفلاتر إذا كان لليلتك مزاج معيّن.',
