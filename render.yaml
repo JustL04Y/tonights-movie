@@ -26,6 +26,6 @@ services:
       - key: NODE_OPTIONS
         value: --max-old-space-size=384
       - key: FILM_CONCURRENCY
-        value: "8"
+        value: "16"
       - key: PAGE_CONCURRENCY
-        value: "4"
+        value: "6"

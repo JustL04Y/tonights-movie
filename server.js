@@ -53,7 +53,12 @@ const CACHE_VERSION = 2;
 // container, and the instance dies mid-enrichment ("JavaScript heap out
 // of memory"). Small hosts get small batches; local machines keep the
 // fast defaults. Override with env vars either way.
-const MEM_DEFAULTS = IS_RENDER ? { page: 4, film: 8 } : { page: 12, film: 32 };
+// With the sliced-string leak fixed (cloneFlat above), retention is now
+// kilobytes per film, so concurrency is bounded by transient fetch
+// buffers only (~4 MB per in-flight page). 16 on the free container
+// peaks around 100-130 MB of the ~256 MB V8 heap while roughly halving
+// the details phase; local machines can afford the original 32.
+const MEM_DEFAULTS = IS_RENDER ? { page: 6, film: 16 } : { page: 12, film: 32 };
 const PAGE_CONCURRENCY = Math.max(1, Number(process.env.PAGE_CONCURRENCY || MEM_DEFAULTS.page));
 const FILM_CONCURRENCY = Math.max(1, Number(process.env.FILM_CONCURRENCY || MEM_DEFAULTS.film));
 
