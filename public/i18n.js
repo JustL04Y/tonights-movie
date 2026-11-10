@@ -1,23 +1,23 @@
 'use strict';
 
 /* ─────────────────────────────────────────────────────────────
-   Tonight's Reel — tiny i18n layer (English / Arabic)
+   Tonight's Movie — tiny i18n layer (English / Arabic)
    Film titles and Letterboxd data stay in their original language;
    the interface, genre names, country names and synopses are localised.
    ───────────────────────────────────────────────────────────── */
 
 const I18N = (() => {
-  const STORAGE_KEY = 'tonights-reel:lang';
+  const STORAGE_KEY = 'tonights-movie:lang';
   const listeners = new Set();
   let lang = 'en';
 
   const dict = {
     en: {
-      'meta.title': "Tonight's Reel — random film picker for any Letterboxd list",
+      'meta.title': "Tonight's Movie — random film picker for any Letterboxd list",
       'meta.description':
         'Free random film picker for Letterboxd: pick from any public watchlist or list, with genre, rating, runtime, decade and country filters. No login required.',
 
-      'brand.name': "Tonight's <em>Reel</em>",
+      'brand.name': "Tonight's <em>Movie</em>",
       'theme.toLight': 'Switch to light theme',
       'theme.toDark': 'Switch to dark theme',
       'lang.switch': 'Switch to Arabic',
@@ -150,11 +150,11 @@ const I18N = (() => {
     },
 
     ar: {
-      'meta.title': 'عرض الليلة — اختيار فيلم عشوائي من أي قائمة ليتربوكسد',
+      'meta.title': 'فيلم الليلة — اختيار فيلم عشوائي من أي قائمة ليتربوكسد',
       'meta.description':
         'مجاني: اختر فيلمًا عشوائيًا من أي قائمة مشاهدة أو قائمة أفلام عامة على ليتربوكسد، مع فلاتر للتصنيف والتقييم والمدة والعقد والبلد. بدون تسجيل دخول.',
 
-      'brand.name': 'عرض <em>الليلة</em>',
+      'brand.name': 'فيلم <em>الليلة</em>',
       'theme.toLight': 'التبديل إلى الوضع الفاتح',
       'theme.toDark': 'التبديل إلى الوضع الداكن',
       'lang.switch': 'Switch to English',

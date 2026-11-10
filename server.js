@@ -579,7 +579,7 @@ process.on('uncaughtException', (err) => console.error('[uncaughtException]', er
 process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', err));
 
 server.listen(PORT, HOST, () => {
-  console.log(`\n  Tonight's Reel running at http://${HOST}:${PORT}\n`);
+  console.log(`\n  Tonight's Movie running at http://${HOST}:${PORT}\n`);
   console.log('  Demo dataset: (click "Try the demo" or load username "demo")');
   console.log('  Live mode reads every page of a watchlist or any public list, then enriches film details in the background.');
   console.log('  The first result appears as soon as the watchlist list is ready; filters unlock when details finish.');
