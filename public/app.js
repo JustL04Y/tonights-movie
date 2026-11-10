@@ -246,6 +246,21 @@ function showLoadError(message, key = '') {
   els.loadError.hidden = !message;
 }
 
+/* Server errors arrive with a stable code (USER_NOT_FOUND, PRIVATE_WATCHLIST,
+   …) plus an English message. Localize by code; fall back to the server's
+   message for codes the dictionary does not know. */
+const SERVER_ERROR_KEYS = {
+  USER_NOT_FOUND: 'error.userNotFound',
+  LIST_NOT_FOUND: 'error.listNotFound',
+  PRIVATE_WATCHLIST: 'error.privateWatchlist',
+  EMPTY_WATCHLIST: 'error.emptyWatchlist',
+  EMPTY_LIST: 'error.emptyList',
+};
+
+function serverErrorKey(parsed) {
+  return (parsed?.code && SERVER_ERROR_KEYS[parsed.code]) || null;
+}
+
 /* ── Theme and language ──────────────────────────────────── */
 
 function currentTheme() {
@@ -1293,12 +1308,13 @@ function wireSource(sourceId) {
       } catch {
         // Keep the fallback message.
       }
-      const message = parsed.message || t('error.couldNotLoad');
+      const errorKey = serverErrorKey(parsed);
+      const message = (errorKey && t(errorKey)) || parsed.message || t('error.couldNotLoad');
       stopSource();
       if (state.view === 'app') {
         toast(message);
       } else {
-        showLoadError(message);
+        showLoadError(message, errorKey);
         setView('landing');
       }
       return;

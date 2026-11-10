@@ -113,6 +113,11 @@ const I18N = (() => {
       'error.inputEmpty': 'Enter a Letterboxd username or paste a list link first.',
       'error.inputInvalid':
         'That does not look like a Letterboxd username or list link. Use letters, numbers, dashes and underscores, or paste a list URL.',
+      'error.userNotFound': "Couldn't find that Letterboxd user. Check the username and try again.",
+      'error.listNotFound': "Couldn't find that Letterboxd list. Check the link and try again.",
+      'error.privateWatchlist': 'That watchlist is private. Make it public on Letterboxd first.',
+      'error.emptyWatchlist': 'That watchlist is empty (or not visible). Add a film or make the list public.',
+      'error.emptyList': 'That list is empty (or not visible).',
       'error.loadFailed': 'That list could not be read. Try again.',
       'error.couldNotLoad': 'Could not load that list.',
       'error.serverDown': 'Could not reach the server. Check that it is running and try again.',
@@ -251,6 +256,11 @@ const I18N = (() => {
       'error.inputEmpty': 'أدخل اسم مستخدم أو الصق رابط قائمة على ليتربوكسد أولًا.',
       'error.inputInvalid':
         'يبدو أن هذا ليس اسم مستخدم أو رابط قائمة صحيحًا في ليتربوكسد. استخدم حروفًا وأرقامًا وشرطات، أو الصق رابط قائمة كاملًا.',
+      'error.userNotFound': 'ما لقينا مستخدم ليتربوكسد بهذا الاسم. تأكد من اسم المستخدم وحاول مرة أخرى.',
+      'error.listNotFound': 'ما لقينا قائمة ليتربوكسد بهذا الرابط. تأكد من الرابط وحاول مرة أخرى.',
+      'error.privateWatchlist': 'قائمة المشاهدة هذه خاصة. اجعلها عامة على ليتربوكسد أولًا.',
+      'error.emptyWatchlist': 'قائمة المشاهدة فارغة (أو غير ظاهرة). أضف فيلمًا أو اجعلها عامة.',
+      'error.emptyList': 'هذه القائمة فارغة (أو غير ظاهرة).',
       'error.loadFailed': 'تعذّرت قراءة هذه القائمة. حاول مرة أخرى.',
       'error.couldNotLoad': 'تعذّر تحميل هذه القائمة.',
       'error.serverDown': 'تعذّر الوصول إلى الخادم. تأكد أنه يعمل ثم حاول مرة أخرى.',
