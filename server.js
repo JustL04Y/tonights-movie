@@ -25,6 +25,16 @@ const PORT = Number(process.env.PORT || 3000);
 const IS_RENDER =
   process.env.RENDER === 'true' || Boolean(process.env.RENDER_EXTERNAL_URL);
 const HOST = process.env.HOST || (IS_RENDER ? '0.0.0.0' : '127.0.0.1');
+
+// A stray rejection or error must not take the whole service down — on
+// small hosts (Render free plan) a crash drops every open SSE stream and
+// sends users back to square one. Log and keep serving.
+process.on('unhandledRejection', (err) => {
+  console.error('[unhandledRejection]', err);
+});
+process.on('uncaughtException', (err) => {
+  console.error('[uncaughtException]', err);
+});
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const CACHE_DIR = path.join(ROOT, 'data', 'watchlists');

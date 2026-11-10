@@ -80,6 +80,8 @@ const I18N = (() => {
         'Film details could not be read, so filters are unavailable. Picking still works.',
       'app.detailsPreparing': 'Preparing filters…',
       'app.detailsInitial': 'Preparing your first pick…',
+      'app.detailsOffline':
+        'Lost the details connection. Picking still works with what was loaded — reload the list to finish enriching.',
       'app.detailsReading': 'Reading details · {done} / {total}',
       'app.noGenres': 'No genre data was available for these films.',
       'app.decadeChip': '{year}s',
@@ -217,6 +219,8 @@ const I18N = (() => {
         'تعذّرت قراءة تفاصيل الأفلام، لذا الفلاتر غير متاحة. الاختيار ما زال يعمل.',
       'app.detailsPreparing': 'نجهّز الفلاتر…',
       'app.detailsInitial': 'نجهّز اختيارك الأول…',
+      'app.detailsOffline':
+        'انقطع اتصال التفاصيل. الاختيار يعمل بما اكتمل تحميله — أعد تحميل القائمة لاستكمال القراءة.',
       'app.detailsReading': 'نقرأ التفاصيل · {done} من {total}',
       'app.noGenres': 'لا تتوفر بيانات تصنيفات لهذه الأفلام.',
       'app.decadeChip': '{year}s',

@@ -93,6 +93,8 @@ const state = {
   filmBySlug: new Map(),
   total: 0,
   detailsComplete: false,
+  rejoins: 0,
+  keepaliveTimer: null,
   details: { completed: 0, total: 0, failed: 0 },
   facets: { genres: [], countries: [], decades: [], runtimeMax: 0, withMetadata: 0 },
   filters: defaultFilters(),
@@ -1129,6 +1131,10 @@ function stopSource() {
     clearTimeout(state.networkTimer);
     state.networkTimer = null;
   }
+  if (state.keepaliveTimer) {
+    clearInterval(state.keepaliveTimer);
+    state.keepaliveTimer = null;
+  }
 }
 
 /* ── Username history ────────────────────────────────────── */
@@ -1189,6 +1195,7 @@ function loadUser(rawSource, { filters } = {}) {
   state.filmBySlug = new Map();
   state.total = 0;
   state.detailsComplete = false;
+  state.rejoins = 0;
   state.facets = { genres: [], countries: [], decades: [], runtimeMax: 0, withMetadata: 0 };
   state.filters = filters || defaultFilters();
   state.pool = [];
@@ -1223,10 +1230,29 @@ function loadUser(rawSource, { filters } = {}) {
   setView('loading');
   showLoading();
 
+  state.rejoins = 0;
+  state.source = wireSource(sourceId);
+}
+
+/* ── Stream wiring ────────────────────────────────────────── */
+
+// One EventSource with the full stream wiring, shared by a fresh load and
+// a mid-flight rejoin: the server replays films + progress to any joining
+// tab, so recovering from a dropped connection needs no state reset.
+function wireSource(sourceId) {
   const source = new EventSource(`/api/watchlist/${encodeURIComponent(sourceId)}/stream`);
-  state.source = source;
+
+  // While details are still enriching, feed the host's activity monitor a
+  // cheap incoming request every few minutes. Render's free plan counts
+  // only incoming requests as activity and spins an "idle" instance down
+  // mid-stream — the connection then dies and the job must be rejoined.
+  if (state.keepaliveTimer) clearInterval(state.keepaliveTimer);
+  state.keepaliveTimer = setInterval(() => {
+    if (!state.detailsComplete) fetch('/api/health', { cache: 'no-store' }).catch(() => {});
+  }, 5 * 60 * 1000);
 
   source.addEventListener('open', () => {
+    state.rejoins = 0;
     if (state.networkTimer) {
       clearTimeout(state.networkTimer);
       state.networkTimer = null;
@@ -1282,31 +1308,57 @@ function loadUser(rawSource, { filters } = {}) {
       return;
     }
 
-    // A CLOSED state means the browser gave up for good — typically a non-200
-    // reply (bad username, server error) that EventSource cannot read. The
-    // server is clearly reachable, so "server down" would be misleading.
+    // Transport dropped. Everything already loaded stays usable, and the
+    // enrichment job keeps running server-side — throwing the user back to
+    // the landing page would discard a working pick. The grace period
+    // covers slow recoveries (an instance restarting, wake from sleep).
+    const inAppEnrichment = state.view === 'app' && !state.detailsComplete;
+
+    // CLOSED means the browser gave up for good — typically a non-200
+    // reply (bad username, or a proxy 502 while the instance restarts).
     if (source.readyState === EventSource.CLOSED) {
       stopSource();
+      if (inAppEnrichment) {
+        if ((state.rejoins || 0) < 5) {
+          // Rejoin: a fresh stream replays films + progress and the job
+          // resumes enriching without touching the current pick.
+          state.rejoins += 1;
+          toast(t('toast.retry'));
+          state.networkTimer = setTimeout(() => {
+            if (state.view === 'app' && !state.detailsComplete && !state.source) {
+              state.source = wireSource(state.username);
+            }
+          }, 2000);
+        } else {
+          els.detailsStrip.classList.add('hidden');
+          toast(t('app.detailsOffline'));
+        }
+        return;
+      }
       showLoadError(t('error.couldNotLoad'), 'error.couldNotLoad');
       setView('landing');
       return;
     }
 
-    // EventSource retries by itself and the `open` handler clears this timer
-    // the moment the connection returns, so the load resumes from the job's
-    // replayed state. The grace period covers slow recoveries (wake from
-    // sleep, a server restart) before giving up.
-    if (state.view === 'loading' && !state.networkTimer) {
+    // Not CLOSED: EventSource is retrying behind the scenes, and the
+    // `open` handler clears this timer the moment the connection returns.
+    if ((state.view === 'loading' || inAppEnrichment) && !state.networkTimer) {
       toast(t('toast.retry'));
       state.networkTimer = setTimeout(() => {
         if (state.view === 'loading') {
           stopSource();
           showLoadError(t('error.serverDown'), 'error.serverDown');
           setView('landing');
+        } else if (state.view === 'app' && !state.detailsComplete) {
+          stopSource();
+          els.detailsStrip.classList.add('hidden');
+          toast(t('app.detailsOffline'));
         }
       }, 30000);
     }
   });
+
+  return source;
 }
 
 function handleProgress(progress) {
