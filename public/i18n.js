@@ -13,31 +13,32 @@ const I18N = (() => {
 
   const dict = {
     en: {
-      'meta.title': 'Watchlist Reel — pick a random film from your Letterboxd watchlist',
+      'meta.title': 'Watchlist Reel — pick a random film from any Letterboxd list',
       'meta.description':
-        'Pick a random film from any public Letterboxd watchlist. Optional genre, rating, runtime, decade, and country filters. No login required.',
+        'Pick a random film from any public Letterboxd list — your watchlist or any curated list. Optional genre, rating, runtime, decade, and country filters. No login required.',
 
       'brand.name': 'Watchlist <em>Reel</em>',
       'theme.toLight': 'Switch to light theme',
       'theme.toDark': 'Switch to dark theme',
       'lang.switch': 'Switch to Arabic',
-      'user.title': 'Load a different watchlist',
+      'user.title': 'Load a different list',
+      'user.listChip': 'list: {name}',
 
-      'landing.eyebrow': 'A Letterboxd watchlist picker',
+      'landing.eyebrow': 'A Letterboxd list picker',
       'landing.title': 'Stop scrolling.<br /><em>Start watching.</em>',
       'landing.lede':
-        'Pick one random film from your Letterboxd watchlist. Add a few filters if tonight has a mood.',
-      'landing.usernameLabel': 'Letterboxd username',
+        'Pick one random film from any public Letterboxd list — your watchlist or any curated list. Add a few filters if tonight has a mood.',
+      'landing.usernameLabel': 'Letterboxd username or list link',
       'landing.placeholder': 'your-letterboxd-name',
-      'landing.submit': 'Load watchlist',
+      'landing.submit': 'Load list',
       'landing.demo': 'Try the 84-film demo',
-      'landing.hint': 'Public watchlists only · no login',
+      'landing.hint': 'Public lists only · no login',
 
       'loading.eyebrow': 'One moment',
-      'loading.title': 'Reading your watchlist…',
-      'loading.sub': 'Loading every watchlist page — not just the first one.',
-      'loading.subMulti': 'Loading every page so the reel has your whole list.',
-      'loading.subSingle': 'Reading the watchlist.',
+      'loading.title': 'Reading your list…',
+      'loading.sub': 'Loading every page of the list — not just the first one.',
+      'loading.subMulti': 'Loading every page so the reel has the whole list.',
+      'loading.subSingle': 'Reading the list.',
       'loading.starting': 'Starting…',
       'loading.cancel': 'Cancel',
       'loading.detailsTitle': 'Preparing the reel…',
@@ -47,6 +48,8 @@ const I18N = (() => {
       'loading.filmsCount': '{done} of {total} films',
       'app.kickerPrefix': '',
       'app.kickerSuffix': '’s watchlist · {total} films',
+      'app.kickerListPrefix': '',
+      'app.kickerListSuffix': ' — a list by {owner} · {total} films',
       'app.poolOne': 'film in the reel',
       'app.poolMany': 'films in the reel',
       'app.filters': 'Filters',
@@ -100,16 +103,16 @@ const I18N = (() => {
       'runtime.minutes': '{minutes}m',
 
       'announce.picked': 'Picked {title}{year}.',
-      'announce.loaded': 'Watchlist loaded with {total} films. Details are still loading.',
+      'announce.loaded': 'List loaded with {total} films. Details are still loading.',
       'announce.ready':
         'All film details ready. {count} films in the reel. Filters are available.',
       'announce.noMatch': 'No films match these filters.',
 
-      'error.usernameEmpty': 'Enter a Letterboxd username first.',
-      'error.usernameInvalid':
-        'That does not look like a Letterboxd username. Use letters, numbers, dashes and underscores.',
-      'error.loadFailed': 'That watchlist could not be read. Try again.',
-      'error.couldNotLoad': 'Could not load that watchlist.',
+      'error.inputEmpty': 'Enter a Letterboxd username or paste a list link first.',
+      'error.inputInvalid':
+        'That does not look like a Letterboxd username or list link. Use letters, numbers, dashes and underscores, or paste a list URL.',
+      'error.loadFailed': 'That list could not be read. Try again.',
+      'error.couldNotLoad': 'Could not load that list.',
       'error.serverDown': 'Could not reach the server. Check that it is running and try again.',
       'error.demoMissing': 'The demo dataset is missing.',
 
@@ -147,31 +150,32 @@ const I18N = (() => {
     },
 
     ar: {
-      'meta.title': 'قائمة المشاهدة — فيلم عشوائي من قائمة ليتربوكسد',
+      'meta.title': 'قائمة المشاهدة — فيلم عشوائي من أي قائمة ليتربوكسد',
       'meta.description':
-        'اختر فيلمًا عشوائيًا من أي قائمة مشاهدة عامة على ليتربوكسد. فلاتر اختيارية للتصنيف والتقييم والمدة والعقد والبلد، بدون تسجيل دخول.',
+        'اختر فيلمًا عشوائيًا من أي قائمة عامة على ليتربوكسد — قائمة مشاهدتك أو أي قائمة أخرى. فلاتر اختيارية للتصنيف والتقييم والمدة والعقد والبلد، بدون تسجيل دخول.',
 
       'brand.name': 'قائمة <em>المشاهدة</em>',
       'theme.toLight': 'التبديل إلى الوضع الفاتح',
       'theme.toDark': 'التبديل إلى الوضع الداكن',
       'lang.switch': 'Switch to English',
-      'user.title': 'تحميل قائمة مشاهدة أخرى',
+      'user.title': 'تحميل قائمة أخرى',
+      'user.listChip': 'قائمة: {name}',
 
-      'landing.eyebrow': 'مُختار أفلام من قائمة مشاهدتك',
+      'landing.eyebrow': 'مُختار أفلام من قوائم ليتربوكسد',
       'landing.title': 'توقّف عن التمرير.<br /><em>ابدأ المشاهدة.</em>',
       'landing.lede':
-        'اختر فيلمًا عشوائيًا واحدًا من قائمة مشاهداتك على ليتربوكسد. أضف بعض الفلاتر إذا كان لليلتك مزاج معيّن.',
-      'landing.usernameLabel': 'اسم المستخدم في ليتربوكسد',
+        'اختر فيلمًا عشوائيًا واحدًا من أي قائمة عامة على ليتربوكسد — قائمة مشاهدتك أو أي قائمة أخرى. أضف بعض الفلاتر إذا كان لليلتك مزاج معيّن.',
+      'landing.usernameLabel': 'اسم المستخدم أو رابط قائمة في ليتربوكسد',
       'landing.placeholder': 'اسم-حسابك-في-ليتربوكسد',
-      'landing.submit': 'حمّل قائمة المشاهدة',
+      'landing.submit': 'حمّل القائمة',
       'landing.demo': 'جرّب الديمو (84 فيلمًا)',
       'landing.hint': 'قوائم عامة فقط · بدون تسجيل دخول',
 
       'loading.eyebrow': 'لحظة واحدة',
-      'loading.title': 'نقرأ قائمة مشاهدتك…',
+      'loading.title': 'نقرأ قائمتك…',
       'loading.sub': 'نحمّل كل صفحات القائمة — وليس الصفحة الأولى فقط.',
-      'loading.subMulti': 'نحمّل كل الصفحات حتى تضم القائمة كل أفلامك.',
-      'loading.subSingle': 'نقرأ قائمة المشاهدة.',
+      'loading.subMulti': 'نحمّل كل الصفحات حتى تضم القائمة كل أفلامها.',
+      'loading.subSingle': 'نقرأ القائمة.',
       'loading.starting': 'نبدأ…',
       'loading.cancel': 'إلغاء',
       'loading.detailsTitle': 'نجهّز القائمة…',
@@ -182,6 +186,8 @@ const I18N = (() => {
 
       'app.kickerPrefix': 'قائمة مشاهدة ',
       'app.kickerSuffix': ' فيها {total} فيلمًا',
+      'app.kickerListPrefix': 'قائمة ',
+      'app.kickerListSuffix': ' من إعداد {owner} فيها {total} فيلمًا',
       'app.poolOne': 'فيلم في القائمة',
       'app.poolMany': 'أفلام في القائمة',
       'app.filters': 'الفلاتر',
@@ -234,16 +240,16 @@ const I18N = (() => {
       'runtime.minutes': '{minutes} د',
 
       'announce.picked': 'تم اختيار {title}{year}.',
-      'announce.loaded': 'تم تحميل قائمة المشاهدة وفيها {total} فيلمًا. التفاصيل ما زالت تُقرأ.',
+      'announce.loaded': 'تم تحميل القائمة وفيها {total} فيلمًا. التفاصيل ما زالت تُقرأ.',
       'announce.ready':
         'اكتملت تفاصيل الأفلام. {count} فيلمًا في القائمة. الفلاتر متاحة الآن.',
       'announce.noMatch': 'لا توجد أفلام مطابقة لهذه الفلاتر.',
 
-      'error.usernameEmpty': 'أدخل اسم مستخدم ليتربوكسد أولًا.',
-      'error.usernameInvalid':
-        'يبدو أن هذا ليس اسم مستخدم صحيحًا في ليتربوكسد. استخدم حروفًا وأرقامًا وشرطات فقط.',
-      'error.loadFailed': 'تعذّرت قراءة قائمة المشاهدة. حاول مرة أخرى.',
-      'error.couldNotLoad': 'تعذّر تحميل قائمة المشاهدة.',
+      'error.inputEmpty': 'أدخل اسم مستخدم أو الصق رابط قائمة على ليتربوكسد أولًا.',
+      'error.inputInvalid':
+        'يبدو أن هذا ليس اسم مستخدم أو رابط قائمة صحيحًا في ليتربوكسد. استخدم حروفًا وأرقامًا وشرطات، أو الصق رابط قائمة كاملًا.',
+      'error.loadFailed': 'تعذّرت قراءة هذه القائمة. حاول مرة أخرى.',
+      'error.couldNotLoad': 'تعذّر تحميل هذه القائمة.',
       'error.serverDown': 'تعذّر الوصول إلى الخادم. تأكد أنه يعمل ثم حاول مرة أخرى.',
       'error.demoMissing': 'بيانات الديمو غير موجودة.',
 

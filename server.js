@@ -7,12 +7,13 @@ const path = require('node:path');
 const {
   BASE,
   scrapeWatchlist,
+  scrapeList,
   enrichFilms,
   fetchFilmDetails,
   computeStats,
   basicFilmFromItem,
-  normalizeUsername,
   isValidUsername,
+  isValidListSlug,
 } = require('./lib/letterboxd');
 const { translate } = require('./lib/translate');
 
@@ -55,13 +56,46 @@ let prewarming = false;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-function cachePath(username) {
-  return path.join(CACHE_DIR, `${username}.json`);
+// A source id is either a username ("justloay") or a list path
+// ("justloay/list/road"). The id doubles as the cache key; list cache files
+// replace "/" with "+" because "+" never appears in a valid username, so the
+// two kinds can never collide in data/watchlists/.
+const LIST_ID_RE = /^([a-z0-9_-]{1,30})\/list\/([a-z0-9-]{1,100})$/;
+
+function parseSourceId(raw) {
+  const id = String(raw || '')
+    .trim()
+    .toLowerCase();
+  if (!id) return null;
+  const listMatch = LIST_ID_RE.exec(id);
+  if (listMatch) {
+    const [, owner, slug] = listMatch;
+    if (!isValidUsername(owner) || !isValidListSlug(slug)) return null;
+    return { kind: 'list', id, owner, slug, cacheFile: id.replace(/\//g, '+') };
+  }
+  if (id === 'demo') return { kind: 'demo', id, cacheFile: 'demo' };
+  if (!isValidUsername(id)) return null;
+  return { kind: 'user', id, username: id, cacheFile: id };
 }
 
-async function readCached(username) {
+function sourceUrl(src) {
+  return src.kind === 'list' ? `${BASE}/${src.owner}/list/${src.slug}/` : `${BASE}/${src.id}/watchlist/`;
+}
+
+function cacheFileFor(sourceId) {
+  const src = parseSourceId(sourceId);
+  return src ? src.cacheFile : null;
+}
+
+function cachePath(cacheFile) {
+  return path.join(CACHE_DIR, `${cacheFile}.json`);
+}
+
+async function readCached(sourceId) {
+  const cacheFile = cacheFileFor(sourceId);
+  if (!cacheFile) return null;
   try {
-    const raw = await fsp.readFile(cachePath(username), 'utf8');
+    const raw = await fsp.readFile(cachePath(cacheFile), 'utf8');
     const parsed = JSON.parse(raw);
     if (parsed.version !== CACHE_VERSION) return null;
     const age = Date.now() - new Date(parsed.fetchedAt).getTime();
@@ -72,8 +106,10 @@ async function readCached(username) {
 }
 
 async function writeCache(payload) {
+  const cacheFile = cacheFileFor(payload.username);
+  if (!cacheFile) throw new Error(`Unsupported cache key: ${payload.username}`);
   await fsp.mkdir(CACHE_DIR, { recursive: true });
-  const target = cachePath(payload.username);
+  const target = cachePath(cacheFile);
   const tmp = `${target}.${process.pid}.tmp`;
   await fsp.writeFile(tmp, JSON.stringify(payload), 'utf8');
   await fsp.rename(tmp, target);
@@ -101,9 +137,10 @@ function sseSend(res, event, data) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-function startJob(username, previous = null) {
+function startJob(sourceId, previous = null) {
+  const src = parseSourceId(sourceId);
   const job = {
-    username,
+    username: sourceId,
     listeners: new Set(),
     progress: { phase: 'starting', message: 'Opening the projection booth…' },
     startedAt: Date.now(),
@@ -112,7 +149,7 @@ function startJob(username, previous = null) {
     result: null,
     error: null,
   };
-  jobs.set(username, job);
+  jobs.set(sourceId, job);
 
   let lastDetailReport = 0;
   const emit = (event, data) => {
@@ -141,10 +178,11 @@ function startJob(username, previous = null) {
       }
     }
 
-    const watchlist = await scrapeWatchlist(username, {
-      pageConcurrency: PAGE_CONCURRENCY,
-      onProgress,
-    });
+    const scrapePromise =
+      src.kind === 'list'
+        ? scrapeList(src.owner, src.slug, { pageConcurrency: PAGE_CONCURRENCY, onProgress })
+        : scrapeWatchlist(src.username, { pageConcurrency: PAGE_CONCURRENCY, onProgress });
+    const watchlist = await scrapePromise;
 
     const basics = watchlist.items.map(basicFilmFromItem);
     const pickItem = watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
@@ -181,9 +219,12 @@ function startJob(username, previous = null) {
     const basicsWithPick = basics.map((film) => (film.slug === pick.slug ? pick : film));
     const base = {
       version: CACHE_VERSION,
-      username,
+      username: sourceId,
+      kind: src.kind === 'list' ? 'list' : 'watchlist',
+      owner: src.kind === 'list' ? src.owner : undefined,
+      slug: src.kind === 'list' ? src.slug : undefined,
       fetchedAt: new Date().toISOString(),
-      source: `${BASE}/${username}/watchlist/`,
+      source: sourceUrl(src),
       pagesFetched: watchlist.pagesFetched,
       pagesTotal: watchlist.pagesTotal,
       listStatus: watchlist.lastListStatus,
@@ -220,7 +261,7 @@ function startJob(username, previous = null) {
     job.status = 'done';
     job.result = payload;
     await writeCache(payload).catch((error) => {
-      console.warn(`[cache] could not write ${username}:`, error.message);
+      console.warn(`[cache] could not write ${sourceId}:`, error.message);
     });
     emit('done', { cached: false, ...payload });
     return payload;
@@ -229,7 +270,7 @@ function startJob(username, previous = null) {
       if (job.status === 'done') return null;
       job.status = 'error';
       job.error = {
-        message: error.message || 'Could not load that watchlist.',
+        message: error.message || 'Could not load that list.',
         code: error.code || 'LOAD_FAILED',
       };
       emit('error', job.error);
@@ -237,22 +278,25 @@ function startJob(username, previous = null) {
     })
     .finally(() => {
       setTimeout(() => {
-        if (jobs.get(username) === job) jobs.delete(username);
+        if (jobs.get(sourceId) === job) jobs.delete(sourceId);
       }, 30000).unref?.();
     });
 
   return job;
 }
 
-async function handleWatchlistStream(req, res, usernameRaw, url) {
-  const username = normalizeUsername(usernameRaw);
-  if (!isValidUsername(username)) {
-    sendJson(res, 400, { error: 'Enter a valid Letterboxd username (letters, numbers, dashes, underscores).' });
+async function handleWatchlistStream(req, res, sourceIdRaw, url) {
+  const source = parseSourceId(decodeURIComponent(sourceIdRaw));
+  if (!source) {
+    sendJson(res, 400, {
+      error: 'Enter a valid Letterboxd username (letters, numbers, dashes, underscores) or a list URL.',
+    });
     return;
   }
+  const sourceId = source.id;
 
   const openedAt = Date.now();
-  const streamLog = (msg) => console.log(`[sse] ${username}: ${msg} (+${Math.round((Date.now() - openedAt) / 1000)}s)`);
+  const streamLog = (msg) => console.log(`[sse] ${sourceId}: ${msg} (+${Math.round((Date.now() - openedAt) / 1000)}s)`);
   res.on('close', () => streamLog(`closed (${res.writableEnded ? 'ended' : 'broken'})`));
   req.on('error', (err) => streamLog(`req error: ${err.message}`));
   res.on('error', (err) => streamLog(`res error: ${err.message}`));
@@ -267,7 +311,7 @@ async function handleWatchlistStream(req, res, usernameRaw, url) {
   });
   res.write(': connected\n\n');
 
-  if (username === 'demo') {
+  if (sourceId === 'demo') {
     try {
       const demo = await readDemo();
       sseSend(res, 'done', { cached: false, ...demo });
@@ -280,16 +324,16 @@ async function handleWatchlistStream(req, res, usernameRaw, url) {
 
   const refresh = url.searchParams.get('refresh') === '1';
 
-  const cached = await readCached(username);
+  const cached = await readCached(sourceId);
   if (!refresh && cached?.fresh) {
     sseSend(res, 'done', { cached: true, ...cached.payload });
     res.end();
     return;
   }
 
-  let job = jobs.get(username);
+  let job = jobs.get(sourceId);
   if (!job || (refresh && job.status !== 'running')) {
-    job = startJob(username, cached?.payload || null);
+    job = startJob(sourceId, cached?.payload || null);
   }
 
   let heartbeat = null;
@@ -330,13 +374,14 @@ async function handleWatchlistStream(req, res, usernameRaw, url) {
   if (job.progress && !finished) sseSend(res, 'progress', job.progress);
 }
 
-async function handleWatchlist(req, res, usernameRaw) {
-  const username = normalizeUsername(usernameRaw);
-  if (!isValidUsername(username)) {
-    sendJson(res, 400, { error: 'Enter a valid Letterboxd username.' });
+async function handleWatchlist(req, res, sourceIdRaw) {
+  const source = parseSourceId(decodeURIComponent(sourceIdRaw));
+  if (!source) {
+    sendJson(res, 400, { error: 'Enter a valid Letterboxd username or list URL.' });
     return;
   }
-  if (username === 'demo') {
+  const sourceId = source.id;
+  if (sourceId === 'demo') {
     try {
       sendJson(res, 200, await readDemo());
     } catch {
@@ -344,7 +389,7 @@ async function handleWatchlist(req, res, usernameRaw) {
     }
     return;
   }
-  const cached = await readCached(username);
+  const cached = await readCached(sourceId);
   if (!cached) {
     sendJson(res, 404, { error: 'Not cached yet. Use the streaming endpoint.', code: 'NOT_CACHED' });
     return;
@@ -454,14 +499,18 @@ async function prewarmStaleCaches() {
     }
     for (const name of names) {
       if (!name.endsWith('.json')) continue;
-      const username = name.slice(0, -'.json'.length);
-      if (!isValidUsername(username) || jobs.has(username)) continue;
-      const cached = await readCached(username);
+      const cacheFile = name.slice(0, -'.json'.length);
+      // "+" in a cache file can only come from a list id ("/" is not a legal
+      // filename character), so the mapping back is unambiguous.
+      const sourceId = cacheFile.includes('+') ? cacheFile.replace(/\+/g, '/') : cacheFile;
+      const src = parseSourceId(sourceId);
+      if (!src || src.kind === 'demo' || jobs.has(sourceId)) continue;
+      const cached = await readCached(sourceId);
       // Fresh caches already answer immediately; only stale ones need the
       // network, and doing it now means the next visitor never sees a wait.
       if (!cached || cached.fresh) continue;
-      console.log(`[prewarm] refreshing stale cache for ${username}`);
-      await startJob(username, cached.payload).promise;
+      console.log(`[prewarm] refreshing stale cache for ${sourceId}`);
+      await startJob(sourceId, cached.payload).promise;
       await sleep(1500);
     }
   } finally {
@@ -530,7 +579,7 @@ process.on('unhandledRejection', (err) => console.error('[unhandledRejection]', 
 server.listen(PORT, HOST, () => {
   console.log(`\n  Watchlist Reel running at http://${HOST}:${PORT}\n`);
   console.log('  Demo dataset: (click "Try the demo" or load username "demo")');
-  console.log('  Live mode reads every public watchlist page, then enriches film details in the background.');
+  console.log('  Live mode reads every page of a watchlist or any public list, then enriches film details in the background.');
   console.log('  The first result appears as soon as the watchlist list is ready; filters unlock when details finish.');
   if (PREWARM) {
     console.log('  Stale caches refresh in the background (PREWARM=0 disables this).\n');

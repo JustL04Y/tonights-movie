@@ -1,8 +1,9 @@
 # Watchlist Reel
 
-A fast, deliberately simple random-film picker for a public Letterboxd
-watchlist. Enter a username, get one film, and optionally narrow the reel by
-genre, rating, runtime, decade, or country.
+A fast, deliberately simple random-film picker for any public Letterboxd list.
+Enter a username (to pick from their watchlist) or paste any list URL — such as
+`https://letterboxd.com/official/list/letterboxds-top-500-films` — get one film,
+and optionally narrow the reel by genre, rating, runtime, decade, or country.
 
 The goal is to feel like the original one-button picker rather than a dashboard:
 one card, one always-visible filter panel, and no film-by-film loading feed.
@@ -21,12 +22,16 @@ npm start
 Open <http://127.0.0.1:3000>.
 
 The landing page has a **Try the 84-film demo** button, which works without
-contacting Letterboxd. To load a real watchlist, enter a public Letterboxd
-username.
+contacting Letterboxd. To load a real source, enter a public Letterboxd
+username or paste a list URL — the field detects which one you meant.
 
-> The watchlist must be public. Private watchlists cannot be read without a login.
+> The source must be public. Private watchlists and lists cannot be read
+> without a login.
 
 ## Features
+
+- **Any public list or watchlist** — paste a full list URL, or type the bare
+  path (`justloay/list/road`), or just a username for their watchlist.
 
 - **One random film at a time** from a shuffled deck that avoids immediate repeats.
 - **Genre filters** with multi-select and `Any` / `All` matching.
@@ -37,12 +42,13 @@ username.
   no rating or runtime data stay included.
 - **Collapsible filter panel** — click `Filters` to show or hide the whole list, then click a filter name to expand its options.
 - **Filter headers are always on the page** — options expand in place, with no pop-up panel.
-- **Every watchlist page is read**, up to 200 pages (5,600 films), instead of
-  stopping at the first few pages.
+- **Every page is read**, up to 200 pages, instead of stopping at the first few.
 - **Fast first result**: the full list arrives first, then one fully enriched
   random pick is shown while the rest of the metadata loads in the background.
 - **Aggregate progress only** (`completed / total`), never a stream of film titles.
-- **Readable URLs**: username and filters live in the URL hash.
+- **Readable URLs**: source (username or list id) and filters live in the URL hash.
+- **Username and list history** — recent sources appear as suggestions when you
+  click the input field; the field itself always starts empty.
 - **Keyboard shortcut** while picking: `R` picks another film.
 - **English and Arabic**, with an `EN` / `ع` toggle. The first visit follows the
   browser language, and the choice is remembered. Arabic uses full RTL layout,
@@ -61,7 +67,7 @@ username.
 
 There are two phases so the page never feels like it is crawling through films:
 
-1. **Watchlist phase** — the server fetches every public watchlist page
+1. **Watchlist/list phase** — the server fetches every page of the source
    concurrently and streams page-level progress. This usually takes a few
    seconds. It then renders the app with the complete set of titles, years, and
    links, plus one fully enriched random pick.
@@ -79,7 +85,7 @@ The practical result is three load states:
 | State | What happens | Rough time for 600 films |
 | --- | --- | --- |
 | Fresh | The two-hour cache is served without any network call. | ~50ms |
-| Warm | The watchlist is re-read; details under a week old are reused. | ~2s |
+| Warm | The source is re-read; details under a week old are reused. | ~2s |
 | Cold | No usable details: every film page is read. | ~13s |
 
 Cold loads are rare because **stale caches refresh in the background** — on
@@ -104,14 +110,18 @@ reports a partial result rather than silently dropping it.
 For a live username the server:
 
 1. Reads public watchlist pages at
-   `https://letterboxd.com/{username}/watchlist/page/{n}/`, detecting the last
-   page from Letterboxd's pagination.
+   `https://letterboxd.com/{username}/watchlist/page/{n}/` — or, for a list,
+   `https://letterboxd.com/{owner}/list/{slug}/page/{n}/` — detecting the last
+   page from Letterboxd's pagination. List pages use the same poster-grid
+   markup as watchlists, so one parser serves both.
 2. Reads each film's public Letterboxd page and extracts the JSON-LD `Movie`
    node plus Open Graph metadata.
 3. Normalizes rating, runtime, genres, countries, languages, directors, poster,
    backdrop, and synopsis.
-4. Streams basics, aggregate progress, and the final dataset to the browser, then
-   writes the finished dataset to `data/watchlists/{username}.json`.
+4. Streams basics, aggregate progress, and the final dataset to the browser,
+   then writes the finished dataset to `data/watchlists/{username}.json` (list
+   sources become `{owner}+list+{slug}.json`, a filename form a username can
+   never produce).
 
 Requests use a normal browser user agent, bounded concurrency, and small delays
 between page batches. Watchlist pages load at up to 12 concurrent requests and
@@ -141,7 +151,7 @@ The app stores its state in the URL hash. Example:
 
 | Param | Meaning |
 | --- | --- |
-| `u` | Letterboxd username (`demo` for the built-in dataset) |
+| `u` | Letterboxd username, a list id as `owner/list/slug`, or `demo` for the built-in dataset |
 | `g` | Comma-separated genres |
 | `m` | `all` for all-genres matching; omit for any |
 | `r` | Minimum rating, from `0.1` to `5` in `0.1` steps |
@@ -155,8 +165,8 @@ The app stores its state in the URL hash. Example:
 | --- | --- |
 | `GET /api/health` | Server status and active job count |
 | `GET /api/demo` | The demo dataset as JSON |
-| `GET /api/watchlist/:username` | A cached watchlist (404 if not cached) |
-| `GET /api/watchlist/:username/stream` | SSE stream with `progress`, `films`, `done`, and `error` events |
+| `GET /api/watchlist/:source` | A cached source (404 if not cached). `:source` is a username or an encoded list id (`justloay%2Flist%2Froad`) |
+| `GET /api/watchlist/:source/stream` | SSE stream with `progress`, `films`, `done`, and `error` events |
 | `GET /api/film/:slug` | On-demand metadata for a single film |
 | `GET /api/translate?lang=ar&q=…` | English-to-Arabic synopsis translation (cached on disk) |
 
@@ -199,12 +209,12 @@ reference.
 
 ## Limitations
 
-- Public watchlists only; no Letterboxd login or OAuth.
+- Public sources only; no Letterboxd login or OAuth.
 - Scraping depends on Letterboxd's current HTML and JSON-LD markup. If that
   changes, `lib/letterboxd.js` will need updating.
 - Country, genre, rating, and release-year data is only as complete as Letterboxd's metadata.
-- The first result appears as soon as the watchlist list is ready; filters need
-  the background details pass to finish.
+- The first result appears as soon as the list is ready; filters need the
+  background details pass to finish.
 - Poster and backdrop images are hot-linked from Letterboxd's CDN.
 - Arabic synopses are machine-translated through public endpoints (Google
   translate via two endpoints, with MyMemory as a last resort). They need a

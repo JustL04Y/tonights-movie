@@ -50,9 +50,9 @@
     </script>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/fonts/plex.css" />
-    <link rel="stylesheet" href="/styles.css?v=66" />
-    <script src="/i18n.js?v=66" defer></script>
-    <script src="/app.js?v=66" defer></script>
+    <link rel="stylesheet" href="/styles.css?v=67" />
+    <script src="/i18n.js?v=67" defer></script>
+    <script src="/app.js?v=67" defer></script>
   </head>
   <body>
     <div class="backdrop" id="backdrop" aria-hidden="true"></div>
@@ -80,14 +80,15 @@
     <main>
       <!-- Landing -->
       <section id="landingView" class="landing">
-        <p class="eyebrow" data-i18n="landing.eyebrow">A Letterboxd watchlist picker</p>
+        <p class="eyebrow" data-i18n="landing.eyebrow">A Letterboxd list picker</p>
         <h1 data-i18n-html="landing.title">Stop scrolling.<br /><em>Start watching.</em></h1>
         <p class="lede" data-i18n="landing.lede">
-          Pick one random film from your Letterboxd watchlist. Add a few filters if tonight has a mood.
+          Pick one random film from any public Letterboxd list — your watchlist or any curated list. Add a few filters
+          if tonight has a mood.
         </p>
 
         <form id="loadForm" class="load-form" autocomplete="off">
-          <label class="sr-only" for="usernameInput" data-i18n="landing.usernameLabel">Letterboxd username</label>
+          <label class="sr-only" for="usernameInput" data-i18n="landing.usernameLabel">Letterboxd username or list link</label>
           <div class="input-shell">
             <span class="at" aria-hidden="true">@</span>
             <input
@@ -98,19 +99,19 @@
               spellcheck="false"
               placeholder="your-letterboxd-name"
               data-i18n-placeholder="landing.placeholder"
-              maxlength="30"
+              maxlength="200"
               list="userSuggestions"
             />
           </div>
           <datalist id="userSuggestions"></datalist>
-          <button class="btn primary" type="submit" data-i18n="landing.submit">Load watchlist</button>
+          <button class="btn primary" type="submit" data-i18n="landing.submit">Load list</button>
         </form>
 
         <p id="loadError" class="load-error" role="alert" hidden></p>
 
         <div class="landing-actions">
           <button class="link-btn" id="demoBtn" type="button" data-i18n="landing.demo">Try the 84-film demo</button>
-          <span class="hint" data-i18n="landing.hint">Public watchlists only · no login</span>
+          <span class="hint" data-i18n="landing.hint">Public lists only · no login</span>
         </div>
       </section>
 
@@ -118,9 +119,9 @@
       <section id="loadingView" class="loading hidden" aria-live="polite">
         <div class="loading-inner">
           <p class="eyebrow" data-i18n="loading.eyebrow">One moment</p>
-          <h2 id="loadingTitle" data-i18n="loading.title">Reading your watchlist…</h2>
+          <h2 id="loadingTitle" data-i18n="loading.title">Reading your list…</h2>
           <p class="loading-sub" id="loadingSub" data-i18n="loading.sub">
-            Loading every watchlist page — not just the first one.
+            Loading every page of the list — not just the first one.
           </p>
           <div class="progress-track" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
           <div class="progress-meta">

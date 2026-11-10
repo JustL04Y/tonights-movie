@@ -164,13 +164,35 @@ const compactNumber = (() => {
 function normalizeInput(value) {
   let input = String(value || '').trim();
   if (!input) return '';
-  const fromUrl = /letterboxd\.com\/([^/?#]+)\/watchlist/i.exec(input);
-  if (fromUrl) input = fromUrl[1];
+  // A pasted watchlist URL reduces to the username.
+  const fromWatchlistUrl = /letterboxd\.com\/([^/?#]+)\/watchlist/i.exec(input);
+  if (fromWatchlistUrl) input = fromWatchlistUrl[1];
+  else {
+    // A pasted list URL reduces to an "owner/list/slug" source id.
+    const fromListUrl = /letterboxd\.com\/([^/?#]+)\/list\/([^/?#]+)/i.exec(input);
+    if (fromListUrl) input = `${fromListUrl[1]}/list/${fromListUrl[2]}`;
+  }
   return input.replace(/^@+/, '').toLowerCase();
 }
 
 function isValidUsername(username) {
   return /^[a-z0-9_-]{1,30}$/.test(username);
+}
+
+// A list source id looks like "owner/list/slug" (as extracted from a pasted
+// list URL, or the bare path typed on its own).
+function isValidListId(id) {
+  return /^([a-z0-9_-]{1,30})\/list\/([a-z0-9-]{1,100})$/.test(id);
+}
+
+function isValidSource(id) {
+  return isValidUsername(id) || isValidListId(id);
+}
+
+function parseSourceId(id) {
+  const listMatch = /^([a-z0-9_-]{1,30})\/list\/([a-z0-9-]{1,100})$/.exec(id || '');
+  if (listMatch) return { kind: 'list', owner: listMatch[1], slug: listMatch[2] };
+  return { kind: 'user', username: id || '' };
 }
 
 // Ratings inside Letterboxd are decimal averages, so the slider keeps one
@@ -316,12 +338,24 @@ function showLoading() {
 
 function showApp() {
   setView('app');
-  const name = state.username === 'demo' ? 'demo' : state.username;
-  els.userChip.textContent = `@${name}`;
+  const src = parseSourceId(state.username);
+  if (src.kind === 'list') {
+    // For lists the slug is the readable name; the owner shows in the kicker.
+    els.userChip.textContent = t('user.listChip', { name: src.slug });
+    els.usernameOut.textContent = src.slug;
+    els.kickerPrefix.textContent = t('app.kickerListPrefix');
+    els.kickerSuffix.textContent = t('app.kickerListSuffix', {
+      owner: src.owner,
+      total: state.total.toLocaleString(),
+    });
+  } else {
+    const name = state.username === 'demo' ? 'demo' : state.username;
+    els.userChip.textContent = `@${name}`;
+    els.usernameOut.textContent = name;
+    els.kickerPrefix.textContent = t('app.kickerPrefix');
+    els.kickerSuffix.textContent = t('app.kickerSuffix', { total: state.total.toLocaleString() });
+  }
   els.userChip.classList.remove('hidden');
-  els.usernameOut.textContent = name;
-  els.kickerPrefix.textContent = t('app.kickerPrefix');
-  els.kickerSuffix.textContent = t('app.kickerSuffix', { total: state.total.toLocaleString() });
 }
 
 function showEmpty() {
@@ -1104,7 +1138,7 @@ function loadUserHistory() {
     const raw = JSON.parse(localStorage.getItem(USER_HISTORY_KEY) || '[]');
     if (!Array.isArray(raw)) return [];
     return [...new Set(raw)]
-      .filter((entry) => typeof entry === 'string' && isValidUsername(entry))
+      .filter((entry) => typeof entry === 'string' && isValidSource(entry))
       .slice(0, USER_HISTORY_LIMIT);
   } catch {
     return [];
@@ -1132,25 +1166,25 @@ function saveUserToHistory(username) {
   renderUserSuggestions(history);
 }
 
-function loadUser(rawUsername, { filters } = {}) {
-  const username = normalizeInput(rawUsername || '');
-  if (!username) {
-    showLoadError(t('error.usernameEmpty'), 'error.usernameEmpty');
+function loadUser(rawSource, { filters } = {}) {
+  const sourceId = normalizeInput(rawSource || '');
+  if (!sourceId) {
+    showLoadError(t('error.inputEmpty'), 'error.inputEmpty');
     els.username.focus();
     return;
   }
-  if (!isValidUsername(username)) {
-    showLoadError(t('error.usernameInvalid'), 'error.usernameInvalid');
+  if (!isValidSource(sourceId)) {
+    showLoadError(t('error.inputInvalid'), 'error.inputInvalid');
     els.username.focus();
     return;
   }
 
   stopSource();
   showLoadError('');
-  els.username.value = username;
-  if (username !== 'demo') saveUserToHistory(username);
+  els.username.value = sourceId;
+  if (sourceId !== 'demo') saveUserToHistory(sourceId);
 
-  state.username = username;
+  state.username = sourceId;
   state.films = [];
   state.filmBySlug = new Map();
   state.total = 0;
@@ -1189,7 +1223,7 @@ function loadUser(rawUsername, { filters } = {}) {
   setView('loading');
   showLoading();
 
-  const source = new EventSource(`/api/watchlist/${encodeURIComponent(username)}/stream`);
+  const source = new EventSource(`/api/watchlist/${encodeURIComponent(sourceId)}/stream`);
   state.source = source;
 
   source.addEventListener('open', () => {
