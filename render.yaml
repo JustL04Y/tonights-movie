@@ -20,3 +20,12 @@ services:
         value: 0.0.0.0
       - key: NODE_VERSION
         value: "20"
+      # Memory headroom on the free 512 MB plan: with the small
+      # concurrency below, a 384 MB V8 heap leaves room for undici
+      # buffers and prevents "JavaScript heap out of memory" crashes.
+      - key: NODE_OPTIONS
+        value: --max-old-space-size=384
+      - key: FILM_CONCURRENCY
+        value: "8"
+      - key: PAGE_CONCURRENCY
+        value: "4"

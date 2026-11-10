@@ -47,8 +47,15 @@ const CACHE_TTL_MS = Math.max(5, CACHE_TTL_MINUTES) * 60 * 1000;
 // ratings and metadata do not drift forever on lists that are never re-read.
 const SEED_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
 const CACHE_VERSION = 2;
-const PAGE_CONCURRENCY = Math.max(1, Number(process.env.PAGE_CONCURRENCY || 12));
-const FILM_CONCURRENCY = Math.max(1, Number(process.env.FILM_CONCURRENCY || 32));
+// Concurrency vs. memory: every in-flight film page holds 1–2 MB of HTML
+// (plus undici buffers and parse temporaries). 32 concurrent pages peaks
+// well past the ~256 MB V8 heap allowed inside Render's free 512 MB
+// container, and the instance dies mid-enrichment ("JavaScript heap out
+// of memory"). Small hosts get small batches; local machines keep the
+// fast defaults. Override with env vars either way.
+const MEM_DEFAULTS = IS_RENDER ? { page: 4, film: 8 } : { page: 12, film: 32 };
+const PAGE_CONCURRENCY = Math.max(1, Number(process.env.PAGE_CONCURRENCY || MEM_DEFAULTS.page));
+const FILM_CONCURRENCY = Math.max(1, Number(process.env.FILM_CONCURRENCY || MEM_DEFAULTS.film));
 // Refresh stale caches in the background instead of making the next visitor
 // wait for a cold/warm rebuild. Set PREWARM=0 to disable.
 const PREWARM = process.env.PREWARM !== '0';
