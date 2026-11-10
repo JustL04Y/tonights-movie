@@ -56,6 +56,12 @@ const CACHE_VERSION = 2;
 const MEM_DEFAULTS = IS_RENDER ? { page: 4, film: 8 } : { page: 12, film: 32 };
 const PAGE_CONCURRENCY = Math.max(1, Number(process.env.PAGE_CONCURRENCY || MEM_DEFAULTS.page));
 const FILM_CONCURRENCY = Math.max(1, Number(process.env.FILM_CONCURRENCY || MEM_DEFAULTS.film));
+
+console.log(
+  `[boot] render=${IS_RENDER} page=${PAGE_CONCURRENCY} film=${FILM_CONCURRENCY} heap=${Math.round(
+    process.memoryUsage().heapUsed / 1e6
+  )}MB node=${process.version}`
+);
 // Refresh stale caches in the background instead of making the next visitor
 // wait for a cold/warm rebuild. Set PREWARM=0 to disable.
 const PREWARM = process.env.PREWARM !== '0';
@@ -186,6 +192,13 @@ function startJob(sourceId, previous = null) {
       const now = Date.now();
       if (progress.completed !== progress.total && now - lastDetailReport < 500) return;
       lastDetailReport = now;
+      // Heap trajectory per progress tick: a climbing line here means real
+      // retention; a flat line under stalls means throttling (403/429s).
+      const mem = process.memoryUsage();
+      console.log(
+        `[job] ${sourceId}: details ${progress.completed}/${progress.total} failed=${progress.failed} ` +
+          `heap=${Math.round(mem.heapUsed / 1e6)}MB rss=${Math.round(mem.rss / 1e6)}MB`
+      );
     }
     emit('progress', progress);
   };
