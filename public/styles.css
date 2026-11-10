@@ -261,7 +261,7 @@ button {
   color: var(--text);
   text-decoration: none;
   font-family: var(--font-label);
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
@@ -1700,13 +1700,11 @@ html[dir="rtl"] #usernameInput {
   text-align: right;
 }
 
-/* Arabic has no uppercase, so an identical pixel size reads smaller than the
-   Latin labels. One step up (~1–2px) restores the optical match; tracking stays
-   at zero and the display weight stays heavier. */
-
 /* The label voice swaps to geometric Kufi in Arabic: the structural
    emphasis that uppercase + tracking gives English comes here from the
-   letterforms themselves. Body text stays Plex for readability. */
+   letterforms themselves. Body text stays Plex for readability. Panel
+   text sizes are unified 1:1 with the English panel (the earlier +1px
+   optical bumps are obsolete now that Kufi carries the label voice). */
 :root[lang="ar"] {
   --font-label: "Noto Kufi Arabic", "IBM Plex Sans Arabic", "Segoe UI", Tahoma,
     "Noto Sans Arabic", Arial, sans-serif;
@@ -1735,44 +1733,18 @@ html[dir="rtl"] #usernameInput {
   letter-spacing: 0;
 }
 
-:root[lang="ar"] .filter-label,
-:root[lang="ar"] .filter-summary .segmented button {
-  font-size: 0.875rem;
+:root[lang="ar"] .film-meta {
+  font-size: 0.9rem;
 }
 
-:root[lang="ar"] .filter-panel-state {
-  font-size: 0.8125rem;
-}
-
-:root[lang="ar"] .filter-summary-value,
-:root[lang="ar"] .filter-slider-output,
-:root[lang="ar"] .chip,
-:root[lang="ar"] .filter-foot .link-btn {
-  font-size: 0.875rem;
-}
-
-:root[lang="ar"] .filter-slider-hint {
-  font-size: 0.8125rem;
-}
-
-:root[lang="ar"] .range-scale {
-  font-size: 0.75rem;
-}
-
-:root[lang="ar"] .chip .n {
-  font-size: 0.75rem;
-}
-
+/* Card-level compensations that still apply: genre tags and the tiny
+   kicker keep their one-step bump (outside the unified panel sizes). */
 :root[lang="ar"] .genre-tag {
   font-size: 0.8rem;
 }
 
 :root[lang="ar"] .film-kicker {
   font-size: 0.78rem;
-}
-
-:root[lang="ar"] .film-meta {
-  font-size: 0.9rem;
 }
 
 :root[lang="ar"] .details-note {
