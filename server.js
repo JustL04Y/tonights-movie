@@ -202,7 +202,7 @@ function startJob(sourceId, previous = null) {
       const mem = process.memoryUsage();
       console.log(
         `[job] ${sourceId}: details ${progress.completed}/${progress.total} failed=${progress.failed} ` +
-          `heap=${Math.round(mem.heapUsed / 1e6)}MB rss=${Math.round(mem.rss / 1e6)}MB`
+          `limit=${progress.limit ?? '?'} heap=${Math.round(mem.heapUsed / 1e6)}MB rss=${Math.round(mem.rss / 1e6)}MB`
       );
     }
     emit('progress', progress);
