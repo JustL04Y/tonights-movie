@@ -106,6 +106,11 @@ const state = {
   pendingSlugs: new Set(),
   networkTimer: null,
   toastTimer: null,
+  // Landing prefetch (see schedulePrefetch below): a cache-only snapshot of
+  // the last-used source, consumed if the user searches that source again.
+  prefetched: null,
+  prefetchTimer: null,
+  prefetchController: null,
   progress: null,
   errorKey: '',
   translations: new Map(),
@@ -345,6 +350,8 @@ function showLanding() {
   els.username.value = '';
   setView('landing');
   writeHash();
+  // Quietly warm the last-used source while the user decides (see above).
+  schedulePrefetch();
   els.username.focus({ preventScroll: true });
 }
 
@@ -1187,6 +1194,49 @@ function saveUserToHistory(username) {
   renderUserSuggestions(history);
 }
 
+/* ── Landing prefetch ────────────────────────────────────── */
+
+// While the user sits on the landing page, quietly fetch the last-used source
+// from the server's cache-only endpoint. On a hit, their next search paints
+// the full app instantly — no stream, no loading screen. The endpoint never
+// triggers a scrape (a miss is a plain 404 NOT_CACHED), so prefetching is
+// free, and a cold source simply falls through to the normal stream path.
+function schedulePrefetch() {
+  cancelPrefetch();
+  const last = loadUserHistory()[0];
+  if (!last || last === 'demo') return;
+  state.prefetchTimer = setTimeout(async () => {
+    state.prefetchTimer = null;
+    const controller = new AbortController();
+    state.prefetchController = controller;
+    try {
+      const res = await fetch(`/api/watchlist/${encodeURIComponent(last)}`, {
+        cache: 'no-store',
+        signal: controller.signal,
+      });
+      if (!res.ok) return;
+      const payload = await res.json();
+      if (payload?.detailsComplete) state.prefetched = { sourceId: last, payload };
+    } catch {
+      // Aborted or a network hiccup — the stream path still works.
+    } finally {
+      if (state.prefetchController === controller) state.prefetchController = null;
+    }
+  }, 600);
+}
+
+function cancelPrefetch() {
+  if (state.prefetchTimer) {
+    clearTimeout(state.prefetchTimer);
+    state.prefetchTimer = null;
+  }
+  if (state.prefetchController) {
+    state.prefetchController.abort();
+    state.prefetchController = null;
+  }
+  state.prefetched = null;
+}
+
 function loadUser(rawSource, { filters } = {}) {
   const sourceId = normalizeInput(rawSource || '');
   if (!sourceId) {
@@ -1241,6 +1291,20 @@ function loadUser(rawSource, { filters } = {}) {
   els.detailsStrip.classList.remove('hidden');
   els.detailsFill.style.width = '0%';
   els.detailsText.textContent = t('app.detailsInitial');
+
+  // Consume a landing prefetch when the user re-searched the exact source it
+  // fetched: the full details-complete payload is already in memory, so the
+  // app paints instantly instead of streaming through the loading screen.
+  const prefetched = state.prefetched;
+  cancelPrefetch();
+  if (
+    sourceId !== 'demo' &&
+    prefetched?.sourceId === sourceId &&
+    prefetched.payload?.detailsComplete
+  ) {
+    handleDone({ cached: true, ...prefetched.payload });
+    return;
+  }
 
   setView('loading');
   showLoading();
@@ -1820,6 +1884,9 @@ function boot() {
     loadUser(username, { filters });
   } else {
     setView('landing');
+    // The landing is the common first screen: warm the last-used source now,
+    // exactly as showLanding() does on later returns to it.
+    schedulePrefetch();
   }
 }
 

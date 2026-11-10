@@ -127,18 +127,77 @@ function cachePath(cacheFile) {
   return path.join(CACHE_DIR, `${cacheFile}.json`);
 }
 
-async function readCached(sourceId) {
-  const cacheFile = cacheFileFor(sourceId);
-  if (!cacheFile) return null;
+/* ── Persistent L2 cache (optional, Upstash Redis REST) ──────────
+   The free Render disk is wiped on every deploy, so a list that took a
+   minute to enrich goes cold again. A Redis layer survives deploys: once
+   anyone has loaded a list, every later request — from this boot or a
+   rebuilt one — reads back in ~100 ms. Enable by setting
+   UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN (Upstash free tier
+   is enough); without them the server behaves exactly as before. */
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_TTL_SECONDS = 60 * 60 * 24 * 30;
+const redisKeyFor = (cacheFile) => `tonights-movie:cache:${cacheFile}`;
+
+async function redisGet(key) {
+  if (!REDIS_URL || !REDIS_TOKEN) return null;
   try {
-    const raw = await fsp.readFile(cachePath(cacheFile), 'utf8');
-    const parsed = JSON.parse(raw);
-    if (parsed.version !== CACHE_VERSION) return null;
-    const age = Date.now() - new Date(parsed.fetchedAt).getTime();
-    return { payload: parsed, fresh: Number.isFinite(age) && age >= 0 && age < CACHE_TTL_MS };
+    const res = await fetch(`${REDIS_URL}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+      signal: AbortSignal.timeout(3000),
+    });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return typeof body.result === 'string' ? body.result : null;
   } catch {
     return null;
   }
+}
+
+async function redisSet(key, value) {
+  if (!REDIS_URL || !REDIS_TOKEN) return;
+  try {
+    await fetch(`${REDIS_URL}/set/${encodeURIComponent(key)}?EX=${REDIS_TTL_SECONDS}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+      body: value,
+      signal: AbortSignal.timeout(5000),
+    });
+  } catch {
+    // The cache is best-effort; a missed write only costs a future re-scrape.
+  }
+}
+
+async function readCached(sourceId) {
+  const cacheFile = cacheFileFor(sourceId);
+  if (!cacheFile) return null;
+  const finish = (parsed) => {
+    if (!parsed || parsed.version !== CACHE_VERSION) return null;
+    const age = Date.now() - new Date(parsed.fetchedAt).getTime();
+    return { payload: parsed, fresh: Number.isFinite(age) && age >= 0 && age < CACHE_TTL_MS };
+  };
+  try {
+    const raw = await fsp.readFile(cachePath(cacheFile), 'utf8');
+    return finish(JSON.parse(raw));
+  } catch {
+    // Disk miss (fresh deploy) — fall through to Redis.
+  }
+  const redisRaw = await redisGet(redisKeyFor(cacheFile));
+  if (!redisRaw) return null;
+  let parsed;
+  try {
+    parsed = JSON.parse(redisRaw);
+  } catch {
+    return null;
+  }
+  const result = finish(parsed);
+  if (!result) return null;
+  // Hydrate the local disk so later reads skip the network hop.
+  fsp
+    .mkdir(CACHE_DIR, { recursive: true })
+    .then(() => fsp.writeFile(cachePath(cacheFile), redisRaw, 'utf8'))
+    .catch(() => {});
+  return result;
 }
 
 async function writeCache(payload) {
@@ -147,8 +206,11 @@ async function writeCache(payload) {
   await fsp.mkdir(CACHE_DIR, { recursive: true });
   const target = cachePath(cacheFile);
   const tmp = `${target}.${process.pid}.tmp`;
-  await fsp.writeFile(tmp, JSON.stringify(payload), 'utf8');
+  const text = JSON.stringify(payload);
+  await fsp.writeFile(tmp, text, 'utf8');
   await fsp.rename(tmp, target);
+  // Best-effort durable copy; never blocks or fails the job.
+  redisSet(redisKeyFor(cacheFile), text);
 }
 
 async function readDemo() {
@@ -624,6 +686,11 @@ server.listen(PORT, HOST, () => {
   console.log('  Demo dataset: (click "Try the demo" or load username "demo")');
   console.log('  Live mode reads every page of a watchlist or any public list, then enriches film details in the background.');
   console.log('  The first result appears as soon as the watchlist list is ready; filters unlock when details finish.');
+  console.log(
+    REDIS_URL && REDIS_TOKEN
+      ? '  Persistent Redis cache: enabled (caches survive deploys).'
+      : '  Persistent Redis cache: off (set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN to enable).'
+  );
   if (PREWARM) {
     console.log('  Stale caches refresh in the background (PREWARM=0 disables this).\n');
     setTimeout(prewarmStaleCaches, 5000).unref?.();
