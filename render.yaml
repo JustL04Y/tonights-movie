@@ -1,0 +1,22 @@
+# Render Blueprint — deploys Tonight's Movie as a free web service.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Render injects PORT automatically; HOST=0.0.0.0 makes the server
+# reachable from outside its container (local default is 127.0.0.1).
+# Note: the free plan has an ephemeral disk — the Letterboxd cache
+# (data/watchlists/) is rebuilt on demand after each restart, which
+# is fine since it self-warms.
+
+services:
+  - type: web
+    name: tonights-movie
+    runtime: node
+    plan: free
+    buildCommand: npm install --no-audit --no-fund
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: NODE_VERSION
+        value: "20"

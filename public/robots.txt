@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
-Sitemap: https://tonights-movie.com/sitemap.xml
+Sitemap: https://tonights-movie.onrender.com/sitemap.xml

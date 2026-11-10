@@ -10,11 +10,15 @@
       content="Free random film picker for Letterboxd: pick from any public watchlist or list, with genre, rating, runtime, decade and country filters. No login required."
     />
     <meta name="robots" content="index, follow" />
-    <link rel="canonical" href="https://tonights-movie.com/" />
+    <!-- TEMPORARY: canonical points to the free Render URL until the
+         tonights-movie.com domain is purchased and attached. Then flip
+         these three URLs (canonical, og:url, JSON-LD url) plus
+         robots.txt and sitemap.xml back to https://tonights-movie.com/ -->
+    <link rel="canonical" href="https://tonights-movie.onrender.com/" />
     <!-- Open Graph / Twitter: how the site previews when shared -->
     <meta property="og:site_name" content="Tonight's Movie" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://tonights-movie.com/" />
+    <meta property="og:url" content="https://tonights-movie.onrender.com/" />
     <meta property="og:title" content="Tonight's Movie — random film picker for any Letterboxd list" />
     <meta
       property="og:description"
@@ -35,7 +39,7 @@
         "@type": "WebApplication",
         "name": "Tonight's Movie",
         "alternateName": "فيلم الليلة",
-        "url": "https://tonights-movie.com/",
+        "url": "https://tonights-movie.onrender.com/",
         "applicationCategory": "EntertainmentApplication",
         "operatingSystem": "Web",
         "browserRequirements": "Requires JavaScript",
