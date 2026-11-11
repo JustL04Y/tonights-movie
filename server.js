@@ -241,11 +241,13 @@ function acceptsGzip(req) {
   return String(req?.headers?.['accept-encoding'] || '').includes('gzip');
 }
 
-function sendJson(res, status, body) {
+function sendJson(res, status, body, options = {}) {
   const text = JSON.stringify(body);
   const headers = {
     'Content-Type': MIME['.json'],
-    'Cache-Control': 'no-store',
+    // Callers that serve immutable content (e.g. a translation of a fixed
+    // text) pass their own policy; the browser then skips the round trip.
+    'Cache-Control': options.cacheControl || 'no-store',
     'Access-Control-Allow-Origin': '*',
     Vary: 'Accept-Encoding',
   };
@@ -485,6 +487,12 @@ function startJob(sourceId, previous = null) {
 
     pick = pick || (await pickPromise);
 
+    // Warm the Arabic synopsis the moment the pick is known: the client asks
+    // for it as soon as the card renders, and a translation that started here
+    // (in parallel with scraping) turns that request into a memory hit
+    // instead of a provider round trip at the front of the serial queue.
+    if (pick?.overview) translate(pick.overview, 'ar').catch(() => {});
+
     // The first pick is fully read before the app appears, so the landing ->
     // result transition feels immediate. Every other film is enriched in the
     // background for filters.
@@ -615,6 +623,9 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
 
   const cached = await readCached(sourceId);
   if (!refresh && cached?.fresh) {
+    // The cached pick's Arabic may be cold after a deploy; warm it without
+    // blocking the snapshot — the client's request joins it if still running.
+    if (cached.payload.pick?.overview) translate(cached.payload.pick.overview, 'ar').catch(() => {});
     sseSend(out, 'done', { cached: true, ...cached.payload });
     out.end();
     return;
@@ -746,7 +757,9 @@ async function handleTranslate(req, res, url) {
     sendJson(res, 503, { error: 'Translation unavailable.' });
     return;
   }
-  sendJson(res, 200, { lang: 'ar', text: translated });
+  // The Arabic rendering of a fixed text never changes, so the browser may
+  // keep it forever and skip future round trips for the same synopsis.
+  sendJson(res, 200, { lang: 'ar', text: translated }, { cacheControl: 'private, max-age=31536000, immutable' });
 }
 
 /* ── Poster proxy ────────────────────────────────────────────────
