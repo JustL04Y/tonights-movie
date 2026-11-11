@@ -1514,6 +1514,68 @@ html[dir="rtl"] .range::-webkit-slider-runnable-track {
   font-size: 0.78rem;
 }
 
+/* Share menu: the Share button opens a small popover with the two image sizes. */
+
+.share-wrap {
+  position: relative;
+}
+
+.btn.share-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.share-menu {
+  position: absolute;
+  inset-inline-start: 0;
+  top: calc(100% + 8px);
+  z-index: 5;
+  min-width: 250px;
+  padding: 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--panel-solid);
+  box-shadow: var(--shadow-panel);
+}
+
+.share-menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-align: start;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.share-menu button:hover {
+  background: var(--surface-5);
+}
+
+.share-menu button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+
+.share-menu .ratio {
+  color: var(--muted-2);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
 .pick-bar {
   display: flex;
   flex-direction: column;
@@ -1755,4 +1817,3 @@ html[dir="rtl"] #usernameInput {
   font-size: 1rem;
   line-height: 1.8;
 }
-

@@ -100,6 +100,15 @@ const I18N = (() => {
       'pick.translated': 'Machine translation',
       'pick.countryMore': '{name}, and others',
 
+      'share.button': 'Share',
+      'share.post': 'Image for posts',
+      'share.story': 'Image for stories',
+      'share.title': 'Share this film as an image',
+      'share.preparing': 'Preparing the image…',
+      'share.saved': 'Image saved.',
+      'share.failed': 'Could not create the image. Try again.',
+      'share.brand': 'Tonight’s Movie',
+
       'runtime.hours': '{hours}h',
       'runtime.hoursMinutes': '{hours}h {minutes}m',
       'runtime.minutes': '{minutes}m',
@@ -243,6 +252,15 @@ const I18N = (() => {
       'pick.posterAlt': 'بوستر فيلم {title}',
       'pick.translated': 'ترجمة آلية',
       'pick.countryMore': '{name} ودول أخرى',
+
+      'share.button': 'شارك',
+      'share.post': 'صورة للمنشورات',
+      'share.story': 'صورة للستوري',
+      'share.title': 'شارك هذا الفيلم كصورة',
+      'share.preparing': 'نجهّز الصورة…',
+      'share.saved': 'تم حفظ الصورة.',
+      'share.failed': 'تعذّر إنشاء الصورة. حاول مرة ثانية.',
+      'share.brand': 'فيلم الليلة',
 
       'runtime.hours': '{hours} س',
       'runtime.hoursMinutes': '{hours} س {minutes} د',

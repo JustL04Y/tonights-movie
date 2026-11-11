@@ -985,6 +985,23 @@ function renderCard(film) {
             </svg>
             ${esc(t('pick.viewOn'))}
           </a>
+          <div class="share-wrap">
+            <button class="btn ghost share-btn" type="button" data-share-toggle aria-expanded="false" title="${esc(
+              t('share.title')
+            )}">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path>
+              </svg>
+              ${esc(t('share.button'))}
+            </button>
+            <div class="share-menu hidden">
+              <button type="button" data-share="post">${esc(t('share.post'))}<span class="ratio">4:5</span></button>
+              <button type="button" data-share="story">${esc(t('share.story'))}<span class="ratio">9:16</span></button>
+            </div>
+          </div>
           <span class="details-note">${esc(detailsNote)}</span>
         </div>
       </div>
@@ -1354,6 +1371,15 @@ function wireSource(sourceId) {
     }
   });
 
+  source.addEventListener('more', (event) => {
+    if (state.source !== source) return;
+    try {
+      handleMoreFilms(JSON.parse(event.data));
+    } catch {
+      // Ignore malformed delta frames; the final snapshot recovers.
+    }
+  });
+
   source.addEventListener('pick', (event) => {
     if (state.source !== source) return;
     try {
@@ -1535,6 +1561,25 @@ function handleFilms(payload) {
   writeHash();
 }
 
+function handleMoreFilms(payload) {
+  if (!payload || !Array.isArray(payload.films) || !payload.films.length) return;
+
+  // Progressive delta frame: append only films the client doesn't hold yet.
+  // (The server dedupes too, but a frame racing the final snapshot can
+  // overlap, and deduping here is one Set lookup.)
+  for (const film of payload.films) {
+    if (!state.filmBySlug.has(film.slug)) {
+      state.films.push(film);
+      state.filmBySlug.set(film.slug, film);
+    }
+  }
+  state.total = Number(payload.total) || state.films.length;
+
+  els.matchCount.textContent = state.total.toLocaleString();
+  els.poolLabel.textContent = t(state.total === 1 ? 'app.poolOne' : 'app.poolMany');
+  updatePickNote();
+}
+
 function handleDone(payload) {
   if (!payload || !Array.isArray(payload.films)) return;
   stopSource();
@@ -1593,6 +1638,476 @@ function handleDone(payload) {
 
   writeHash();
   announce(t('announce.ready', { count: state.pool.length }));
+}
+
+/* ── Share image ─────────────────────────────────────────────
+   Draws the picked film as a ready-to-post PNG (4:5 for feeds, 9:16 for
+   stories) on a canvas, the way X's "Screenshot" share option does for
+   posts. Posters are loaded through the server's /api/poster route because
+   Letterboxd's image CDN sends no CORS headers, and a canvas that has drawn
+   a cross-origin image refuses to export. */
+
+// Flip together with the canonical / og:url change in index.html once the
+// custom domain is attached.
+const SHARE_SITE_HOST = 'tonights-movie.onrender.com';
+const SHARE_FONT = '"IBM Plex Sans Arabic", "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif';
+const SHARE_FORMATS = {
+  post: { w: 1080, h: 1350, top: 84, poster: 380, title: 58, meta: 30, chip: 26, body: 30, titleLines: 2, bodyLines: 4, bottom: 70 },
+  // Stories keep ~250px clear top and bottom for the app's own UI.
+  story: { w: 1080, h: 1920, top: 200, poster: 480, title: 72, meta: 36, chip: 30, body: 36, titleLines: 3, bodyLines: 5, bottom: 250 },
+};
+const SHARE_BRAND_HEIGHT = 84;
+const shareBlobs = new Map();
+
+function shareDir(text) {
+  return /[\u0590-\u08FF]/.test(String(text || '')) ? 'rtl' : 'ltr';
+}
+
+function shareRoundRect(ctx, x, y, w, h, r) {
+  const radius = Math.min(r, w / 2, h / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.arcTo(x + w, y, x + w, y + h, radius);
+  ctx.arcTo(x + w, y + h, x, y + h, radius);
+  ctx.arcTo(x, y + h, x, y, radius);
+  ctx.arcTo(x, y, x + w, y, radius);
+  ctx.closePath();
+}
+
+function shareLoadImage(source) {
+  return new Promise((resolve) => {
+    if (!source) {
+      resolve(null);
+      return;
+    }
+    let src;
+    try {
+      const url = new URL(source, location.href);
+      src = url.origin === location.origin ? url.href : `/api/poster?u=${encodeURIComponent(url.href)}`;
+    } catch {
+      resolve(null);
+      return;
+    }
+    const image = new Image();
+    const timer = setTimeout(() => resolve(null), 9000);
+    image.onload = () => {
+      clearTimeout(timer);
+      resolve(image);
+    };
+    image.onerror = () => {
+      clearTimeout(timer);
+      resolve(null);
+    };
+    image.src = src;
+  });
+}
+
+function shareFit(ctx, text, maxWidth) {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let out = text;
+  while (out.length > 1 && ctx.measureText(`${out}…`).width > maxWidth) out = out.slice(0, -1);
+  return `${out.trimEnd()}…`;
+}
+
+function shareWrap(ctx, text, maxWidth, maxLines) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  if (!words.length || maxLines < 1) return [];
+  const lines = [];
+  let line = '';
+  for (const word of words) {
+    const candidate = line ? `${line} ${word}` : word;
+    if (!line || ctx.measureText(candidate).width <= maxWidth) {
+      line = candidate;
+    } else {
+      lines.push(line);
+      line = word;
+    }
+  }
+  if (line) lines.push(line);
+  if (lines.length > maxLines) {
+    // Whatever does not fit collapses into one last line that ends in "…".
+    const overflow = lines.slice(maxLines - 1).join(' ');
+    lines.length = maxLines - 1;
+    lines.push(`${overflow}…`);
+  }
+  return lines.map((entry) => shareFit(ctx, entry, maxWidth));
+}
+
+function shareCover(ctx, image, x, y, w, h) {
+  const scale = Math.max(w / image.width, h / image.height);
+  const dw = image.width * scale;
+  const dh = image.height * scale;
+  ctx.drawImage(image, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+}
+
+function shareBackground(ctx, image, w, h) {
+  if (image) {
+    // Repeated downscaling is a cheap blur that works everywhere
+    // (ctx.filter is missing in Safari).
+    let source = image;
+    for (const width of [160, 40]) {
+      const step = document.createElement('canvas');
+      step.width = width;
+      step.height = Math.max(1, Math.round((width * h) / w));
+      const stepCtx = step.getContext('2d');
+      stepCtx.imageSmoothingQuality = 'high';
+      shareCover(stepCtx, source, 0, 0, step.width, step.height);
+      source = step;
+    }
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(source, 0, 0, w, h);
+    ctx.fillStyle = 'rgba(12, 16, 20, 0.58)';
+    ctx.fillRect(0, 0, w, h);
+    const fade = ctx.createLinearGradient(0, 0, 0, h);
+    fade.addColorStop(0, 'rgba(12, 16, 20, 0)');
+    fade.addColorStop(1, 'rgba(12, 16, 20, 0.55)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, w, h);
+    return;
+  }
+  ctx.fillStyle = '#0c1014';
+  ctx.fillRect(0, 0, w, h);
+  const glow = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, h * 0.75);
+  glow.addColorStop(0, 'rgba(0, 224, 84, 0.16)');
+  glow.addColorStop(1, 'rgba(0, 224, 84, 0)');
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, w, h);
+}
+
+function shareStar(ctx, cx, cy, radius) {
+  ctx.beginPath();
+  for (let i = 0; i < 10; i += 1) {
+    const angle = -Math.PI / 2 + (i * Math.PI) / 5;
+    const r = i % 2 === 0 ? radius : radius * 0.42;
+    const px = cx + Math.cos(angle) * r;
+    const py = cy + Math.sin(angle) * r;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}
+
+function sharePoster(ctx, image, film, x, y, w, h) {
+  const radius = Math.round(w * 0.045);
+  ctx.save();
+  ctx.shadowColor = 'rgba(0, 0, 0, 0.55)';
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 24;
+  shareRoundRect(ctx, x, y, w, h, radius);
+  ctx.fillStyle = '#10151a';
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  shareRoundRect(ctx, x, y, w, h, radius);
+  ctx.clip();
+  if (image) {
+    shareCover(ctx, image, x, y, w, h);
+  } else {
+    const fill = ctx.createLinearGradient(x, y, x + w * 0.4, y + h);
+    fill.addColorStop(0, '#1b232c');
+    fill.addColorStop(1, '#10151a');
+    ctx.fillStyle = fill;
+    ctx.fillRect(x, y, w, h);
+    const size = Math.round(w * 0.075);
+    const label = `${film.title}${film.year ? ` (${film.year})` : ''}`;
+    ctx.font = `700 ${size}px ${SHARE_FONT}`;
+    ctx.direction = shareDir(label);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#c2ccd6';
+    const lines = shareWrap(ctx, label, w - 80, 6);
+    const lh = Math.round(size * 1.3);
+    let ty = y + h / 2 - ((lines.length - 1) * lh) / 2;
+    for (const line of lines) {
+      ctx.fillText(line, x + w / 2, ty);
+      ty += lh;
+    }
+  }
+  ctx.restore();
+
+  shareRoundRect(ctx, x, y, w, h, radius);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  if (typeof film.rating === 'number' && film.rating > 0) {
+    const size = Math.round(w * 0.058);
+    const text = film.rating.toFixed(1);
+    ctx.font = `700 ${size}px ${SHARE_FONT}`;
+    ctx.direction = 'ltr';
+    const padX = Math.round(size * 0.75);
+    const starW = Math.round(size * 0.95);
+    const pillW = padX * 2 + starW + Math.round(size * 0.35) + Math.ceil(ctx.measureText(text).width);
+    const pillH = Math.round(size * 1.9);
+    const inset = Math.round(w * 0.05);
+    const px = I18N.isArabic() ? x + w - inset - pillW : x + inset;
+    const py = y + h - inset - pillH;
+    shareRoundRect(ctx, px, py, pillW, pillH, pillH / 2);
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    shareStar(ctx, px + padX + starW / 2, py + pillH / 2, size * 0.5);
+    ctx.fillStyle = '#f5c451';
+    ctx.fill();
+    ctx.fillStyle = '#eef2f5';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, px + padX + starW + Math.round(size * 0.35), py + pillH / 2 + 1);
+  }
+}
+
+function shareChips(ctx, labels, cx, y, maxWidth, size, rtl) {
+  ctx.font = `400 ${size}px ${SHARE_FONT}`;
+  const padX = Math.round(size * 0.8);
+  const height = Math.round(size * 2);
+  const gap = Math.round(size * 0.5);
+  const chips = [];
+  let total = 0;
+  for (const label of labels) {
+    ctx.direction = shareDir(label);
+    const width = Math.ceil(ctx.measureText(label).width) + padX * 2;
+    const next = total + (chips.length ? gap : 0) + width;
+    if (next > maxWidth) break;
+    chips.push({ label, width });
+    total = next;
+  }
+  if (!chips.length) return 0;
+
+  let cursor = rtl ? cx + total / 2 : cx - total / 2;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  for (const chip of chips) {
+    const left = rtl ? cursor - chip.width : cursor;
+    shareRoundRect(ctx, left, y, chip.width, height, height / 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#d3dce5';
+    ctx.direction = shareDir(chip.label);
+    ctx.fillText(chip.label, left + chip.width / 2, y + height / 2 + 1);
+    cursor = rtl ? left - gap : left + chip.width + gap;
+  }
+  return height;
+}
+
+function shareBrand(ctx, cfg, rtl) {
+  const cx = cfg.w / 2;
+  const top = cfg.h - cfg.bottom - SHARE_BRAND_HEIGHT;
+  const name = t('share.brand');
+  ctx.font = `700 34px ${SHARE_FONT}`;
+  ctx.direction = rtl ? 'rtl' : 'ltr';
+  const nameW = Math.ceil(ctx.measureText(name).width);
+  const dotR = 10;
+  const dotGap = 16;
+  const groupW = nameW + dotGap + dotR * 2;
+  const nameCx = rtl ? cx - groupW / 2 + nameW / 2 : cx + groupW / 2 - nameW / 2;
+  const dotCx = rtl ? cx + groupW / 2 - dotR : cx - groupW / 2 + dotR;
+  const dotCy = top + 20;
+
+  const dot = ctx.createRadialGradient(dotCx - 3, dotCy - 3, 1, dotCx, dotCy, dotR);
+  dot.addColorStop(0, '#b8ffd2');
+  dot.addColorStop(0.55, '#00e054');
+  dot.addColorStop(1, '#008a34');
+  ctx.beginPath();
+  ctx.arc(dotCx, dotCy, dotR, 0, Math.PI * 2);
+  ctx.fillStyle = dot;
+  ctx.fill();
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = '#eef2f5';
+  ctx.fillText(name, nameCx, top + 20);
+
+  ctx.font = `400 26px ${SHARE_FONT}`;
+  ctx.direction = 'ltr';
+  ctx.fillStyle = '#9aa7b4';
+  ctx.fillText(SHARE_SITE_HOST, cx, top + 66);
+}
+
+async function renderShareCard(film, format) {
+  const cfg = SHARE_FORMATS[format] || SHARE_FORMATS.post;
+  const rtl = I18N.isArabic();
+  const title = film.title || '';
+  const overview = translatedOverview(film) || film.overview || '';
+
+  const metaParts = [];
+  if (film.year) metaParts.push(String(film.year));
+  if (film.runtime) metaParts.push(formatRuntime(film.runtime));
+  if (film.directors?.length) metaParts.push(t('pick.directedBy', { names: film.directors.slice(0, 2).join(', ') }));
+  const metaText = metaParts.join('   ·   ');
+  const genres = (film.genres || []).slice(0, 4).map((genre) => tGenre(genre.name));
+
+  // Canvas text needs the web fonts to be loaded; ask for the exact glyphs
+  // used so the right unicode-range subsets are fetched.
+  const sample = `${title} ${metaText} ${genres.join(' ')} ${overview} ${t('share.brand')}`;
+  const loadFont = (descriptor) => (document.fonts?.load ? document.fonts.load(descriptor, sample) : Promise.resolve());
+  const fonts = Promise.all([
+    loadFont('700 40px "IBM Plex Sans Arabic"'),
+    loadFont('400 30px "IBM Plex Sans Arabic"'),
+  ]).catch(() => {});
+  const [image] = await Promise.all([shareLoadImage(film.poster), fonts]);
+
+  const canvas = document.createElement('canvas');
+  canvas.width = cfg.w;
+  canvas.height = cfg.h;
+  const ctx = canvas.getContext('2d');
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  shareBackground(ctx, image, cfg.w, cfg.h);
+
+  const posterW = cfg.poster;
+  const posterH = Math.round(posterW * 1.5);
+  const cx = cfg.w / 2;
+  const maxW = cfg.w - 160;
+  sharePoster(ctx, image, film, cx - posterW / 2, cfg.top, posterW, posterH);
+
+  let y = cfg.top + posterH + Math.round(cfg.title * 0.9);
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = `700 ${cfg.title}px ${SHARE_FONT}`;
+  ctx.direction = shareDir(title);
+  ctx.fillStyle = '#eef2f5';
+  const titleLh = Math.round(cfg.title * 1.2);
+  for (const line of shareWrap(ctx, title, maxW, cfg.titleLines)) {
+    ctx.fillText(line, cx, y + titleLh / 2);
+    y += titleLh;
+  }
+
+  if (metaText) {
+    y += Math.round(cfg.meta * 0.45);
+    ctx.font = `400 ${cfg.meta}px ${SHARE_FONT}`;
+    ctx.direction = rtl ? 'rtl' : 'ltr';
+    ctx.fillStyle = '#c7d1db';
+    const metaLh = Math.round(cfg.meta * 1.45);
+    for (const line of shareWrap(ctx, metaText, maxW, 2)) {
+      ctx.fillText(line, cx, y + metaLh / 2);
+      y += metaLh;
+    }
+  }
+
+  y += Math.round(cfg.chip * 0.9);
+  const chipH = shareChips(ctx, genres, cx, y, maxW, cfg.chip, rtl);
+  if (chipH) y += chipH + Math.round(cfg.body * 1.1);
+
+  const bodyLh = Math.round(cfg.body * 1.5);
+  const footerTop = cfg.h - cfg.bottom - SHARE_BRAND_HEIGHT - 28;
+  const room = Math.min(cfg.bodyLines, Math.floor((footerTop - y) / bodyLh));
+  if (overview && room >= 2) {
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.font = `400 ${cfg.body}px ${SHARE_FONT}`;
+    ctx.direction = shareDir(overview);
+    ctx.fillStyle = 'rgba(238, 242, 245, 0.86)';
+    for (const line of shareWrap(ctx, overview, maxW - 40, room)) {
+      ctx.fillText(line, cx, y + bodyLh / 2);
+      y += bodyLh;
+    }
+  }
+
+  shareBrand(ctx, cfg, rtl);
+
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+  if (!blob) throw new Error('The canvas could not be exported.');
+  return { blob, complete: !film.poster || Boolean(image) };
+}
+
+// Renders are cached per film, size, language and synopsis, so choosing a size
+// right after opening the menu (which warms both) can call navigator.share
+// while the tap still counts as a user gesture — Safari requires that.
+function getShareBlob(film, format) {
+  const overview = translatedOverview(film) || film.overview || '';
+  const key = [film.slug, format, I18N.isArabic() ? 'ar' : 'en', overview.length, film.poster ? 1 : 0].join('|');
+  let promise = shareBlobs.get(key);
+  if (!promise) {
+    promise = renderShareCard(film, format).then(({ blob, complete }) => {
+      // A card drawn without its poster (the load failed) is not worth keeping.
+      if (!complete) shareBlobs.delete(key);
+      return blob;
+    });
+    shareBlobs.set(key, promise);
+    promise.catch(() => shareBlobs.delete(key));
+    while (shareBlobs.size > 6) shareBlobs.delete(shareBlobs.keys().next().value);
+  }
+  return promise;
+}
+
+function downloadBlob(blob, filename) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+}
+
+async function shareCurrentFilm(format) {
+  const film = state.current;
+  if (!film) return;
+  const filename = `${film.slug}-${format}.png`;
+  const pending = getShareBlob(film, format);
+
+  let notified = false;
+  const timer = setTimeout(() => {
+    notified = true;
+    toast(t('share.preparing'));
+  }, 350);
+  let blob;
+  try {
+    blob = await pending;
+  } catch {
+    clearTimeout(timer);
+    toast(t('share.failed'));
+    return;
+  }
+  clearTimeout(timer);
+  if (notified) els.toast.classList.remove('is-on');
+
+  const file = new File([blob], filename, { type: 'image/png' });
+  const touch = Boolean(window.matchMedia?.('(pointer: coarse)').matches);
+  if (touch && navigator.canShare?.({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: film.title });
+      return;
+    } catch (error) {
+      if (error?.name === 'AbortError') return;
+      // Any other failure falls through to a plain download.
+    }
+  }
+  downloadBlob(blob, filename);
+  toast(t('share.saved'));
+}
+
+function closeShareMenus({ restoreFocus = false } = {}) {
+  $$('.share-menu:not(.hidden)', els.spotlight).forEach((menu) => {
+    menu.classList.add('hidden');
+    const toggle = $('[data-share-toggle]', menu.parentElement);
+    toggle?.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) toggle?.focus();
+  });
+}
+
+function toggleShareMenu(toggle) {
+  const menu = $('.share-menu', toggle.parentElement);
+  if (!menu) return;
+  const opening = menu.classList.contains('hidden');
+  closeShareMenus();
+  if (!opening) return;
+  menu.classList.remove('hidden');
+  toggle.setAttribute('aria-expanded', 'true');
+  if (state.current) {
+    // Warm both sizes so the next tap does not wait on the canvas.
+    getShareBlob(state.current, 'post').catch(() => {});
+    getShareBlob(state.current, 'story').catch(() => {});
+  }
 }
 
 /* ── Events ──────────────────────────────────────────────── */
@@ -1855,6 +2370,27 @@ function bindEvents() {
   els.pickBtn.addEventListener('click', () => {
     if (!state.pool.length) computePool();
     pickFilm();
+  });
+
+  els.spotlight.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-share-toggle]');
+    if (toggle) {
+      toggleShareMenu(toggle);
+      return;
+    }
+    const option = event.target.closest('[data-share]');
+    if (option) {
+      closeShareMenus();
+      shareCurrentFilm(option.dataset.share);
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.share-wrap')) closeShareMenus();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeShareMenus({ restoreFocus: true });
   });
 
   document.addEventListener('keydown', (event) => {

@@ -284,19 +284,45 @@ function startJob(sourceId, previous = null) {
     }
 
     // Progressive cold load: the first card appears after page 1 alone, and
-    // every later page streams its films into the app the user is already
-    // looking at. The pick is chosen from page 1 so it can start loading
-    // while the remaining pages arrive.
+    // every later page streams its NEW films into the app the user is already
+    // looking at. Deltas — never full re-sends — keep bandwidth linear, so a
+    // 500-page list costs the same per film as a 10-page one; a timer
+    // coalesces pages that land together into one frame.
     let pickItem = null;
     let pick = null;
     let pickPromise = null;
+    let streamStarted = false;
+    let flushTimer = null;
+    const delivered = new Set();
+    let deltaBuffer = [];
 
-    const emitFilmsSoFar = (items) => {
-      if (job.status !== 'running' || !items.length) return;
-      // Films already read in a previous run (the seed map) stream in fully
-      // enriched; brand-new ones stream as basics and enrich in background.
-      const films = items.map((item) => seeded.get(item.slug) || basicFilmFromItem(item));
-      emit('films', { films, total: films.length, pick: pick || films[0] });
+    const toFilm = (item) => seeded.get(item.slug) || basicFilmFromItem(item);
+
+    const flushDelta = () => {
+      flushTimer = null;
+      if (job.status !== 'running' || !deltaBuffer.length) return;
+      const films = deltaBuffer.map(toFilm);
+      deltaBuffer = [];
+      emit('more', { films, total: delivered.size });
+    };
+
+    // Scrape done: the coalescer may still hold pages that landed inside its
+    // 800ms window — flush them as one final delta. `delivered` marks films
+    // as queued (not sent), so the buffer is the source of truth here; an
+    // earlier version discarded it and relied on a full re-send, which the
+    // delta streaming no longer performs.
+    const flushRemaining = () => {
+      if (flushTimer) {
+        clearTimeout(flushTimer);
+        flushTimer = null;
+      }
+      if (!streamStarted || !deltaBuffer.length || job.status !== 'running') {
+        deltaBuffer = [];
+        return;
+      }
+      const films = deltaBuffer.map(toFilm);
+      deltaBuffer = [];
+      emit('more', { films, total: delivered.size });
     };
 
     const onPage = (items) => {
@@ -321,7 +347,25 @@ function startJob(sourceId, previous = null) {
             .catch(() => {});
         }
       }
-      emitFilmsSoFar(items);
+
+      const fresh = [];
+      for (const item of items) {
+        if (delivered.has(item.slug)) continue;
+        delivered.add(item.slug);
+        fresh.push(item);
+      }
+      if (!fresh.length) return;
+
+      if (!streamStarted) {
+        // First frame is a full snapshot: the card draws from it immediately.
+        streamStarted = true;
+        const films = fresh.map(toFilm);
+        emit('films', { films, total: films.length, pick: pick || films[0] });
+        return;
+      }
+
+      deltaBuffer.push(...fresh);
+      if (!flushTimer) flushTimer = setTimeout(flushDelta, 800);
     };
 
     const scrapePromise =
@@ -329,6 +373,11 @@ function startJob(sourceId, previous = null) {
         ? scrapeList(src.owner, src.slug, { pageConcurrency: PAGE_CONCURRENCY, onProgress, onPage })
         : scrapeWatchlist(src.username, { pageConcurrency: PAGE_CONCURRENCY, onProgress, onPage });
     const watchlist = await scrapePromise;
+
+    // Scrape done: top up whatever the coalescer never flushed. A connection
+    // that streamed deltas receives only the missing tail — re-sending the
+    // whole list there would be exactly the quadratic cost the deltas avoid.
+    flushRemaining();
 
     const basics = watchlist.items.map(basicFilmFromItem);
     if (!pickItem) {
@@ -365,7 +414,7 @@ function startJob(sourceId, previous = null) {
     // The first pick is fully read before the app appears, so the landing ->
     // result transition feels immediate. Every other film is enriched in the
     // background for filters.
-    const basicsWithPick = basics.map((film) => (film.slug === pick.slug ? pick : film));
+    const basicsWithPick = watchlist.items.map((item) => (item.slug === pick.slug ? pick : toFilm(item)));
     const base = {
       version: CACHE_VERSION,
       username: sourceId,
@@ -387,10 +436,10 @@ function startJob(sourceId, previous = null) {
     };
 
     job.basics = base;
-    // The authoritative full-list frame: also covers single-page lists and any
-    // rejoining client (replays job.basics). Progressive frames already drew
-    // the card, so this just tops up the pool the client holds.
-    if (job.status === 'running') emit('films', base);
+    // Full snapshot only for connections that never entered delta streaming
+    // (single-page lists get it as their one and only frame). Streamed loads
+    // keep their deltas; the final 'more' above topped up the tail.
+    if (job.status === 'running' && !streamStarted) emit('films', base);
 
     const enriched = await enrichedPromise;
 
@@ -606,6 +655,102 @@ async function handleTranslate(req, res, url) {
   sendJson(res, 200, { lang: 'ar', text: translated });
 }
 
+/* ── Poster proxy ────────────────────────────────────────────────
+   The share-card canvas can only export pixels from same-origin images, and
+   Letterboxd's image CDN (a.ltrbxd.com) sends no CORS headers. This route
+   fetches a poster from that CDN and serves it from our own origin.
+   It is deliberately narrow so it can never act as an open proxy:
+   https only, *.ltrbxd.com only, no redirects, JPEG/PNG/WebP only, size
+   capped. Posters are small, so a tiny in-memory LRU keeps repeat shares
+   off the network without threatening the free-plan memory budget. */
+const POSTER_HOST_RE = /^[a-z0-9-]+\.ltrbxd\.com$/;
+const POSTER_TYPE_RE = /^image\/(jpeg|png|webp)$/;
+const POSTER_MAX_BYTES = 3 * 1024 * 1024;
+const POSTER_CACHE_MAX = 60;
+const posterCache = new Map();
+
+function posterTarget(raw) {
+  if (!raw || raw.length > 600) return null;
+  let target;
+  try {
+    target = new URL(raw);
+  } catch {
+    return null;
+  }
+  if (target.protocol !== 'https:' || target.port || target.username || target.password) return null;
+  if (!POSTER_HOST_RE.test(target.hostname)) return null;
+  return target;
+}
+
+async function readCapped(response, maxBytes) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of response.body) {
+    size += chunk.length;
+    if (size > maxBytes) throw Object.assign(new Error('Poster too large'), { status: 413 });
+    chunks.push(chunk);
+  }
+  return Buffer.concat(chunks);
+}
+
+async function handlePoster(req, res, url) {
+  const target = posterTarget(url.searchParams.get('u'));
+  if (!target) {
+    sendJson(res, 400, { error: 'Invalid poster URL.' });
+    return;
+  }
+
+  const key = target.href;
+  let entry = posterCache.get(key);
+  if (entry) {
+    // Re-insert so the Map's insertion order doubles as LRU order.
+    posterCache.delete(key);
+    posterCache.set(key, entry);
+  } else {
+    try {
+      const upstream = await fetch(key, {
+        redirect: 'error',
+        signal: AbortSignal.timeout(8000),
+        headers: {
+          Accept: 'image/jpeg,image/png,image/webp',
+          'User-Agent': 'Mozilla/5.0 (compatible; TonightsMovie/1.0)',
+        },
+      });
+      if (!upstream.ok) {
+        sendJson(res, 502, { error: 'Poster unavailable.' });
+        return;
+      }
+      const type = String(upstream.headers.get('content-type') || '')
+        .split(';')[0]
+        .trim()
+        .toLowerCase();
+      if (!POSTER_TYPE_RE.test(type)) {
+        sendJson(res, 502, { error: 'Unexpected poster type.' });
+        return;
+      }
+      if (Number(upstream.headers.get('content-length')) > POSTER_MAX_BYTES) {
+        sendJson(res, 413, { error: 'Poster too large.' });
+        return;
+      }
+      entry = { type, body: await readCapped(upstream, POSTER_MAX_BYTES) };
+      posterCache.set(key, entry);
+      while (posterCache.size > POSTER_CACHE_MAX) posterCache.delete(posterCache.keys().next().value);
+    } catch (error) {
+      sendJson(res, error?.status === 413 ? 413 : 502, { error: 'Poster unavailable.' });
+      return;
+    }
+  }
+
+  res.writeHead(200, {
+    'Content-Type': entry.type,
+    'Content-Length': entry.body.length,
+    // The URL carries Letterboxd's ?v= version, so a changed poster is a new key.
+    'Cache-Control': 'public, max-age=604800',
+    'X-Content-Type-Options': 'nosniff',
+  });
+  res.end(req.method === 'HEAD' ? undefined : entry.body);
+}
+
 async function serveStatic(req, res, pathname) {
   let relative = decodeURIComponent(pathname);
   if (relative === '/') relative = '/index.html';
@@ -743,6 +888,11 @@ const server = http.createServer(async (req, res) => {
 
     if (url.pathname === '/api/translate') {
       await handleTranslate(req, res, url);
+      return;
+    }
+
+    if (url.pathname === '/api/poster') {
+      await handlePoster(req, res, url);
       return;
     }
 
