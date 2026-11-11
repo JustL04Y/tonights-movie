@@ -90,6 +90,20 @@ const jobs = new Map();
 const filmCache = new Map();
 let prewarming = false;
 
+// De-duplicates concurrent reads of the same film page: the pick fetch and a
+// client /api/film request for the slug on screen share one promise instead of
+// doubling the hit on Letterboxd.
+const detailInFlight = new Map();
+function queueFilmDetails(item, options = {}) {
+  const existing = detailInFlight.get(item.slug);
+  if (existing) return existing;
+  const promise = fetchFilmDetails(item, options).finally(() => {
+    detailInFlight.delete(item.slug);
+  });
+  detailInFlight.set(item.slug, promise);
+  return promise;
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // A source id is either a username ("justloay") or a list path
@@ -327,18 +341,34 @@ function startJob(sourceId, previous = null) {
 
     const onPage = (items) => {
       if (!pickItem) {
-        pickItem = items[Math.floor(Math.random() * items.length)];
+        // Variety comes free from seeds: a film whose details are already
+        // cached can headline randomly. With no seeds (true cold load) the
+        // visitor's first card is the list's opening film, so read THAT one
+        // instead of a random film they may never see — one fetch then fills
+        // the visible card.
+        const seededOnPage = items.filter((item) => seeded.has(item.slug));
+        pickItem = seededOnPage.length
+          ? seededOnPage[Math.floor(Math.random() * seededOnPage.length)]
+          : items[0];
         pick = seeded.get(pickItem.slug) || null;
         if (!pick) {
-          pickPromise = fetchFilmDetails(pickItem)
+          // Gate-free single fetch so the pick never queues behind the
+          // enrichment burst; short first attempt so a tarpitted read retries
+          // fast. Timed so regressions show in the log directly.
+          const pickStartedAt = Date.now();
+          pickPromise = queueFilmDetails(pickItem, { firstTimeoutMs: 5000 })
             .then((film) => {
               if (film.metaComplete) {
                 seeded.set(film.slug, film);
                 filmCache.set(film.slug, film);
               }
+              console.log(`[pick] ${film.slug}: ${Date.now() - pickStartedAt}ms`);
               return film;
             })
-            .catch(() => basicFilmFromItem(pickItem));
+            .catch((error) => {
+              console.log(`[pick] ${pickItem.slug}: failed in ${Date.now() - pickStartedAt}ms (${error?.status || error?.message})`);
+              return basicFilmFromItem(pickItem);
+            });
           pickPromise
             .then((film) => {
               pick = film;
@@ -382,22 +412,32 @@ function startJob(sourceId, previous = null) {
     const basics = watchlist.items.map(basicFilmFromItem);
     if (!pickItem) {
       // Defensive: onPage fires for page 1 unconditionally, so this only runs
-      // if a future refactor changes that contract.
-      pickItem = watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
+      // if a future refactor changes that contract. Same policy as onPage:
+      // random among seeded films for variety, else the opening film the
+      // visitor is actually shown.
+      const seededAny = watchlist.items.filter((item) => seeded.has(item.slug));
+      pickItem = seededAny.length
+        ? seededAny[Math.floor(Math.random() * seededAny.length)]
+        : watchlist.items[0];
       pick = seeded.get(pickItem.slug) || null;
     }
     if (!pick) {
+      const pickStartedAt = Date.now();
       pickPromise =
         pickPromise ||
-        fetchFilmDetails(pickItem)
+        queueFilmDetails(pickItem, { firstTimeoutMs: 5000 })
           .then((film) => {
             if (film.metaComplete) {
               seeded.set(film.slug, film);
               filmCache.set(film.slug, film);
             }
+            console.log(`[pick] ${film.slug}: ${Date.now() - pickStartedAt}ms`);
             return film;
           })
-          .catch(() => basicFilmFromItem(pickItem));
+          .catch((error) => {
+            console.log(`[pick] ${pickItem.slug}: failed in ${Date.now() - pickStartedAt}ms (${error?.status || error?.message})`);
+            return basicFilmFromItem(pickItem);
+          });
     }
 
     job.progress = { phase: 'details', completed: 0, total: basics.length, failed: 0 };
@@ -610,16 +650,22 @@ async function handleFilm(req, res, slug) {
     return;
   }
 
+  const detailStartedAt = Date.now();
   try {
-    const film = await fetchFilmDetails({
-      slug,
-      link: `${BASE}/film/${slug}/`,
-      fallbackTitle: slug.replace(/-/g, ' '),
-      fallbackYear: null,
-    });
+    const film = await queueFilmDetails(
+      {
+        slug,
+        link: `${BASE}/film/${slug}/`,
+        fallbackTitle: slug.replace(/-/g, ' '),
+        fallbackYear: null,
+      },
+      { firstTimeoutMs: 5000 }
+    );
     if (film.metaComplete) filmCache.set(slug, film);
+    console.log(`[film-api] ${slug}: ${Date.now() - detailStartedAt}ms`);
     sendJson(res, 200, film);
   } catch (error) {
+    console.log(`[film-api] ${slug}: failed in ${Date.now() - detailStartedAt}ms (${error?.status || error?.message})`);
     if (error?.status === 404) {
       sendJson(res, 404, { error: 'Film not found.' });
     } else if (error?.status === 403 || error?.status === 429) {
