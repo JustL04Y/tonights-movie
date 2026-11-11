@@ -4,6 +4,7 @@ const http = require('node:http');
 const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
+const zlib = require('node:zlib');
 const {
   BASE,
   scrapeWatchlist,
@@ -233,20 +234,53 @@ async function readDemo() {
   return { ...payload, version: CACHE_VERSION, username: 'demo', demo: true, detailsComplete: true };
 }
 
+// Visitors far from the origin (the Gulf routes at ~80 KB/s) feel every
+// uncompressed byte, so large bodies travel gzip'd. Browsers and curl send
+// Accept-Encoding: gzip by default; anything else gets plain JSON.
+function acceptsGzip(req) {
+  return String(req?.headers?.['accept-encoding'] || '').includes('gzip');
+}
+
 function sendJson(res, status, body) {
   const text = JSON.stringify(body);
-  res.writeHead(status, {
+  const headers = {
     'Content-Type': MIME['.json'],
-    'Content-Length': Buffer.byteLength(text),
     'Cache-Control': 'no-store',
     'Access-Control-Allow-Origin': '*',
-  });
+    Vary: 'Accept-Encoding',
+  };
+  if (acceptsGzip(res.req) && text.length > 1024) {
+    const gz = zlib.gzipSync(text);
+    res.writeHead(status, { ...headers, 'Content-Encoding': 'gzip', 'Content-Length': gz.length });
+    res.end(gz);
+    return;
+  }
+  res.writeHead(status, { ...headers, 'Content-Length': Buffer.byteLength(text) });
   res.end(text);
 }
 
 function sseSend(res, event, data) {
   if (res.writableEnded || res.destroyed) return;
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+
+// SSE over gzip. Every frame must reach the browser the moment it is
+// written, so each write sync-flushes a fresh gzip block (Z_SYNC_FLUSH) —
+// the standard way to stream through gzip. A 772-film snapshot is ~700 KB
+// raw and the long-haul routes crawl at ~80 KB/s; compressed it is ~6x
+// smaller, so the cached path drops from ~9s to ~2s.
+function sseTarget(req, res) {
+  if (!acceptsGzip(req)) return res;
+  const gz = zlib.createGzip({ level: 6, flush: zlib.constants.Z_SYNC_FLUSH });
+  gz.pipe(res);
+  gz.on('error', () => res.destroy());
+  let ended = false;
+  return {
+    write: (chunk) => { if (!ended) gz.write(chunk); return true; },
+    end: () => { if (!ended) { ended = true; gz.end(); } },
+    get writableEnded() { return ended || res.writableEnded; },
+    get destroyed() { return res.destroyed; },
+  };
 }
 
 function startJob(sourceId, previous = null) {
@@ -501,9 +535,18 @@ function startJob(sourceId, previous = null) {
 
     job.status = 'done';
     job.result = payload;
-    await writeCache(payload).catch((error) => {
-      console.warn(`[cache] could not write ${sourceId}:`, error.message);
-    });
+    // A heavily throttled run (Letterboxd tarpitting the host IP) produces
+    // mostly fallback films; caching that would serve a degraded list for the
+    // whole TTL window. Keep this run's result for its connected clients, but
+    // leave the durable cache to a healthier pass.
+    const failedCount = enriched.reduce((n, film) => n + (film.metaComplete ? 0 : 1), 0);
+    if (failedCount * 4 <= enriched.length) {
+      await writeCache(payload).catch((error) => {
+        console.warn(`[cache] could not write ${sourceId}:`, error.message);
+      });
+    } else {
+      console.warn(`[cache] skipped ${sourceId}: ${failedCount}/${enriched.length} films failed`);
+    }
     emit('done', { cached: false, ...payload });
     return payload;
   })()
@@ -543,23 +586,28 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
   res.on('error', (err) => streamLog(`res error: ${err.message}`));
   streamLog('connected');
 
+  // Content-Encoding must ride inside writeHead: with explicit headers Node
+  // commits them immediately, so a later setHeader throws HEADERS_SENT.
+  const gzipped = acceptsGzip(req);
   res.writeHead(200, {
     'Content-Type': 'text/event-stream; charset=utf-8',
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
     'X-Accel-Buffering': 'no',
     'Access-Control-Allow-Origin': '*',
+    ...(gzipped ? { 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' } : {}),
   });
-  res.write(': connected\n\n');
+  const out = sseTarget(req, res);
+  out.write(': connected\n\n');
 
   if (sourceId === 'demo') {
     try {
       const demo = await readDemo();
-      sseSend(res, 'done', { cached: false, ...demo });
+      sseSend(out, 'done', { cached: false, ...demo });
     } catch {
-      sseSend(res, 'error', { message: 'The demo dataset is missing. Run npm run build:demo.', code: 'DEMO_MISSING' });
+      sseSend(out, 'error', { message: 'The demo dataset is missing. Run npm run build:demo.', code: 'DEMO_MISSING' });
     }
-    res.end();
+    out.end();
     return;
   }
 
@@ -567,8 +615,8 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
 
   const cached = await readCached(sourceId);
   if (!refresh && cached?.fresh) {
-    sseSend(res, 'done', { cached: true, ...cached.payload });
-    res.end();
+    sseSend(out, 'done', { cached: true, ...cached.payload });
+    out.end();
     return;
   }
 
@@ -585,17 +633,17 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
   };
   const listener = (event, data) => {
     if (event === 'error') streamLog(`sending error event: ${data?.message}`);
-    sseSend(res, event, data);
+    sseSend(out, event, data);
     if (event === 'done' || event === 'error') {
       finished = true;
       cleanup();
-      if (!res.writableEnded) res.end();
+      out.end();
     }
   };
 
   job.listeners.add(listener);
   heartbeat = setInterval(() => {
-    if (!res.writableEnded) res.write(': ping\n\n');
+    if (!out.writableEnded) out.write(': ping\n\n');
   }, 15000);
   heartbeat.unref?.();
 
@@ -611,8 +659,8 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
     listener('error', job.error);
     return;
   }
-  if (job.basics) sseSend(res, 'films', job.basics);
-  if (job.progress && !finished) sseSend(res, 'progress', job.progress);
+  if (job.basics) sseSend(out, 'films', job.basics);
+  if (job.progress && !finished) sseSend(out, 'progress', job.progress);
 }
 
 async function handleWatchlist(req, res, sourceIdRaw) {
@@ -797,6 +845,35 @@ async function handlePoster(req, res, url) {
   res.end(req.method === 'HEAD' ? undefined : entry.body);
 }
 
+// Whole-file gzip for text assets, memoized per file version. The page shell
+// (~174 KB of JS/CSS/HTML) is a third of that compressed — and on slow
+// long-haul routes every saved kilobyte is felt on first paint.
+const GZIP_TYPES = new Set(['.js', '.css', '.html', '.json', '.svg', '.txt', '.map']);
+const gzipFileCache = new Map();
+
+async function sendStaticFile(req, res, filePath, stat, ext) {
+  const headers = {
+    'Content-Type': MIME[ext] || 'application/octet-stream',
+    // Assets are not content-hashed, so revalidate them on every load.
+    'Cache-Control': 'no-cache',
+    Vary: 'Accept-Encoding',
+  };
+  if (GZIP_TYPES.has(ext) && stat.size > 1024 && stat.size < 2 * 1024 * 1024 && acceptsGzip(req)) {
+    const key = `${filePath}:${stat.mtimeMs}:${stat.size}`;
+    let body = gzipFileCache.get(key);
+    if (!body) {
+      if (gzipFileCache.size > 64) gzipFileCache.clear();
+      body = zlib.gzipSync(await fsp.readFile(filePath), { level: 6 });
+      gzipFileCache.set(key, body);
+    }
+    res.writeHead(200, { ...headers, 'Content-Encoding': 'gzip', 'Content-Length': body.length });
+    res.end(body);
+    return;
+  }
+  res.writeHead(200, headers);
+  fs.createReadStream(filePath).pipe(res);
+}
+
 async function serveStatic(req, res, pathname) {
   let relative = decodeURIComponent(pathname);
   if (relative === '/') relative = '/index.html';
@@ -808,22 +885,13 @@ async function serveStatic(req, res, pathname) {
   try {
     const stat = await fsp.stat(filePath);
     if (!stat.isFile()) throw new Error('not a file');
-    const ext = path.extname(filePath).toLowerCase();
-    const headers = {
-      'Content-Type': MIME[ext] || 'application/octet-stream',
-      'Content-Length': stat.size,
-      // Assets are not content-hashed, so revalidate them on every load.
-      'Cache-Control': 'no-cache',
-    };
-    res.writeHead(200, headers);
-    fs.createReadStream(filePath).pipe(res);
+    await sendStaticFile(req, res, filePath, stat, path.extname(filePath).toLowerCase());
   } catch {
     if (!path.extname(pathname)) {
       // Single-page fallback for pretty URLs.
       const indexPath = path.join(PUBLIC_DIR, 'index.html');
       const stat = await fsp.stat(indexPath);
-      res.writeHead(200, { 'Content-Type': MIME['.html'], 'Content-Length': stat.size, 'Cache-Control': 'no-cache' });
-      fs.createReadStream(indexPath).pipe(res);
+      await sendStaticFile(req, res, indexPath, stat, '.html');
       return;
     }
     sendJson(res, 404, { error: 'Not found' });
