@@ -1747,32 +1747,9 @@ function shareCover(ctx, image, x, y, w, h) {
   ctx.drawImage(image, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
 }
 
-function shareBackground(ctx, image, w, h) {
-  if (image) {
-    // Repeated downscaling is a cheap blur that works everywhere
-    // (ctx.filter is missing in Safari).
-    let source = image;
-    for (const width of [160, 40]) {
-      const step = document.createElement('canvas');
-      step.width = width;
-      step.height = Math.max(1, Math.round((width * h) / w));
-      const stepCtx = step.getContext('2d');
-      stepCtx.imageSmoothingQuality = 'high';
-      shareCover(stepCtx, source, 0, 0, step.width, step.height);
-      source = step;
-    }
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.drawImage(source, 0, 0, w, h);
-    ctx.fillStyle = 'rgba(12, 16, 20, 0.58)';
-    ctx.fillRect(0, 0, w, h);
-    const fade = ctx.createLinearGradient(0, 0, 0, h);
-    fade.addColorStop(0, 'rgba(12, 16, 20, 0)');
-    fade.addColorStop(1, 'rgba(12, 16, 20, 0.55)');
-    ctx.fillStyle = fade;
-    ctx.fillRect(0, 0, w, h);
-    return;
-  }
+function shareBackground(ctx, w, h) {
+  // Solid stage with the brand glow. An earlier version filled the canvas
+  // with a blurred copy of the poster; it is gone on purpose.
   ctx.fillStyle = '#0c1014';
   ctx.fillRect(0, 0, w, h);
   const glow = ctx.createRadialGradient(w / 2, 0, 0, w / 2, 0, h * 0.75);
@@ -1967,7 +1944,7 @@ async function renderShareCard(film, format) {
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
 
-  shareBackground(ctx, image, cfg.w, cfg.h);
+  shareBackground(ctx, cfg.w, cfg.h);
 
   const posterW = cfg.poster;
   const posterH = Math.round(posterW * 1.5);
@@ -2096,6 +2073,7 @@ async function shareCurrentFilm(format) {
 function closeShareMenus({ restoreFocus = false } = {}) {
   $$('.share-menu:not(.hidden)', els.spotlight).forEach((menu) => {
     menu.classList.add('hidden');
+    menu.style.transform = '';
     const toggle = $('[data-share-toggle]', menu.parentElement);
     toggle?.setAttribute('aria-expanded', 'false');
     if (restoreFocus) toggle?.focus();
@@ -2110,6 +2088,16 @@ function toggleShareMenu(toggle) {
   if (!opening) return;
   menu.classList.remove('hidden');
   toggle.setAttribute('aria-expanded', 'true');
+  // On narrow phones the popover is wider than the room beside its anchor,
+  // which used to push it past the viewport and widen the page. Nudge it
+  // back inside instead — the anchor never moves off-screen itself.
+  const margin = 8;
+  const edge = document.documentElement.clientWidth;
+  const rect = menu.getBoundingClientRect();
+  let shift = 0;
+  if (rect.left < margin) shift = margin - rect.left;
+  else if (rect.right > edge - margin) shift = edge - margin - rect.right;
+  if (shift) menu.style.transform = `translateX(${shift.toFixed(1)}px)`;
   if (state.current) {
     // Warm both sizes so the next tap does not wait on the canvas.
     getShareBlob(state.current, 'post').catch(() => {});
