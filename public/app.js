@@ -2107,98 +2107,110 @@ function toggleShareMenu(toggle) {
 
 /* ── Events ──────────────────────────────────────────────── */
 
-function setupDetailsAnimation() {
+/* ── <details> open/close animation ───────────────────────── */
+
+// Shared by the summary click and the F keyboard shortcut so both paths play
+// the same motion (the keyboard path must not snap open or closed).
+const detailsAnimations = new WeakMap();
+
+function toggleDetailsAnimated(details) {
+  const summary = details.querySelector(':scope > summary');
+  const content = summary ? summary.nextElementSibling : null;
+  if (!summary || !content) return;
+
+  // Read per toggle so a mid-session preference change is honored.
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const duration = 220;
   const easing = 'cubic-bezier(0.4, 0, 0.2, 1)';
-  const running = new WeakMap();
 
+  const current = detailsAnimations.get(details);
+  const reopening = current ? current.mode === 'closing' : false;
+  const opening = reopening || !details.open;
+
+  // A closed <details> still reports a laid-out height for its content,
+  // so start from zero when opening fresh.
+  const startHeight = opening && !reopening ? 0 : content.getBoundingClientRect().height;
+
+  if (current) current.animation.cancel();
+  detailsAnimations.delete(details);
+  details.classList.remove('is-collapsing');
+
+  if (reduceMotion.matches) {
+    details.open = opening;
+    return;
+  }
+
+  if (opening) {
+    details.open = true;
+    const endHeight = content.getBoundingClientRect().height;
+    const endPadding = parseFloat(getComputedStyle(content).paddingBottom) || 0;
+
+    const animation = content.animate(
+      [
+        { height: `${startHeight}px`, paddingBottom: '0px', opacity: startHeight ? 1 : 0 },
+        { height: `${endHeight}px`, paddingBottom: `${endPadding}px`, opacity: 1 },
+      ],
+      { duration, easing }
+    );
+
+    detailsAnimations.set(details, { animation, mode: 'opening' });
+
+    const cleanup = () => {
+      if (detailsAnimations.get(details)?.animation !== animation) return;
+      detailsAnimations.delete(details);
+    };
+
+    animation.addEventListener('finish', cleanup);
+    animation.addEventListener('cancel', cleanup);
+    return;
+  }
+
+  details.classList.add('is-collapsing');
+
+  const startPadding = parseFloat(getComputedStyle(content).paddingBottom) || 0;
+
+  const animation = content.animate(
+    [
+      { height: `${startHeight}px`, paddingBottom: `${startPadding}px`, opacity: 1 },
+      { height: '0px', paddingBottom: '0px', opacity: 0 },
+    ],
+    { duration, easing, fill: 'forwards' }
+  );
+
+  detailsAnimations.set(details, { animation, mode: 'closing' });
+
+  let fallback = 0;
+
+  const settle = () => {
+    if (detailsAnimations.get(details)?.animation !== animation) return;
+    clearTimeout(fallback);
+    details.open = false;
+    details.classList.remove('is-collapsing');
+    detailsAnimations.delete(details);
+    animation.cancel();
+  };
+
+  animation.addEventListener('finish', settle);
+  animation.addEventListener('cancel', () => {
+    clearTimeout(fallback);
+    if (detailsAnimations.get(details)?.animation !== animation) return;
+    details.classList.remove('is-collapsing');
+  });
+
+  fallback = setTimeout(settle, duration + 200);
+}
+
+function setupDetailsAnimation() {
   const sections = [els.filterPanel, ...$$('details.filter-block', els.filterBody)];
 
   sections.forEach((details) => {
     const summary = details.querySelector(':scope > summary');
-    const content = summary ? summary.nextElementSibling : null;
-    if (!summary || !content) return;
+    if (!summary) return;
 
     summary.addEventListener('click', (event) => {
       if (event.target.closest('.segmented')) return;
       event.preventDefault();
-
-      const current = running.get(details);
-      const reopening = current ? current.mode === 'closing' : false;
-      const opening = reopening || !details.open;
-
-      // A closed <details> still reports a laid-out height for its content,
-      // so start from zero when opening fresh.
-      const startHeight = opening && !reopening ? 0 : content.getBoundingClientRect().height;
-
-      if (current) current.animation.cancel();
-      running.delete(details);
-      details.classList.remove('is-collapsing');
-
-      if (reduceMotion.matches) {
-        details.open = opening;
-        return;
-      }
-
-      if (opening) {
-        details.open = true;
-        const endHeight = content.getBoundingClientRect().height;
-        const endPadding = parseFloat(getComputedStyle(content).paddingBottom) || 0;
-
-        const animation = content.animate(
-          [
-            { height: `${startHeight}px`, paddingBottom: '0px', opacity: startHeight ? 1 : 0 },
-            { height: `${endHeight}px`, paddingBottom: `${endPadding}px`, opacity: 1 },
-          ],
-          { duration, easing }
-        );
-
-        running.set(details, { animation, mode: 'opening' });
-
-        const cleanup = () => {
-          if (running.get(details)?.animation !== animation) return;
-          running.delete(details);
-        };
-
-        animation.addEventListener('finish', cleanup);
-        animation.addEventListener('cancel', cleanup);
-        return;
-      }
-
-      details.classList.add('is-collapsing');
-
-      const startPadding = parseFloat(getComputedStyle(content).paddingBottom) || 0;
-
-      const animation = content.animate(
-        [
-          { height: `${startHeight}px`, paddingBottom: `${startPadding}px`, opacity: 1 },
-          { height: '0px', paddingBottom: '0px', opacity: 0 },
-        ],
-        { duration, easing, fill: 'forwards' }
-      );
-
-      running.set(details, { animation, mode: 'closing' });
-
-      let fallback = 0;
-
-      const settle = () => {
-        if (running.get(details)?.animation !== animation) return;
-        clearTimeout(fallback);
-        details.open = false;
-        details.classList.remove('is-collapsing');
-        running.delete(details);
-        animation.cancel();
-      };
-
-      animation.addEventListener('finish', settle);
-      animation.addEventListener('cancel', () => {
-        clearTimeout(fallback);
-        if (running.get(details)?.animation !== animation) return;
-        details.classList.remove('is-collapsing');
-      });
-
-      fallback = setTimeout(settle, duration + 200);
+      toggleDetailsAnimated(details);
     });
   });
 }
@@ -2449,7 +2461,17 @@ function bindEvents() {
       pickFilm();
     } else if (event.code === 'KeyF') {
       event.preventDefault();
-      els.filterPanel.open = !els.filterPanel.open;
+      toggleDetailsAnimated(els.filterPanel);
+    } else {
+      return;
+    }
+    // R/F are shortcuts, not navigation, so drop whatever the last mouse click
+    // left focused. Chrome lights :focus-visible on a mouse-focused element
+    // the moment a real key lands — a clicked filter header would suddenly
+    // ring green on the next R. (Tab position survives: Chrome resumes from
+    // the blurred element.)
+    if (document.activeElement instanceof HTMLElement && document.activeElement !== document.body) {
+      document.activeElement.blur();
     }
   });
 
