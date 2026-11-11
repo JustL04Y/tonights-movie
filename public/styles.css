@@ -179,6 +179,11 @@
 html {
   min-height: 100%;
   background: var(--bg);
+  /* A popover poking past a screen edge (the share menu on narrow RTL
+     phones) used to widen the page and let it pan sideways. Clip the
+     overflow instead — unlike `hidden`, `clip` does not turn the other
+     axis into a scroll container, so vertical scrolling stays untouched. */
+  overflow-x: clip;
 }
 
 body {
