@@ -2462,6 +2462,12 @@ function bindEvents() {
     } else if (event.code === 'KeyF') {
       event.preventDefault();
       toggleDetailsAnimated(els.filterPanel);
+    } else if (event.code === 'KeyL') {
+      event.preventDefault();
+      I18N.setLang(I18N.isArabic() ? 'en' : 'ar');
+    } else if (event.code === 'KeyT') {
+      event.preventDefault();
+      applyTheme(currentTheme() === 'light' ? 'dark' : 'light');
     } else {
       return;
     }

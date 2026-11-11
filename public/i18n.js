@@ -103,6 +103,8 @@ const I18N = (() => {
       'shortcuts.title': 'Keyboard shortcuts',
       'shortcuts.anotherFilm': 'Another film',
       'shortcuts.filters': 'Filter panel',
+      'shortcuts.language': 'Language',
+      'shortcuts.theme': 'Theme',
       'shortcuts.close': 'Close dialog',
       'shortcuts.shortcuts': 'Shortcuts dialog',
 
@@ -262,6 +264,8 @@ const I18N = (() => {
       'shortcuts.title': 'اختصارات لوحة المفاتيح',
       'shortcuts.anotherFilm': 'فيلم آخر',
       'shortcuts.filters': 'لوحة الفلاتر',
+      'shortcuts.language': 'اللغة',
+      'shortcuts.theme': 'الوضع الداكن/الفاتح',
       'shortcuts.close': 'إغلاق النافذة',
       'shortcuts.shortcuts': 'الاختصارات',
 
