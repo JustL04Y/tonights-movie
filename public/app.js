@@ -1397,7 +1397,12 @@ function wireSource(sourceId) {
       const index = state.films.findIndex((f) => f.slug === film.slug);
       if (index >= 0) state.films[index] = film;
       state.filmBySlug.set(film.slug, film);
-      if (state.current?.slug === film.slug) renderCard(film);
+      if (state.current?.slug === film.slug) {
+        // The headline card IS the pick (also on cold loads, where it starts
+        // basic): keep the held object in step with what is rendered.
+        state.current = film;
+        renderCard(film);
+      }
     } catch {
       // Ignore malformed frames.
     }

@@ -341,15 +341,13 @@ function startJob(sourceId, previous = null) {
 
     const onPage = (items) => {
       if (!pickItem) {
-        // Variety comes free from seeds: a film whose details are already
-        // cached can headline randomly. With no seeds (true cold load) the
-        // visitor's first card is the list's opening film, so read THAT one
-        // instead of a random film they may never see — one fetch then fills
-        // the visible card.
+        // Variety is the product: random among already-read films when seeds
+        // make that free, else random from the page. The chosen film IS the
+        // headline card now, so this single fetch is never wasted.
         const seededOnPage = items.filter((item) => seeded.has(item.slug));
         pickItem = seededOnPage.length
           ? seededOnPage[Math.floor(Math.random() * seededOnPage.length)]
-          : items[0];
+          : items[Math.floor(Math.random() * items.length)];
         pick = seeded.get(pickItem.slug) || null;
         if (!pick) {
           // Gate-free single fetch so the pick never queues behind the
@@ -388,9 +386,12 @@ function startJob(sourceId, previous = null) {
 
       if (!streamStarted) {
         // First frame is a full snapshot: the card draws from it immediately.
+        // The headline card is the pick — random even on a cold load. Its
+        // details are the one fetch already in flight, so the client's
+        // on-demand read joins the same promise and the card fills in place.
         streamStarted = true;
         const films = fresh.map(toFilm);
-        emit('films', { films, total: films.length, pick: pick || films[0] });
+        emit('films', { films, total: films.length, pick: pick || toFilm(pickItem) });
         return;
       }
 
@@ -413,12 +414,11 @@ function startJob(sourceId, previous = null) {
     if (!pickItem) {
       // Defensive: onPage fires for page 1 unconditionally, so this only runs
       // if a future refactor changes that contract. Same policy as onPage:
-      // random among seeded films for variety, else the opening film the
-      // visitor is actually shown.
+      // random among seeded films when free, else random — the pick headlines.
       const seededAny = watchlist.items.filter((item) => seeded.has(item.slug));
       pickItem = seededAny.length
         ? seededAny[Math.floor(Math.random() * seededAny.length)]
-        : watchlist.items[0];
+        : watchlist.items[Math.floor(Math.random() * watchlist.items.length)];
       pick = seeded.get(pickItem.slug) || null;
     }
     if (!pick) {
