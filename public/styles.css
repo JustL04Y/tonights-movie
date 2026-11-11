@@ -191,6 +191,11 @@ body {
   margin: 0;
   display: flex;
   flex-direction: column;
+  /* The rule that actually stops the page from widening when a popover
+     pokes past a screen edge. Chromium ignores overflow-x: clip on the
+     root element for scrollable overflow, so this belongs on body —
+     tested with a forced-overflow popover: scrollWidth stays put. */
+  overflow-x: clip;
   color: var(--text);
   font-family: var(--font-sans);
   background:
