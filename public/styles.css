@@ -1386,9 +1386,25 @@ html[dir="rtl"] .range::-webkit-slider-runnable-track {
   }
 }
 
+/* Touch has no hover: the same preview plays while the finger is down and
+   settles on release. Press-only — a sticky glow would make the poster
+   look like a button it is not. */
+@media (hover: none) {
+  .poster-wrap:active img,
+  .poster-wrap:active .poster-placeholder {
+    transform: translateY(-2px) scale(1.015);
+    box-shadow:
+      var(--poster-hover-shadow),
+      0 0 0 1px var(--poster-hover-ring);
+    filter: saturate(1.03) brightness(1.02);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .poster-wrap:hover img,
-  .poster-wrap:hover .poster-placeholder {
+  .poster-wrap:hover .poster-placeholder,
+  .poster-wrap:active img,
+  .poster-wrap:active .poster-placeholder {
     transform: none;
     filter: none;
   }

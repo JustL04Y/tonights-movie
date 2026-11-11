@@ -2243,6 +2243,11 @@ function refreshLanguage() {
 function bindEvents() {
   setupDetailsAnimation();
 
+  // iOS Safari only paints :active states on elements when at least one
+  // touch listener exists somewhere on the page — this empty one unlocks
+  // the poster's press feedback there.
+  document.addEventListener('touchstart', () => {}, { passive: true });
+
   I18N.onChange(refreshLanguage);
 
   if (els.themeToggle) {
