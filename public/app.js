@@ -2272,6 +2272,17 @@ function bindEvents() {
   if (els.shortcutsDialog) {
     els.shortcutsToggle?.addEventListener('click', toggleShortcutsDialog);
     els.shortcutsClose?.addEventListener('click', () => els.shortcutsDialog.close());
+    // A click on the backdrop — anywhere outside the box — closes it too.
+    els.shortcutsDialog.addEventListener('click', (event) => {
+      if (event.target === els.shortcutsDialog) els.shortcutsDialog.close();
+    });
+    // Closing (Esc included) restores focus to the invoking chip, which would
+    // light up its green focus ring. Drop that synthetic restore a frame later.
+    els.shortcutsDialog.addEventListener('close', () => {
+      requestAnimationFrame(() => {
+        if (document.activeElement === els.shortcutsToggle) els.shortcutsToggle.blur();
+      });
+    });
   }
 
   els.loadForm.addEventListener('submit', (event) => {
