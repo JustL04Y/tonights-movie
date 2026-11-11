@@ -905,7 +905,21 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname === '/api/health') {
-      sendJson(res, 200, { ok: true, uptime: Math.round(process.uptime()), jobs: jobs.size });
+      // Report the L2 cache state so activation is verifiable from outside.
+      let redis = 'off';
+      if (REDIS_URL && REDIS_TOKEN) {
+        try {
+          const res = await fetch(`${REDIS_URL}/ping`, {
+            headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+            signal: AbortSignal.timeout(3000),
+          });
+          const body = await res.json().catch(() => null);
+          redis = res.ok && body?.result === 'PONG' ? 'on' : 'error';
+        } catch {
+          redis = 'error';
+        }
+      }
+      sendJson(res, 200, { ok: true, uptime: Math.round(process.uptime()), jobs: jobs.size, redis });
       return;
     }
 
