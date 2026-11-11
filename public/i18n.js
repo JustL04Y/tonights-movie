@@ -29,8 +29,8 @@ const I18N = (() => {
       'landing.lede':
         'Pick one random film from any public Letterboxd list — your watchlist or any curated list. Add a few filters if tonight has a mood.',
       'landing.usernameLabel': 'Letterboxd username or list link',
-      'landing.placeholder': 'your-letterboxd-name',
-      'landing.submit': 'Load list',
+      'landing.placeholder': 'Your username or a list URL',
+      'landing.submit': 'Pick me a film',
       'landing.demo': 'Try the 84-film demo',
       'landing.hint': 'Public lists only · no login',
 
@@ -99,6 +99,12 @@ const I18N = (() => {
       'pick.posterAlt': 'Poster for {title}',
       'pick.translated': 'Machine translation',
       'pick.countryMore': '{name}, and others',
+
+      'shortcuts.title': 'Keyboard shortcuts',
+      'shortcuts.anotherFilm': 'Another film',
+      'shortcuts.filters': 'Filter panel',
+      'shortcuts.close': 'Close dialog',
+      'shortcuts.shortcuts': 'Shortcuts dialog',
 
       'share.button': 'Share',
       'share.post': 'Image for posts',
@@ -182,8 +188,8 @@ const I18N = (() => {
       'landing.lede':
         'اختر فيلمًا عشوائيًا واحدًا من أي قائمة عامة على ليتربوكسد — قائمة مشاهدتك أو أي قائمة أخرى. أضف بعض الفلاتر إذا كان لليلتك مزاج معيّن.',
       'landing.usernameLabel': 'اسم المستخدم أو رابط قائمة في ليتربوكسد',
-      'landing.placeholder': 'اسم-حسابك-في-ليتربوكسد',
-      'landing.submit': 'حمّل القائمة',
+      'landing.placeholder': 'اسم حسابك أو رابط قائمة',
+      'landing.submit': 'اختر لي فيلم',
       'landing.demo': 'جرّب الديمو (84 فيلمًا)',
       'landing.hint': 'قوائم عامة فقط · بدون تسجيل دخول',
 
@@ -252,6 +258,12 @@ const I18N = (() => {
       'pick.posterAlt': 'بوستر فيلم {title}',
       'pick.translated': 'ترجمة آلية',
       'pick.countryMore': '{name} ودول أخرى',
+
+      'shortcuts.title': 'اختصارات لوحة المفاتيح',
+      'shortcuts.anotherFilm': 'فيلم آخر',
+      'shortcuts.filters': 'لوحة الفلاتر',
+      'shortcuts.close': 'إغلاق النافذة',
+      'shortcuts.shortcuts': 'الاختصارات',
 
       'share.button': 'شارك',
       'share.post': 'صورة للمنشورات',

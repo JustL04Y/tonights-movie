@@ -29,6 +29,9 @@ const els = {
   brandLink: $('#brandLink'),
   themeToggle: $('#themeToggle'),
   langToggle: $('#langToggle'),
+  shortcutsToggle: $('#shortcutsToggle'),
+  shortcutsDialog: $('#shortcutsDialog'),
+  shortcutsClose: $('#shortcutsClose'),
   themeColor: $('#themeColor'),
   usernameOut: $('#usernameOut'),
   kickerPrefix: $('#kickerPrefix'),
@@ -986,16 +989,20 @@ function renderCard(film) {
             ${esc(t('pick.viewOn'))}
           </a>
           <div class="share-wrap">
-            <button class="btn ghost share-btn" type="button" data-share-toggle aria-expanded="false" title="${esc(
-              t('share.title')
-            )}">
+            <button
+              class="btn ghost share-btn"
+              type="button"
+              data-share-toggle
+              aria-expanded="false"
+              aria-label="${esc(t('share.title'))}"
+              title="${esc(t('share.title'))}"
+            >
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="18" cy="5" r="3"></circle>
                 <circle cx="6" cy="12" r="3"></circle>
                 <circle cx="18" cy="19" r="3"></circle>
                 <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"></path>
               </svg>
-              ${esc(t('share.button'))}
             </button>
             <div class="share-menu hidden">
               <button type="button" data-share="post">${esc(t('share.post'))}<span class="ratio">4:5</span></button>
@@ -2262,6 +2269,11 @@ function bindEvents() {
     });
   }
 
+  if (els.shortcutsDialog) {
+    els.shortcutsToggle?.addEventListener('click', toggleShortcutsDialog);
+    els.shortcutsClose?.addEventListener('click', () => els.shortcutsDialog.close());
+  }
+
   els.loadForm.addEventListener('submit', (event) => {
     event.preventDefault();
     loadUser(els.username.value);
@@ -2393,17 +2405,47 @@ function bindEvents() {
     if (event.key === 'Escape') closeShareMenus({ restoreFocus: true });
   });
 
+  // Shortcuts read event.code, not event.key: the code names the physical
+  // key, so R and F keep working on an Arabic (or any other) layout where
+  // the same key produces a different character.
+  const isTypingTarget = (target) => {
+    const tag = target?.tagName;
+    return tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || target?.isContentEditable;
+  };
+
+  function toggleShortcutsDialog() {
+    if (!els.shortcutsDialog) return;
+    if (els.shortcutsDialog.open) els.shortcutsDialog.close();
+    else els.shortcutsDialog.showModal();
+  }
+
   document.addEventListener('keydown', (event) => {
-    if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.defaultPrevented || event.altKey) return;
 
-    const tag = event.target?.tagName;
-    if (tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || event.target?.isContentEditable) return;
+    // Ctrl+/ toggles the shortcuts dialog from anywhere — including inside a
+    // field, because the combination never types a character. The bare ?
+    // (Shift+/ on most layouts) does the same, but only outside fields.
+    if (event.code === 'Slash' && (event.ctrlKey || event.metaKey)) {
+      event.preventDefault();
+      toggleShortcutsDialog();
+      return;
+    }
+    if (event.code === 'Slash' && event.shiftKey && !isTypingTarget(event.target)) {
+      event.preventDefault();
+      toggleShortcutsDialog();
+      return;
+    }
 
-    if (state.view !== 'app') return;
+    if (event.metaKey || event.ctrlKey) return;
+    if (isTypingTarget(event.target)) return;
+    if (state.view !== 'app' || els.shortcutsDialog?.open) return;
 
-    if (event.key.toLowerCase() === 'r') {
+    if (event.code === 'KeyR') {
       event.preventDefault();
       pickFilm();
+    } else if (event.code === 'KeyF') {
+      event.preventDefault();
+      els.filterPanel.open = !els.filterPanel.open;
     }
   });
 

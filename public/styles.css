@@ -1817,3 +1817,109 @@ html[dir="rtl"] #usernameInput {
   font-size: 1rem;
   line-height: 1.8;
 }
+
+/* Keyboard shortcuts: a "!" chip next to the language and theme toggles opens
+   a native <dialog>, so Esc and focus trapping come for free. The chip is for
+   pointer devices only — touch screens have no keyboard to benefit. */
+
+.shortcuts-chip {
+  display: none;
+  font: 600 0.95rem/1 var(--font-sans);
+}
+
+@media (hover: hover) {
+  .shortcuts-chip {
+    display: inline-grid;
+  }
+}
+
+.shortcuts-dialog {
+  width: min(420px, calc(100vw - 40px));
+  padding: 20px 22px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--panel-solid);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+
+.shortcuts-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dialog-head h2 {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.dialog-close {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+
+.dialog-close:hover,
+.dialog-close:focus-visible {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.shortcut-rows {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shortcut-rows li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+  color: var(--text-soft);
+}
+
+.shortcut-rows li:last-child {
+  border-bottom: 0;
+}
+
+.keys {
+  display: inline-flex;
+  gap: 6px;
+  /* Key order stays left-to-right even in the Arabic layout. */
+  direction: ltr;
+}
+
+kbd {
+  display: inline-grid;
+  place-items: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 1px solid var(--line-strong);
+  border-bottom-width: 2px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  color: var(--text);
+  font: 600 0.78rem/1 var(--font-sans);
+}
