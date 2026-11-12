@@ -12,6 +12,7 @@ const {
   scrapeList,
   enrichFilms,
   fetchFilmDetails,
+  createThrottleGate,
   computeStats,
   basicFilmFromItem,
   isValidUsername,
@@ -89,20 +90,98 @@ const MIME = {
 };
 
 const jobs = new Map();
-const filmCache = new Map();
 let prewarming = false;
 
-// De-duplicates concurrent reads of the same film page: the pick fetch and a
-// client /api/film request for the slug on screen share one promise instead of
-// doubling the hit on Letterboxd.
+// ── Film cache + one global read gate ───────────────────────────
+// Every film read — enrichment workers, the headline pick, /api/film and the
+// translation route — flows through one bounded path: a single adaptive gate
+// spans all concurrent jobs (N simultaneous cold loads can no longer multiply
+// Letterboxd traffic), identical in-flight reads share one promise instead of
+// doubling the hit, and fully read films are cached with a timestamp the
+// moment they complete rather than when the job finishes.
+const FILM_CACHE_MAX = Math.max(10, Number(process.env.FILM_CACHE_MAX) || 4000);
+const FILM_CACHE_TTL_MS = SEED_MAX_AGE_MS; // same freshness rule as job seeding
+const filmCache = new Map(); // slug -> { film, fetchedAt }, LRU by insertion order
+
+// One adaptive gate for every film page read in this process.
+const filmGate = createThrottleGate({
+  start: FILM_CONCURRENCY,
+  max: Math.max(FILM_CONCURRENCY, Math.min(FILM_CONCURRENCY * 2, 48)),
+});
+
 const detailInFlight = new Map();
-function queueFilmDetails(item, options = {}) {
+
+function filmCacheGet(slug) {
+  const entry = filmCache.get(slug);
+  if (!entry) return null;
+  if (Date.now() - entry.fetchedAt > FILM_CACHE_TTL_MS) {
+    filmCache.delete(slug);
+    return null;
+  }
+  // Refresh recency so the LRU eviction keeps hot films.
+  filmCache.delete(slug);
+  filmCache.set(slug, entry);
+  return entry.film;
+}
+
+function filmCacheSet(slug, film) {
+  if (!film?.metaComplete) return;
+  filmCache.delete(slug);
+  filmCache.set(slug, { film, fetchedAt: Date.now() });
+  while (filmCache.size > FILM_CACHE_MAX) {
+    filmCache.delete(filmCache.keys().next().value);
+  }
+}
+
+// Dedupe-only read for enrichment workers: the gate slot is already held by
+// the caller, but identical in-flight reads still share one promise and every
+// completed film lands in the cache immediately (not when the job finishes).
+// Failed reads stay uncached, so a throttled film self-heals on a later load.
+function cachedFilmDetails(item, options = {}) {
+  const hit = filmCacheGet(item.slug);
+  if (hit) return Promise.resolve(hit);
   const existing = detailInFlight.get(item.slug);
   if (existing) return existing;
-  const promise = fetchFilmDetails(item, options).finally(() => {
-    detailInFlight.delete(item.slug);
-  });
+  const promise = fetchFilmDetails(item, options)
+    .then((film) => {
+      filmCacheSet(item.slug, film);
+      return film;
+    })
+    .finally(() => {
+      detailInFlight.delete(item.slug);
+    });
   detailInFlight.set(item.slug, promise);
+  return promise;
+}
+
+// Public read path (the pick, /api/film, /api/translate): bounded by the
+// shared gate; `priority` queue-jumps the headline pick past an enrichment
+// burst without going unbounded.
+async function getFilmDetails(item, options = {}) {
+  const hit = filmCacheGet(item.slug);
+  if (hit) return hit;
+  const existing = detailInFlight.get(item.slug);
+  if (existing) return existing;
+  const promise = (async () => {
+    await filmGate.acquire(Boolean(options.priority));
+    try {
+      const film = await fetchFilmDetails(item, options);
+      filmGate.success();
+      filmCacheSet(item.slug, film);
+      return film;
+    } catch (error) {
+      if (error?.status === 403 || error?.status === 429) filmGate.throttle();
+      throw error;
+    } finally {
+      filmGate.release();
+    }
+  })();
+  detailInFlight.set(item.slug, promise);
+  promise
+    .finally(() => {
+      detailInFlight.delete(item.slug);
+    })
+    .catch(() => {});
   return promise;
 }
 
@@ -403,7 +482,10 @@ function startJob(sourceId, previous = null) {
     // Reuse every film detail we already read for this user (in-memory or in
     // the previous cache file). A refresh then only fetches new films instead
     // of re-reading hundreds of unchanged film pages.
-    const seeded = new Map(filmCache);
+    // filmCache entries are wrapped ({ film, fetchedAt }); the seed map holds
+    // bare film objects, exactly what enrichFilms' `initial` expects.
+    const seeded = new Map();
+    for (const [slug, entry] of filmCache) seeded.set(slug, entry.film);
     const previousAge = Date.now() - new Date(previous?.fetchedAt || 0).getTime();
     const canSeed = Number.isFinite(previousAge) && previousAge >= 0 && previousAge < SEED_MAX_AGE_MS;
     if (canSeed) {
@@ -465,15 +547,16 @@ function startJob(sourceId, previous = null) {
           : items[Math.floor(Math.random() * items.length)];
         pick = seeded.get(pickItem.slug) || null;
         if (!pick) {
-          // Gate-free single fetch so the pick never queues behind the
-          // enrichment burst; short first attempt so a tarpitted read retries
-          // fast. Timed so regressions show in the log directly.
+          // Priority jump through the shared gate: the pick waits for at most
+          // one in-flight slot instead of the whole burst, and every other
+          // reader of the same slug joins this one promise. Short first
+          // attempt so a tarpitted read retries fast. Timed so regressions
+          // show in the log directly.
           const pickStartedAt = Date.now();
-          pickPromise = queueFilmDetails(pickItem, { firstTimeoutMs: 5000 })
+          pickPromise = getFilmDetails(pickItem, { firstTimeoutMs: 5000, priority: true })
             .then((film) => {
               if (film.metaComplete) {
                 seeded.set(film.slug, film);
-                filmCache.set(film.slug, film);
               }
               console.log(`[pick] ${film.slug}: ${Date.now() - pickStartedAt}ms`);
               return film;
@@ -540,11 +623,10 @@ function startJob(sourceId, previous = null) {
       const pickStartedAt = Date.now();
       pickPromise =
         pickPromise ||
-        queueFilmDetails(pickItem, { firstTimeoutMs: 5000 })
+        getFilmDetails(pickItem, { firstTimeoutMs: 5000, priority: true })
           .then((film) => {
             if (film.metaComplete) {
               seeded.set(film.slug, film);
-              filmCache.set(film.slug, film);
             }
             console.log(`[pick] ${film.slug}: ${Date.now() - pickStartedAt}ms`);
             return film;
@@ -557,9 +639,13 @@ function startJob(sourceId, previous = null) {
 
     job.progress = { phase: 'details', completed: 0, total: basics.length, failed: 0 };
 
-    // Read the rest of the details in the background for the filters.
+    // Read the rest of the details in the background for the filters. The
+    // shared gate + dedupe read path means: one global limit across every
+    // concurrent job, and each film cached the moment its read completes.
     const enrichedPromise = enrichFilms(watchlist.items, {
       concurrency: FILM_CONCURRENCY,
+      gate: filmGate,
+      fetchOne: cachedFilmDetails,
       initial: seeded,
       onProgress,
     });
@@ -603,10 +689,6 @@ function startJob(sourceId, previous = null) {
     if (job.status === 'running' && !streamStarted) emit('films', base);
 
     const enriched = await enrichedPromise;
-
-    for (const film of enriched) {
-      if (film.metaComplete) filmCache.set(film.slug, film);
-    }
 
     const enrichedPick = enriched.find((film) => film.slug === pick.slug);
     const payload = {
@@ -727,9 +809,7 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
     // already fully read, so slug-based translation requests (and film API
     // repeats) resolve from memory instead of re-scraping Letterboxd.
     for (const film of cached.payload.films || []) {
-      if (film?.metaComplete && film.overview && !filmCache.has(film.slug)) {
-        filmCache.set(film.slug, film);
-      }
+      filmCacheSet(film.slug, film);
     }
     // The cached pick's Arabic may be cold after a deploy; warm it without
     // blocking the snapshot — the client's request joins it if still running.
@@ -820,7 +900,7 @@ async function handleFilm(req, res, slug) {
     return;
   }
 
-  const cached = filmCache.get(slug);
+  const cached = filmCacheGet(slug);
   if (cached) {
     sendJson(res, 200, { ...cached, cached: true });
     return;
@@ -828,7 +908,7 @@ async function handleFilm(req, res, slug) {
 
   const detailStartedAt = Date.now();
   try {
-    const film = await queueFilmDetails(
+    const film = await getFilmDetails(
       {
         slug,
         link: `${BASE}/film/${slug}/`,
@@ -837,7 +917,6 @@ async function handleFilm(req, res, slug) {
       },
       { firstTimeoutMs: 5000 }
     );
-    if (film.metaComplete) filmCache.set(slug, film);
     console.log(`[film-api] ${slug}: ${Date.now() - detailStartedAt}ms`);
     sendJson(res, 200, film);
   } catch (error) {
@@ -873,11 +952,11 @@ async function handleTranslate(req, res, url) {
     return;
   }
 
-  let overview = filmCache.get(slug)?.overview;
+  let overview = filmCacheGet(slug)?.overview;
   if (!overview) {
     const detailStartedAt = Date.now();
     try {
-      const film = await queueFilmDetails(
+      const film = await getFilmDetails(
         {
           slug,
           link: `${BASE}/film/${slug}/`,
@@ -887,10 +966,9 @@ async function handleTranslate(req, res, url) {
         { firstTimeoutMs: 5000 }
       );
       overview = film.overview;
-      // Share the fetch with every other consumer (handleFilm, enrichFilms)
-      // so a repeat request never re-scrapes the same film page.
-      if (film.metaComplete) filmCache.set(slug, film);
-      console.log(`[translate] ${slug}: film fetched in ${Date.now() - detailStartedAt}ms`);
+      // Logs on both the fetch and the join of an in-flight read; either way
+      // this is one Letterboxd page for every requester of the slug.
+      console.log(`[translate] ${slug}: overview ready in ${Date.now() - detailStartedAt}ms`);
     } catch (error) {
       console.log(`[translate] ${slug}: film fetch failed (${error?.status || error?.message})`);
       if (error?.status === 404) {
