@@ -186,6 +186,19 @@ async function redisSet(key, value) {
   }
 }
 
+async function redisDel(key) {
+  if (!REDIS_URL || !REDIS_TOKEN) return;
+  try {
+    await fetch(`${REDIS_URL}/del/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
+      signal: AbortSignal.timeout(3000),
+    });
+  } catch {
+    // Best-effort, like every other Redis write here.
+  }
+}
+
 async function readCached(sourceId) {
   const cacheFile = cacheFileFor(sourceId);
   if (!cacheFile) return null;
@@ -604,6 +617,8 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
     return;
   }
   const sourceId = source.id;
+  // Feeds prewarm (recently requested sources only) and cache eviction.
+  noteAccess(sourceId);
 
   const openedAt = Date.now();
   const streamLog = (msg) => console.log(`[sse] ${sourceId}: ${msg} (+${Math.round((Date.now() - openedAt) / 1000)}s)`);
@@ -713,6 +728,7 @@ async function handleWatchlist(req, res, sourceIdRaw) {
     sendJson(res, 400, { error: 'Enter a valid Letterboxd username or list URL.' });
     return;
   }
+  noteAccess(source.id);
   const sourceId = source.id;
   if (sourceId === 'demo') {
     try {
@@ -1062,6 +1078,52 @@ const POPULAR_LISTS = (
   .map((id) => id.trim())
   .filter(Boolean);
 
+// ── Source access tracking ──────────────────────────────────────
+// Prewarm and eviction need "when was this source last requested". Kept in
+// memory, flushed periodically to data/access.json plus a Redis copy, so the
+// record survives Render's ephemeral disk across deploys.
+const ACCESS_FILE = path.join(ROOT, 'data', 'access.json');
+const ACCESS_FLUSH_MS = 60000;
+const PREWARM_RECENT_MS = Number(process.env.PREWARM_RECENT_DAYS || 3) * 24 * 60 * 60 * 1000;
+const CACHE_EVICT_MS = Number(process.env.CACHE_EVICT_DAYS || 30) * 24 * 60 * 60 * 1000;
+const accessTimes = new Map(); // sourceId -> last-request timestamp
+let accessDirty = false;
+
+function noteAccess(sourceId) {
+  if (!sourceId || sourceId === 'demo') return;
+  accessTimes.set(sourceId, Date.now());
+  accessDirty = true;
+}
+
+async function loadAccessTimes() {
+  const merge = (json) => {
+    try {
+      const data = JSON.parse(json);
+      for (const [id, ts] of Object.entries(data)) {
+        if (Number.isFinite(ts) && ts > (accessTimes.get(id) || 0)) accessTimes.set(id, ts);
+      }
+    } catch {
+      // Missing or corrupt access data just means "unknown" for those sources.
+    }
+  };
+  try {
+    merge(await fsp.readFile(ACCESS_FILE, 'utf8'));
+  } catch {}
+  // The Redis copy outlives the ephemeral disk.
+  merge(await redisGet('tonights-movie:access'));
+}
+
+async function flushAccessTimes() {
+  if (!accessDirty) return;
+  accessDirty = false;
+  const text = JSON.stringify(Object.fromEntries(accessTimes));
+  try {
+    await fsp.mkdir(path.dirname(ACCESS_FILE), { recursive: true });
+    await fsp.writeFile(ACCESS_FILE, text, 'utf8');
+  } catch {}
+  redisSet('tonights-movie:access', text);
+}
+
 async function prewarmStaleCaches() {
   if (!PREWARM || prewarming) return;
   prewarming = true;
@@ -1091,7 +1153,39 @@ async function prewarmStaleCaches() {
         // filename character), so the mapping back is unambiguous.
         return cacheFile.includes('+') ? cacheFile.replace(/\+/g, '/') : cacheFile;
       });
-    for (const sourceId of [...seedIds, ...fileIds]) {
+    // Sources never seen by this tracking get a baseline of "now": they earn a
+    // full recent-window before becoming eviction candidates, rather than
+    // being judged by a timestamp that does not exist.
+    for (const id of fileIds) {
+      if (!accessTimes.has(id)) {
+        accessTimes.set(id, Date.now());
+        accessDirty = true;
+      }
+    }
+
+    // Eviction: caches nobody has requested for CACHE_EVICT_MS are deleted
+    // from disk and Redis, so server load no longer grows with every user
+    // ever searched. Popular lists are never evicted.
+    for (const sourceId of fileIds) {
+      if (POPULAR_LISTS.includes(sourceId)) continue;
+      const last = accessTimes.get(sourceId) || 0;
+      if (Date.now() - last < CACHE_EVICT_MS) continue;
+      console.log(`[prewarm] evicting cache for ${sourceId} (no requests in ${Math.round(CACHE_EVICT_MS / 86400000)} days)`);
+      await fsp.unlink(cachePath(cacheFileFor(sourceId))).catch((error) => {
+        console.warn(`[prewarm] evict disk ${sourceId}: ${error.message}`);
+      });
+      await redisDel(redisKeyFor(cacheFileFor(sourceId)));
+      accessTimes.delete(sourceId);
+      accessDirty = true;
+    }
+
+    // Only popular lists plus sources requested recently get refreshed, so the
+    // sweep stays proportional to actual traffic instead of growing forever.
+    const recentIds = fileIds.filter((sourceId) => {
+      const last = accessTimes.get(sourceId) || 0;
+      return Date.now() - last < PREWARM_RECENT_MS;
+    });
+    for (const sourceId of [...seedIds, ...recentIds]) {
       const src = parseSourceId(sourceId);
       if (!src || src.kind === 'demo' || jobs.has(sourceId)) continue;
       const cached = await readCached(sourceId);
@@ -1247,9 +1341,14 @@ server.listen(PORT, HOST, () => {
   );
   if (PREWARM) {
     console.log('  Stale caches refresh in the background (PREWARM=0 disables this).\n');
+    loadAccessTimes().catch(() => {});
     setTimeout(prewarmStaleCaches, 5000).unref?.();
     setInterval(prewarmStaleCaches, PREWARM_INTERVAL_MS).unref?.();
   } else {
     console.log('  Background prewarm disabled (PREWARM=0).\n');
+    // Access tracking still runs: eviction decisions must be recorded even
+    // while the refresh sweep is off.
+    loadAccessTimes().catch(() => {});
   }
+  setInterval(flushAccessTimes, ACCESS_FLUSH_MS).unref?.();
 });
