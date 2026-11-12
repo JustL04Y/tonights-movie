@@ -218,14 +218,20 @@ async function readCached(sourceId) {
 async function writeCache(payload) {
   const cacheFile = cacheFileFor(payload.username);
   if (!cacheFile) throw new Error(`Unsupported cache key: ${payload.username}`);
-  await fsp.mkdir(CACHE_DIR, { recursive: true });
-  const target = cachePath(cacheFile);
-  const tmp = `${target}.${process.pid}.tmp`;
   const text = JSON.stringify(payload);
-  await fsp.writeFile(tmp, text, 'utf8');
-  await fsp.rename(tmp, target);
-  // Best-effort durable copy; never blocks or fails the job.
+  // Durable tier first and independent of the disk: if the ephemeral
+  // filesystem is ever full or read-only, Redis must not lose the snapshot
+  // too (a failed disk write used to skip the Redis copy entirely).
   redisSet(redisKeyFor(cacheFile), text);
+  try {
+    await fsp.mkdir(CACHE_DIR, { recursive: true });
+    const target = cachePath(cacheFile);
+    const tmp = `${target}.${process.pid}.tmp`;
+    await fsp.writeFile(tmp, text, 'utf8');
+    await fsp.rename(tmp, target);
+  } catch (error) {
+    console.warn(`[cache] disk write failed for ${cacheFile}:`, error.message);
+  }
 }
 
 async function readDemo() {
@@ -887,6 +893,40 @@ async function sendStaticFile(req, res, filePath, stat, ext) {
   fs.createReadStream(filePath).pipe(res);
 }
 
+// Real storage self-test, run once per boot and memoized (the uptime pinger
+// hits this route every few minutes — do not probe on every call). The disk
+// probe writes and deletes a throwaway file; the Redis probe round-trips a
+// tiny key. PONG alone cannot tell a working cache from one that silently
+// fails its writes.
+let storageProbePromise = null;
+function storageProbe() {
+  if (!storageProbePromise) {
+    storageProbePromise = (async () => {
+      let disk = 'ok';
+      try {
+        await fsp.mkdir(CACHE_DIR, { recursive: true });
+        const probe = path.join(CACHE_DIR, '.probe');
+        await fsp.writeFile(probe, String(Date.now()), 'utf8');
+        await fsp.unlink(probe);
+      } catch {
+        disk = 'readonly';
+      }
+      let redis = 'off';
+      if (REDIS_URL && REDIS_TOKEN) {
+        try {
+          const marker = `probe-${Date.now()}`;
+          await redisSet('tonights-movie:health:probe', marker);
+          redis = (await redisGet('tonights-movie:health:probe')) === marker ? 'roundtrip-ok' : 'broken';
+        } catch {
+          redis = 'error';
+        }
+      }
+      return [disk, redis];
+    })().catch(() => ['error', 'error']);
+  }
+  return storageProbePromise;
+}
+
 async function serveStatic(req, res, pathname) {
   let relative = decodeURIComponent(pathname);
   if (relative === '/') relative = '/index.html';
@@ -986,21 +1026,10 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (url.pathname === '/api/health') {
-      // Report the L2 cache state so activation is verifiable from outside.
-      let redis = 'off';
-      if (REDIS_URL && REDIS_TOKEN) {
-        try {
-          const res = await fetch(`${REDIS_URL}/ping`, {
-            headers: { Authorization: `Bearer ${REDIS_TOKEN}` },
-            signal: AbortSignal.timeout(3000),
-          });
-          const body = await res.json().catch(() => null);
-          redis = res.ok && body?.result === 'PONG' ? 'on' : 'error';
-        } catch {
-          redis = 'error';
-        }
-      }
-      sendJson(res, 200, { ok: true, uptime: Math.round(process.uptime()), jobs: jobs.size, redis });
+      // Report real storage health: disk writability and an actual Redis
+      // round trip, probed once per boot.
+      const [disk, redis] = await storageProbe();
+      sendJson(res, 200, { ok: true, uptime: Math.round(process.uptime()), jobs: jobs.size, disk, redis });
       return;
     }
 
