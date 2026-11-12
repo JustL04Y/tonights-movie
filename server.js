@@ -752,29 +752,68 @@ async function handleFilm(req, res, slug) {
 
 async function handleTranslate(req, res, url) {
   const lang = String(url.searchParams.get('lang') || '').toLowerCase();
-  const text = String(url.searchParams.get('q') || '').trim();
+  const slug = String(url.searchParams.get('slug') || '').trim();
 
   if (lang !== 'ar') {
     sendJson(res, 400, { error: 'Unsupported language.' });
     return;
   }
-  if (!text) {
-    sendJson(res, 400, { error: 'Missing text.' });
-    return;
-  }
-  if (text.length > 4000) {
-    sendJson(res, 413, { error: 'Text too long.' });
+  // Only film slugs are accepted — the server resolves the synopsis from its
+  // own cache (or fetches that film page), so arbitrary client text never
+  // reaches the translation provider. This endpoint can no longer be used as
+  // an open relay to burn provider quota.
+  if (!/^[a-z0-9-]{1,200}$/.test(slug)) {
+    sendJson(res, 400, { error: 'Missing or invalid film slug.' });
     return;
   }
 
-  const translated = await translate(text, 'ar');
+  let overview = filmCache.get(slug)?.overview;
+  if (!overview) {
+    const detailStartedAt = Date.now();
+    try {
+      const film = await queueFilmDetails(
+        {
+          slug,
+          link: `${BASE}/film/${slug}/`,
+          fallbackTitle: slug.replace(/-/g, ' '),
+          fallbackYear: null,
+        },
+        { firstTimeoutMs: 5000 }
+      );
+      overview = film.overview;
+      // Share the fetch with every other consumer (handleFilm, enrichFilms)
+      // so a repeat request never re-scrapes the same film page.
+      if (film.metaComplete) filmCache.set(slug, film);
+      console.log(`[translate] ${slug}: film fetched in ${Date.now() - detailStartedAt}ms`);
+    } catch (error) {
+      console.log(`[translate] ${slug}: film fetch failed (${error?.status || error?.message})`);
+      if (error?.status === 404) {
+        sendJson(res, 404, { error: 'Film not found.' });
+      } else if (error?.status === 403 || error?.status === 429) {
+        sendJson(res, 429, { error: 'Letterboxd is rate limiting requests. Try again shortly.' });
+      } else {
+        sendJson(res, 502, { error: 'Could not read that film page right now.' });
+      }
+      return;
+    }
+  }
+  if (!overview) {
+    sendJson(res, 404, { error: 'No synopsis found for that film.' });
+    return;
+  }
+  if (overview.length > 4000) {
+    sendJson(res, 413, { error: 'Synopsis too long to translate.' });
+    return;
+  }
+
+  const translated = await translate(overview, 'ar');
   if (!translated) {
     sendJson(res, 503, { error: 'Translation unavailable.' });
     return;
   }
   // The Arabic rendering of a fixed text never changes, so the browser may
   // keep it forever and skip future round trips for the same synopsis.
-  sendJson(res, 200, { lang: 'ar', text: translated }, { cacheControl: 'private, max-age=31536000, immutable' });
+  sendJson(res, 200, { lang: 'ar', slug, text: translated }, { cacheControl: 'private, max-age=31536000, immutable' });
 }
 
 /* ── Poster proxy ────────────────────────────────────────────────

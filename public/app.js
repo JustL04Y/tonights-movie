@@ -1084,8 +1084,11 @@ async function ensureArabicOverview(film) {
   const timer = setTimeout(() => controller.abort(), TRANSLATION_TIMEOUT_MS);
 
   try {
+    // Slug only: the server resolves the synopsis from its own film cache (or
+    // fetches the film page), so the request can never be abused as a
+    // free-form translation relay.
     const response = await fetch(
-      `/api/translate?lang=ar&q=${encodeURIComponent(film.overview)}`,
+      `/api/translate?lang=ar&slug=${encodeURIComponent(film.slug)}`,
       { headers: { Accept: 'application/json' }, signal: controller.signal }
     );
     if (!response.ok) throw new Error('Translation unavailable');
