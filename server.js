@@ -19,6 +19,12 @@ const {
   isValidListSlug,
 } = require('./lib/letterboxd');
 const { translate } = require('./lib/translate');
+const {
+  searchMovie,
+  pickResult,
+  tmdbFetchJson,
+  filmFromTmdb,
+} = require('./lib/tmdb');
 
 const PORT = Number(process.env.PORT || 3000);
 // Render runs the app inside a container and requires binding to all
@@ -49,7 +55,7 @@ const CACHE_TTL_MS = Math.max(5, CACHE_TTL_MINUTES) * 60 * 1000;
 // Film details can be reused from an older cache file, but only for a week so
 // ratings and metadata do not drift forever on lists that are never re-read.
 const SEED_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 // Concurrency vs. memory: every in-flight film page holds 1–2 MB of HTML
 // (plus undici buffers and parse temporaries). 32 concurrent pages peaks
 // well past the ~256 MB V8 heap allowed inside Render's free 512 MB
@@ -183,6 +189,102 @@ async function getFilmDetails(item, options = {}) {
     })
     .catch(() => {});
   return promise;
+}
+
+// ── TMDB bulk enrichment (official API, keyed) ──────────────────
+// With TMDB_API_KEY set, film details come from TMDB (Arabic synopses are
+// human-written there) instead of scraping every Letterboxd film page. The
+// lists themselves still come from Letterboxd, and the on-screen card
+// upgrades to the real Letterboxd community rating through the lazy
+// lbRating fetch below. Without the key every path here is inert and the
+// server behaves exactly as before.
+const TMDB_KEY = process.env.TMDB_API_KEY || '';
+const TMDB_CONCURRENCY = Math.max(1, Number(process.env.TMDB_CONCURRENCY) || 10);
+const tmdbInFlight = new Map();
+
+// One TMDB film: search by title+year, confidence-check the match, fetch
+// details in Arabic (English fallback when TMDB has no Arabic synopsis).
+// A confident miss returns null so the caller can scrape Letterboxd for that
+// film instead — a wrong match never reaches the user.
+async function getTmdbFilm(item) {
+  const title = item.title || item.fallbackTitle || '';
+  const year = item.year || item.fallbackYear || null;
+  const existing = tmdbInFlight.get(item.slug);
+  if (existing) return existing;
+  const promise = (async () => {
+    const results = await searchMovie(title, year, TMDB_KEY);
+    const chosen = pickResult(results, { title, year });
+    if (!chosen) return null;
+    const details = await tmdbFetchJson(
+      `/movie/${chosen.id}`,
+      { language: 'ar', append_to_response: 'credits' },
+      TMDB_KEY
+    );
+    const film = filmFromTmdb(item.slug, title, year, details);
+    if (!film.overview) {
+      const english = await tmdbFetchJson(`/movie/${chosen.id}`, { language: 'en-US' }, TMDB_KEY);
+      film.overview = (english.overview || '').trim();
+      film.overviewLang = film.overview ? 'en' : '';
+    }
+    filmCacheSet(item.slug, film);
+    return film;
+  })();
+  tmdbInFlight.set(item.slug, promise);
+  promise
+    .finally(() => {
+      tmdbInFlight.delete(item.slug);
+    })
+    .catch(() => {});
+  return promise;
+}
+
+// Bulk pass with the same contract as enrichFilms: array of film objects in
+// input order plus identical progress events. Cached films (this process or
+// the seeded previous payload) cost zero requests; confident TMDB misses fall
+// back to the Letterboxd scrape through the shared read path.
+async function tmdbEnrich(items, { onProgress, initial = new Map() } = {}) {
+  let completed = 0;
+  let failed = 0;
+  let lastReportAt = 0;
+  const report = (force = false) => {
+    if (!onProgress) return;
+    const now = Date.now();
+    if (!force && now - lastReportAt < 350) return;
+    lastReportAt = now;
+    onProgress({ phase: 'details', completed, total: items.length, failed, limit: TMDB_CONCURRENCY });
+  };
+
+  const results = new Array(items.length);
+  let nextIndex = 0;
+  const worker = async () => {
+    while (true) {
+      const index = nextIndex;
+      nextIndex += 1;
+      if (index >= items.length) return;
+      const item = items[index];
+      const cached = initial.get(item.slug) || filmCacheGet(item.slug);
+      if (cached?.metaComplete) {
+        results[index] = cached;
+        completed += 1;
+        report();
+        continue;
+      }
+      try {
+        let film = await getTmdbFilm(item);
+        if (!film) film = await getFilmDetails(item, {});
+        results[index] = film;
+      } catch {
+        results[index] = basicFilmFromItem(item);
+        failed += 1;
+      }
+      completed += 1;
+      report();
+    }
+  };
+
+  await Promise.all(Array.from({ length: Math.min(TMDB_CONCURRENCY, items.length) }, () => worker()));
+  report(true);
+  return results;
 }
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -521,6 +623,15 @@ function startJob(sourceId, previous = null) {
 
     const toFilm = (item) => seeded.get(item.slug) || basicFilmFromItem(item);
 
+    // The headline pick: a TMDB film when the API is wired (instant, Arabic
+    // synopsis included), otherwise a priority jump through the Letterboxd
+    // gate. A TMDB match miss falls back to the Letterboxd page, so the pick
+    // is always fully read either way.
+    const fetchPickFilm = (item) =>
+      (TMDB_KEY ? getTmdbFilm(item) : Promise.resolve(null)).then((film) =>
+        film || getFilmDetails(item, { firstTimeoutMs: 5000, priority: true })
+      );
+
     const flushDelta = () => {
       flushTimer = null;
       if (job.status !== 'running' || !deltaBuffer.length) return;
@@ -565,7 +676,7 @@ function startJob(sourceId, previous = null) {
           // attempt so a tarpitted read retries fast. Timed so regressions
           // show in the log directly.
           const pickStartedAt = Date.now();
-          pickPromise = getFilmDetails(pickItem, { firstTimeoutMs: 5000, priority: true })
+          pickPromise = fetchPickFilm(pickItem)
             .then((film) => {
               if (film.metaComplete) {
                 seeded.set(film.slug, film);
@@ -635,7 +746,7 @@ function startJob(sourceId, previous = null) {
       const pickStartedAt = Date.now();
       pickPromise =
         pickPromise ||
-        getFilmDetails(pickItem, { firstTimeoutMs: 5000, priority: true })
+        fetchPickFilm(pickItem)
           .then((film) => {
             if (film.metaComplete) {
               seeded.set(film.slug, film);
@@ -654,13 +765,15 @@ function startJob(sourceId, previous = null) {
     // Read the rest of the details in the background for the filters. The
     // shared gate + dedupe read path means: one global limit across every
     // concurrent job, and each film cached the moment its read completes.
-    const enrichedPromise = enrichFilms(watchlist.items, {
-      concurrency: FILM_CONCURRENCY,
-      gate: filmGate,
-      fetchOne: cachedFilmDetails,
-      initial: seeded,
-      onProgress,
-    });
+    const enrichedPromise = TMDB_KEY
+      ? tmdbEnrich(basics, { onProgress, initial: seeded })
+      : enrichFilms(watchlist.items, {
+          concurrency: FILM_CONCURRENCY,
+          gate: filmGate,
+          fetchOne: cachedFilmDetails,
+          initial: seeded,
+          onProgress,
+        });
 
     pick = pick || (await pickPromise);
 
@@ -668,7 +781,8 @@ function startJob(sourceId, previous = null) {
     // for it as soon as the card renders, and a translation that started here
     // (in parallel with scraping) turns that request into a memory hit
     // instead of a provider round trip at the front of the serial queue.
-    if (pick?.overview) translate(pick.overview, 'ar').catch(() => {});
+    // TMDB synopses arrive already Arabic — nothing to warm.
+    if (pick?.overview && pick.overviewLang !== 'ar') translate(pick.overview, 'ar').catch(() => {});
 
     // The first pick is fully read before the app appears, so the landing ->
     // result transition feels immediate. Every other film is enriched in the
@@ -825,7 +939,11 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
     }
     // The cached pick's Arabic may be cold after a deploy; warm it without
     // blocking the snapshot — the client's request joins it if still running.
-    if (cached.payload.pick?.overview) translate(cached.payload.pick.overview, 'ar').catch(() => {});
+    // TMDB synopses are already Arabic (overviewLang=ar), skip those.
+    const pickPayload = cached.payload.pick;
+    if (pickPayload?.overview && pickPayload.overviewLang !== 'ar') {
+      translate(pickPayload.overview, 'ar').catch(() => {});
+    }
     sseSend(out, 'done', { cached: true, ...cached.payload });
     out.end();
     return;
@@ -1020,7 +1138,7 @@ async function handleTranslate(req, res, url) {
    https only, *.ltrbxd.com only, no redirects, JPEG/PNG/WebP only, size
    capped. Posters are small, so a tiny in-memory LRU keeps repeat shares
    off the network without threatening the free-plan memory budget. */
-const POSTER_HOST_RE = /^[a-z0-9-]+\.ltrbxd\.com$/;
+const POSTER_HOST_RE = /^([a-z0-9-]+\.ltrbxd\.com|image\.tmdb\.org)$/;
 const POSTER_TYPE_RE = /^image\/(jpeg|png|webp)$/;
 const POSTER_MAX_BYTES = 3 * 1024 * 1024;
 const POSTER_CACHE_MAX = 60;
