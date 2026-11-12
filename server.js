@@ -870,11 +870,41 @@ async function handlePoster(req, res, url) {
 const GZIP_TYPES = new Set(['.js', '.css', '.html', '.json', '.svg', '.txt', '.map']);
 const gzipFileCache = new Map();
 
+// Font binaries never change in practice (OFL files are stable), so they ship
+// immutable. Text assets revalidate: a changed file costs one conditional
+// request; an unchanged one costs a 304 with no body — which matters when the
+// round trip alone is ~0.5s and app.js alone is ~24 KB compressed.
+const IMMUTABLE_TYPES = new Set(['.woff2', '.woff', '.ttf', '.otf']);
+
+function etagFor(stat) {
+  return `W/"${stat.size.toString(16)}-${Math.round(stat.mtimeMs).toString(16)}"`;
+}
+
+// If-None-Match may list several validators with or without the weak marker
+// and quotes; compare loosely on the core value.
+function etagMatches(ifNoneMatch, etag) {
+  if (!ifNoneMatch) return false;
+  const core = etag.replace(/^W\//, '').replace(/"/g, '');
+  return String(ifNoneMatch)
+    .split(',')
+    .some((candidate) => candidate.trim().replace(/^W\//, '').replace(/"/g, '') === core);
+}
+
 async function sendStaticFile(req, res, filePath, stat, ext) {
+  const etag = etagFor(stat);
+  const cacheControl = IMMUTABLE_TYPES.has(ext)
+    ? 'public, max-age=31536000, immutable'
+    : 'no-cache';
+  if (etagMatches(req.headers['if-none-match'], etag)) {
+    res.writeHead(304, { ETag: etag, 'Cache-Control': cacheControl, Vary: 'Accept-Encoding' });
+    res.end();
+    return;
+  }
   const headers = {
     'Content-Type': MIME[ext] || 'application/octet-stream',
-    // Assets are not content-hashed, so revalidate them on every load.
-    'Cache-Control': 'no-cache',
+    ETag: etag,
+    'Last-Modified': stat.mtime.toUTCString(),
+    'Cache-Control': cacheControl,
     Vary: 'Accept-Encoding',
   };
   if (GZIP_TYPES.has(ext) && stat.size > 1024 && stat.size < 2 * 1024 * 1024 && acceptsGzip(req)) {
