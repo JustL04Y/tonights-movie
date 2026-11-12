@@ -627,9 +627,31 @@ function startJob(sourceId, previous = null) {
     // synopsis included), otherwise a priority jump through the Letterboxd
     // gate. A TMDB match miss falls back to the Letterboxd page, so the pick
     // is always fully read either way.
+    //
+    // TMDB cannot know Letterboxd's community score, and the card used to
+    // flash the TMDB number before the lazy upgrade. Instead the pick waits
+    // — capped — for the Letterboxd page itself: same number the card showed
+    // before TMDB existed here, served from the 30-day Redis cache for any
+    // film someone has picked before. If the page is tarpitted the cap
+    // releases the card with the TMDB score and the client upgrade finishes
+    // the job moments later.
+    const withLetterboxdRating = async (film) => {
+      if (!film) return film;
+      const lb = await Promise.race([
+        lbRating(film.slug).catch(() => null),
+        sleep(2500).then(() => null),
+      ]);
+      if (lb && typeof lb.rating === 'number') {
+        film.lbRating = lb.rating;
+        film.lbRatingCount = lb.ratingCount ?? null;
+      }
+      return film;
+    };
     const fetchPickFilm = (item) =>
       (TMDB_KEY ? getTmdbFilm(item) : Promise.resolve(null)).then((film) =>
-        film || getFilmDetails(item, { firstTimeoutMs: 5000, priority: true })
+        film
+          ? withLetterboxdRating(film)
+          : getFilmDetails(item, { firstTimeoutMs: 5000, priority: true })
       );
 
     const flushDelta = () => {
