@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const fsp = require('node:fs/promises');
 const path = require('node:path');
 const zlib = require('node:zlib');
+const crypto = require('node:crypto');
 const {
   BASE,
   scrapeWatchlist,
@@ -254,7 +255,6 @@ function sendJson(res, status, body, options = {}) {
     // Callers that serve immutable content (e.g. a translation of a fixed
     // text) pass their own policy; the browser then skips the round trip.
     'Cache-Control': options.cacheControl || 'no-store',
-    'Access-Control-Allow-Origin': '*',
     Vary: 'Accept-Encoding',
   };
   if (acceptsGzip(res.req) && text.length > 1024) {
@@ -608,7 +608,6 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
     'Cache-Control': 'no-cache, no-transform',
     Connection: 'keep-alive',
     'X-Accel-Buffering': 'no',
-    'Access-Control-Allow-Origin': '*',
     ...(gzipped ? { 'Content-Encoding': 'gzip', Vary: 'Accept-Encoding' } : {}),
   });
   const out = sseTarget(req, res);
@@ -1045,11 +1044,65 @@ async function prewarmStaleCaches() {
   }
 }
 
+// ── Security headers ─────────────────────────────────────────────
+// Applied to every response from the router below. The CSP allows only
+// same-origin resources: posters load through /api/poster, fonts are
+// self-hosted, and the inline <script> blocks (theme/language bootstrap,
+// JSON-LD) are pinned by hash so no unsafe-inline is needed. Hashes are
+// recomputed when index.html changes (mtime-checked like the gzip cache),
+// so editing the page never silently breaks itself.
+const INLINE_SCRIPT_RE = /<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/g;
+
+const cspCache = { mtimeMs: 0, policy: '' };
+
+async function contentSecurityPolicy() {
+  const indexPath = path.join(PUBLIC_DIR, 'index.html');
+  let stat;
+  try {
+    stat = await fsp.stat(indexPath);
+  } catch {
+    return ''; // No policy rather than a policy that bricks the page.
+  }
+  if (cspCache.mtimeMs !== stat.mtimeMs) {
+    const html = await fsp.readFile(indexPath, 'utf8');
+    const hashes = [];
+    for (const match of html.matchAll(INLINE_SCRIPT_RE)) {
+      // Hash the exact text between the tags — that is what the browser
+      // hashes. JSON-LD is inert data, but hashing it too is harmless and
+      // keeps the policy correct if its type ever changes.
+      const hash = crypto.createHash('sha256').update(match[2]).digest('base64');
+      hashes.push(`'sha256-${hash}'`);
+    }
+    cspCache.mtimeMs = stat.mtimeMs;
+    cspCache.policy = [
+      "default-src 'self'",
+      hashes.length ? `script-src 'self' ${hashes.join(' ')}` : "script-src 'self'",
+      "style-src 'self'",
+      "img-src 'self' data:",
+      "font-src 'self'",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "frame-ancestors 'none'",
+    ].join('; ');
+  }
+  return cspCache.policy;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   if (url.pathname.startsWith('/api/')) console.log(`[req] ${req.method} ${url.pathname}${url.search}`);
 
   try {
+    // Framing, sniffing and referrer policy apply to every response; the CSP
+    // is skipped only if index.html could not be read.
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('X-Frame-Options', 'DENY');
+    const csp = await contentSecurityPolicy();
+    if (csp) res.setHeader('Content-Security-Policy', csp);
+
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       sendJson(res, 405, { error: 'Method not allowed' });
       return;
