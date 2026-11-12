@@ -723,6 +723,14 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
 
   const cached = await readCached(sourceId);
   if (!refresh && cached?.fresh) {
+    // Seed the film cache from the snapshot: every metaComplete film in it is
+    // already fully read, so slug-based translation requests (and film API
+    // repeats) resolve from memory instead of re-scraping Letterboxd.
+    for (const film of cached.payload.films || []) {
+      if (film?.metaComplete && film.overview && !filmCache.has(film.slug)) {
+        filmCache.set(film.slug, film);
+      }
+    }
     // The cached pick's Arabic may be cold after a deploy; warm it without
     // blocking the snapshot — the client's request joins it if still running.
     if (cached.payload.pick?.overview) translate(cached.payload.pick.overview, 'ar').catch(() => {});
