@@ -363,9 +363,21 @@ function sendJson(res, status, body, options = {}) {
     ...options.headers,
   };
   if (acceptsGzip(res.req) && text.length > 1024) {
-    const gz = zlib.gzipSync(text);
-    res.writeHead(status, { ...headers, 'Content-Encoding': 'gzip', 'Content-Length': gz.length });
-    res.end(gz);
+    // Off the event loop: a 700 KB watchlist snapshot used to block every
+    // other request for the whole gzip pass.
+    zlib.gzip(text, (error, gz) => {
+      if (error || res.writableEnded || res.destroyed) {
+        // Fall through to the plain body; a failed compression must not
+        // strand the response.
+        if (!res.writableEnded && !res.destroyed && !res.headersSent) {
+          res.writeHead(status, { ...headers, 'Content-Length': Buffer.byteLength(text) });
+          res.end(text);
+        }
+        return;
+      }
+      res.writeHead(status, { ...headers, 'Content-Encoding': 'gzip', 'Content-Length': gz.length });
+      res.end(gz);
+    });
     return;
   }
   res.writeHead(status, { ...headers, 'Content-Length': Buffer.byteLength(text) });
