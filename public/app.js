@@ -899,9 +899,25 @@ function pickFilm() {
   announce(t('announce.picked', { title: film.title, year }));
 }
 
+function posterProxyUrl(value) {
+  // The CSP allows only same-origin images, so the card (like the share
+  // canvas) loads remote posters through the server's /api/poster proxy —
+  // which whitelists the two image hosts (Letterboxd CDN and TMDB) and caps
+  // size and type.
+  const url = safeUrl(value);
+  if (!url) return '';
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin === location.origin) return parsed.href;
+    return `/api/poster?u=${encodeURIComponent(url)}`;
+  } catch {
+    return '';
+  }
+}
+
 function posterMarkup(film) {
   const title = `${film.title}${film.year ? ` (${film.year})` : ''}`;
-  const poster = safeUrl(film.poster);
+  const poster = posterProxyUrl(film.poster);
 
   if (poster) {
     return `<img src="${esc(poster)}" alt="${esc(
@@ -1037,7 +1053,7 @@ function renderCard(film) {
     );
   }
 
-  const art = safeUrl(film.backdrop) || safeUrl(film.poster);
+  const art = posterProxyUrl(film.backdrop) || posterProxyUrl(film.poster);
   if (art) {
     els.backdrop.style.backgroundImage = `url("${art.replace(/"/g, '%22')}")`;
     els.backdrop.classList.add('is-on');
