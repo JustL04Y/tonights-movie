@@ -964,10 +964,15 @@ function renderCard(film) {
         film.metaComplete ? esc(t('pick.noSynopsis')) : esc(t('pick.readingDetails'))
       }</p>`;
 
+  // The ratings note names Letterboxd, so it only ever shows a Letterboxd
+  // count: the lazy upgrade's number, or a film that was scraped from
+  // Letterboxd itself. A TMDB-only count stays silent until the upgrade
+  // lands — a TMDB number labelled "on Letterboxd" would be a lie.
+  const noteCount = film.lbRatingCount ?? (film.ratingSource === 'tmdb' ? null : film.ratingCount);
   const detailsNote = film.metaComplete
-    ? (film.lbRatingCount ?? film.ratingCount)
-      ? t((film.lbRatingCount ?? film.ratingCount) === 1 ? 'pick.ratingsOne' : 'pick.ratingsMany', {
-          count: compactNumber(film.lbRatingCount ?? film.ratingCount),
+    ? noteCount
+      ? t(noteCount === 1 ? 'pick.ratingsOne' : 'pick.ratingsMany', {
+          count: compactNumber(noteCount),
         })
       : ''
     : t('pick.detailsLoading');
