@@ -912,8 +912,11 @@ function posterMarkup(film) {
 }
 
 function ratingMarkup(film) {
-  if (typeof film.rating !== 'number' || film.rating <= 0) return '';
-  return `<span class="rating-badge"><span class="star" aria-hidden="true">★</span> ${film.rating.toFixed(1)}</span>`;
+  // The card prefers the real Letterboxd community rating once the lazy
+  // fetch has delivered it; until then it shows the TMDB score (same scale).
+  const shown = typeof film.lbRating === 'number' ? film.lbRating : film.rating;
+  if (typeof shown !== 'number' || shown <= 0) return '';
+  return `<span class="rating-badge" data-rating-badge><span class="star" aria-hidden="true">★</span> ${shown.toFixed(1)}</span>`;
 }
 
 function translatedOverview(film) {
@@ -962,9 +965,9 @@ function renderCard(film) {
       }</p>`;
 
   const detailsNote = film.metaComplete
-    ? film.ratingCount
-      ? t(film.ratingCount === 1 ? 'pick.ratingsOne' : 'pick.ratingsMany', {
-          count: compactNumber(film.ratingCount),
+    ? (film.lbRatingCount ?? film.ratingCount)
+      ? t((film.lbRatingCount ?? film.ratingCount) === 1 ? 'pick.ratingsOne' : 'pick.ratingsMany', {
+          count: compactNumber(film.lbRatingCount ?? film.ratingCount),
         })
       : ''
     : t('pick.detailsLoading');
@@ -1009,7 +1012,7 @@ function renderCard(film) {
               <button type="button" data-share="story">${esc(t('share.story'))}<span class="ratio">9:16</span></button>
             </div>
           </div>
-          <span class="details-note">${esc(detailsNote)}</span>
+          <span class="details-note" data-details-note>${esc(detailsNote)}</span>
         </div>
       </div>
     </article>
@@ -1040,6 +1043,55 @@ function renderCard(film) {
 
   if (!film.metaComplete) ensureDetails(film);
   else ensureArabicOverview(film);
+  ensureLetterboxdRating(film);
+}
+
+// TMDB cannot know Letterboxd's community score, so films that came from the
+// API start with the TMDB rating (same 0-5 scale) and upgrade here: one
+// non-blocking fetch per film, and the server caches the answer for 30 days
+// where every viewer shares it.
+async function ensureLetterboxdRating(film) {
+  if (!film || film.ratingSource !== 'tmdb' || typeof film.lbRating === 'number') return;
+  if (!state.lbRatingPending) state.lbRatingPending = new Set();
+  if (state.lbRatingPending.has(film.slug)) return;
+  state.lbRatingPending.add(film.slug);
+  try {
+    const response = await fetch(`/api/film/${encodeURIComponent(film.slug)}?lb=1`, {
+      headers: { Accept: 'application/json' },
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (typeof data?.rating !== 'number') return;
+    film.lbRating = data.rating;
+    film.lbRatingCount = data.ratingCount ?? null;
+    // Keep every alias of this film in step so re-renders keep the upgrade.
+    const index = state.films.findIndex((f) => f.slug === film.slug);
+    if (index >= 0) {
+      state.films[index].lbRating = data.rating;
+      state.films[index].lbRatingCount = data.ratingCount ?? null;
+    }
+    const alias = state.filmBySlug.get(film.slug);
+    if (alias) {
+      alias.lbRating = data.rating;
+      alias.lbRatingCount = data.ratingCount ?? null;
+    }
+    if (state.current?.slug === film.slug && state.view === 'app') {
+      const badge = $('[data-rating-badge]', els.spotlight);
+      if (badge) badge.innerHTML = `<span class="star" aria-hidden="true">★</span> ${data.rating.toFixed(1)}`;
+      if (data.ratingCount != null) {
+        const note = $('[data-details-note]', els.spotlight);
+        if (note) {
+          note.textContent = t(data.ratingCount === 1 ? 'pick.ratingsOne' : 'pick.ratingsMany', {
+            count: compactNumber(data.ratingCount),
+          });
+        }
+      }
+    }
+  } catch {
+    // The TMDB rating stays; the upgrade is best-effort.
+  } finally {
+    state.lbRatingPending.delete(film.slug);
+  }
 }
 
 function clearTranslationTimer(slug) {
@@ -1075,6 +1127,14 @@ function scheduleTranslationRetry(film) {
 async function ensureArabicOverview(film) {
   if (!I18N.isArabic() || !film || !film.slug || !film.overview) return;
   if (state.translations.has(film.slug) || state.translationPending.has(film.slug)) return;
+
+  // TMDB synopses arrive already written in Arabic — no provider call. Seed
+  // the translation map so the card renders it exactly like a translated
+  // overview (rtl), and never hits /api/translate for this film.
+  if (film.overviewLang === 'ar') {
+    state.translations.set(film.slug, film.overview);
+    return;
+  }
 
   const retryAt = state.translationRetryAt.get(film.slug) || 0;
   if (Date.now() < retryAt) return;

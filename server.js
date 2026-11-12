@@ -1020,13 +1020,72 @@ async function handleWatchlist(req, res, sourceIdRaw) {
   sendJson(res, 200, { ...cached.payload, cached: true, stale: !cached.fresh });
 }
 
-async function handleFilm(req, res, slug) {
+// ── Letterboxd community rating (lazy, one page per film) ───────
+// TMDB cannot know Letterboxd's community score. The card therefore starts
+// with the TMDB rating (same 0-5 scale) and the client fetches the real one
+// for the film on screen; the number is stable, so it is cached for 30 days
+// in Redis (the global 30-day cache TTL) and shared by every viewer and process.
+const lbRatingInFlight = new Map();
+
+async function lbRating(slug) {
+  if (!/^[a-z0-9-]{1,200}$/.test(slug)) return null;
+  const redisRaw = await redisGet(`tonights-movie:lbrating:${slug}`);
+  if (redisRaw) {
+    try {
+      const parsed = JSON.parse(redisRaw);
+      if (typeof parsed.rating === 'number') return parsed;
+    } catch {
+      // Fall through and read the page.
+    }
+  }
+  const existing = lbRatingInFlight.get(slug);
+  if (existing) return existing;
+  const promise = (async () => {
+    await filmGate.acquire(false);
+    try {
+      const film = await fetchFilmDetails({
+        slug,
+        link: `${BASE}/film/${slug}/`,
+        fallbackTitle: slug.replace(/-/g, ' '),
+        fallbackYear: null,
+      });
+      if (typeof film.rating !== 'number') return null;
+      const payload = { rating: film.rating, ratingCount: film.ratingCount ?? null };
+      redisSet(`tonights-movie:lbrating:${slug}`, JSON.stringify(payload));
+      return payload;
+    } finally {
+      filmGate.release();
+    }
+  })();
+  lbRatingInFlight.set(slug, promise);
+  promise
+    .finally(() => {
+      lbRatingInFlight.delete(slug);
+    })
+    .catch(() => {});
+  return promise;
+}
+
+async function handleFilm(req, res, slug, url) {
   if (!rateAllowed(req, 'film')) {
     sendRateLimited(res, 'film');
     return;
   }
   if (!/^[a-z0-9-]{1,200}$/.test(slug)) {
     sendJson(res, 400, { error: 'Invalid film slug.' });
+    return;
+  }
+
+  // Lazy Letterboxd community rating for TMDB-sourced films: the card starts
+  // with the TMDB score and upgrades to the familiar Letterboxd number when
+  // this returns. One page per film, cached 30 days in Redis.
+  if (url && url.searchParams.get('lb') === '1') {
+    const payload = await lbRating(slug);
+    if (payload) {
+      sendJson(res, 200, payload);
+    } else {
+      sendJson(res, 404, { error: 'No Letterboxd rating found.' });
+    }
     return;
   }
 
@@ -1580,7 +1639,7 @@ const server = http.createServer(async (req, res) => {
 
     const filmMatch = /^\/api\/film\/([^/]+)\/?$/.exec(url.pathname);
     if (filmMatch) {
-      await handleFilm(req, res, filmMatch[1]);
+      await handleFilm(req, res, filmMatch[1], url);
       return;
     }
 
