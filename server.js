@@ -639,7 +639,7 @@ function startJob(sourceId, previous = null) {
       if (!film) return film;
       const lb = await Promise.race([
         lbRating(film.slug).catch(() => null),
-        sleep(2500).then(() => null),
+        sleep(4000).then(() => null),
       ]);
       if (lb && typeof lb.rating === 'number') {
         film.lbRating = lb.rating;
@@ -1063,21 +1063,34 @@ async function lbRating(slug) {
   const existing = lbRatingInFlight.get(slug);
   if (existing) return existing;
   const promise = (async () => {
-    await filmGate.acquire(false);
+    // Letterboxd throttles a film-page request that lands right after a list
+    // scrape burst (shared per-IP budget), which is exactly when the pick
+    // asks. One short, calm retry off the gate usually lands the real
+    // number; both the pick race and the ?lb=1 route share this promise.
+    const readPage = async () => {
+      await filmGate.acquire(false);
+      try {
+        return await fetchFilmDetails({
+          slug,
+          link: `${BASE}/film/${slug}/`,
+          fallbackTitle: slug.replace(/-/g, ' '),
+          fallbackYear: null,
+        });
+      } finally {
+        filmGate.release();
+      }
+    };
+    let film;
     try {
-      const film = await fetchFilmDetails({
-        slug,
-        link: `${BASE}/film/${slug}/`,
-        fallbackTitle: slug.replace(/-/g, ' '),
-        fallbackYear: null,
-      });
-      if (typeof film.rating !== 'number') return null;
-      const payload = { rating: film.rating, ratingCount: film.ratingCount ?? null };
-      redisSet(`tonights-movie:lbrating:${slug}`, JSON.stringify(payload));
-      return payload;
-    } finally {
-      filmGate.release();
+      film = await readPage();
+    } catch {
+      await sleep(1500);
+      film = await readPage();
     }
+    if (typeof film.rating !== 'number') return null;
+    const payload = { rating: film.rating, ratingCount: film.ratingCount ?? null };
+    redisSet(`tonights-movie:lbrating:${slug}`, JSON.stringify(payload));
+    return payload;
   })();
   lbRatingInFlight.set(slug, promise);
   promise
