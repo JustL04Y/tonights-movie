@@ -281,6 +281,7 @@ function sendJson(res, status, body, options = {}) {
     // text) pass their own policy; the browser then skips the round trip.
     'Cache-Control': options.cacheControl || 'no-store',
     Vary: 'Accept-Encoding',
+    ...options.headers,
   };
   if (acceptsGzip(res.req) && text.length > 1024) {
     const gz = zlib.gzipSync(text);
@@ -290,6 +291,53 @@ function sendJson(res, status, body, options = {}) {
   }
   res.writeHead(status, { ...headers, 'Content-Length': Buffer.byteLength(text) });
   res.end(text);
+}
+
+// ── Per-IP rate limiting ─────────────────────────────────────────
+// In-memory sliding-window counters per IP and endpoint family. Render's
+// proxy sets x-forwarded-for; without it (local dev) the socket address is
+// used. Buckets are pruned on touch and the map is hard-bounded, so a flood
+// of unique spoofed IPs costs a counter reset, never memory.
+const RATE_LIMITS = {
+  stream: { limit: 15, windowMs: 60000 },
+  film: { limit: 60, windowMs: 60000 },
+  translate: { limit: 30, windowMs: 60000 },
+};
+const rateBuckets = new Map(); // ip -> Map(bucket -> timestamps[])
+
+function clientIp(req) {
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return forwarded || req.socket?.remoteAddress || 'unknown';
+}
+
+function rateAllowed(req, bucket) {
+  const { limit, windowMs } = RATE_LIMITS[bucket];
+  const ip = clientIp(req);
+  const now = Date.now();
+  let perIp = rateBuckets.get(ip);
+  if (!perIp) {
+    perIp = new Map();
+    rateBuckets.set(ip, perIp);
+  }
+  const stamps = (perIp.get(bucket) || []).filter((t) => now - t < windowMs);
+  if (stamps.length >= limit) {
+    perIp.set(bucket, stamps);
+    return false;
+  }
+  stamps.push(now);
+  perIp.set(bucket, stamps);
+  if (rateBuckets.size > 5000) rateBuckets.clear();
+  return true;
+}
+
+function sendRateLimited(res, bucket) {
+  console.log(`[ratelimit] ${bucket}: ${clientIp(res.req)} hit the cap`);
+  sendJson(
+    res,
+    429,
+    { error: 'Too many requests. Slow down.' },
+    { headers: { 'Retry-After': String(Math.ceil(RATE_LIMITS[bucket].windowMs / 1000)) } }
+  );
 }
 
 function sseSend(res, event, data) {
@@ -609,6 +657,10 @@ function startJob(sourceId, previous = null) {
 }
 
 async function handleWatchlistStream(req, res, sourceIdRaw, url) {
+  if (!rateAllowed(req, 'stream')) {
+    sendRateLimited(res, 'stream');
+    return;
+  }
   const source = parseSourceId(decodePath(sourceIdRaw));
   if (!source) {
     sendJson(res, 400, {
@@ -723,6 +775,10 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
 }
 
 async function handleWatchlist(req, res, sourceIdRaw) {
+  if (!rateAllowed(req, 'stream')) {
+    sendRateLimited(res, 'stream');
+    return;
+  }
   const source = parseSourceId(decodePath(sourceIdRaw));
   if (!source) {
     sendJson(res, 400, { error: 'Enter a valid Letterboxd username or list URL.' });
@@ -747,6 +803,10 @@ async function handleWatchlist(req, res, sourceIdRaw) {
 }
 
 async function handleFilm(req, res, slug) {
+  if (!rateAllowed(req, 'film')) {
+    sendRateLimited(res, 'film');
+    return;
+  }
   if (!/^[a-z0-9-]{1,200}$/.test(slug)) {
     sendJson(res, 400, { error: 'Invalid film slug.' });
     return;
@@ -785,6 +845,10 @@ async function handleFilm(req, res, slug) {
 }
 
 async function handleTranslate(req, res, url) {
+  if (!rateAllowed(req, 'translate')) {
+    sendRateLimited(res, 'translate');
+    return;
+  }
   const lang = String(url.searchParams.get('lang') || '').toLowerCase();
   const slug = String(url.searchParams.get('slug') || '').trim();
 
