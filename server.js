@@ -154,6 +154,8 @@ const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const REDIS_TTL_SECONDS = 60 * 60 * 24 * 30;
 const redisKeyFor = (cacheFile) => `tonights-movie:cache:${cacheFile}`;
+// Admin gate for ?refresh=1 (see handleWatchlistStream). Empty = disabled.
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN || '';
 
 async function redisGet(key) {
   if (!REDIS_URL || !REDIS_TOKEN) return null;
@@ -635,6 +637,22 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
   }
 
   const refresh = url.searchParams.get('refresh') === '1';
+  // Forcing a re-scrape is an admin action: unrestricted, anyone could bypass
+  // the cache for every source and keep the server scraping Letterboxd around
+  // the clock. Set REFRESH_TOKEN on the server to allow `?refresh=1&token=…`;
+  // without it the parameter is always refused.
+  if (refresh) {
+    const token = String(url.searchParams.get('token') || '');
+    if (!REFRESH_TOKEN || token !== REFRESH_TOKEN) {
+      console.log(`[refresh] refused for ${sourceId} (no/invalid token)`);
+      sseSend(out, 'error', {
+        message: 'Refresh requires an admin token.',
+        code: 'REFRESH_FORBIDDEN',
+      });
+      out.end();
+      return;
+    }
+  }
 
   const cached = await readCached(sourceId);
   if (!refresh && cached?.fresh) {
