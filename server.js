@@ -248,6 +248,16 @@ function acceptsGzip(req) {
   return String(req?.headers?.['accept-encoding'] || '').includes('gzip');
 }
 
+// decodeURIComponent throws URIError on malformed sequences such as %E0%A4%A.
+// A broken URL is a client error (400), never a 500.
+function decodePath(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return null;
+  }
+}
+
 function sendJson(res, status, body, options = {}) {
   const text = JSON.stringify(body);
   const headers = {
@@ -584,7 +594,7 @@ function startJob(sourceId, previous = null) {
 }
 
 async function handleWatchlistStream(req, res, sourceIdRaw, url) {
-  const source = parseSourceId(decodeURIComponent(sourceIdRaw));
+  const source = parseSourceId(decodePath(sourceIdRaw));
   if (!source) {
     sendJson(res, 400, {
       error: 'Enter a valid Letterboxd username (letters, numbers, dashes, underscores) or a list URL.',
@@ -680,7 +690,7 @@ async function handleWatchlistStream(req, res, sourceIdRaw, url) {
 }
 
 async function handleWatchlist(req, res, sourceIdRaw) {
-  const source = parseSourceId(decodeURIComponent(sourceIdRaw));
+  const source = parseSourceId(decodePath(sourceIdRaw));
   if (!source) {
     sendJson(res, 400, { error: 'Enter a valid Letterboxd username or list URL.' });
     return;
@@ -957,7 +967,11 @@ function storageProbe() {
 }
 
 async function serveStatic(req, res, pathname) {
-  let relative = decodeURIComponent(pathname);
+  let relative = decodePath(pathname);
+  if (relative === null) {
+    sendJson(res, 400, { error: 'Bad request' });
+    return;
+  }
   if (relative === '/') relative = '/index.html';
   const filePath = path.join(PUBLIC_DIR, path.normalize(relative).replace(/^([/\\])+/, ''));
   if (!filePath.startsWith(PUBLIC_DIR)) {
