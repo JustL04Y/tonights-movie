@@ -971,13 +971,29 @@ function renderCard(film) {
     .join('');
 
   const translation = translatedOverview(film);
-  const overviewText = translation || film.overview;
+  const nativeArabic = I18N.isArabic() && film.overviewLang === 'ar';
+  // While the Arabic UI waits for a translation, don't flash the English
+  // synopsis — a placeholder reads better than an English wall of text.
+  // After a few failed attempts the English text comes back as the
+  // fallback, so a provider outage never leaves the card empty.
+  const attempts = state.translationAttempts.get(film.slug) || 0;
+  const holdEnglish = I18N.isArabic() && !translation && !nativeArabic && Boolean(film.overview) && film.metaComplete && attempts < 3;
+  const overviewText = holdEnglish ? '' : translation || film.overview;
+  const arabicSynopsis = Boolean(translation) || nativeArabic;
   const overview = overviewText
-    ? `<p class="overview"${translation ? ' lang="ar" dir="rtl" title="' + esc(t('pick.translated')) + '"' : ''}>${esc(
-        overviewText
-      )}</p>`
+    ? `<p class="overview"${
+        arabicSynopsis
+          ? translation
+            ? ' lang="ar" dir="rtl" title="' + esc(t('pick.translated')) + '"'
+            : ' lang="ar" dir="rtl"'
+          : ''
+      }>${esc(overviewText)}</p>`
     : `<p class="overview details-note">${
-        film.metaComplete ? esc(t('pick.noSynopsis')) : esc(t('pick.readingDetails'))
+        holdEnglish
+          ? esc(t('pick.translating'))
+          : film.metaComplete
+            ? esc(t('pick.noSynopsis'))
+            : esc(t('pick.readingDetails'))
       }</p>`;
 
   // The ratings note names Letterboxd, so it only ever shows a Letterboxd
@@ -1186,8 +1202,11 @@ async function ensureArabicOverview(film) {
 
     if (I18N.isArabic() && state.current?.slug === film.slug && state.view === 'app') {
       const node = $('.overview', els.spotlight);
-      if (node && node.classList.contains('details-note') === false) {
+      if (node) {
+        // The node may be the "translating…" placeholder while this fetch was
+        // in flight — replace it in place either way.
         node.textContent = data.text.trim();
+        node.classList.remove('details-note');
         node.setAttribute('lang', 'ar');
         node.setAttribute('dir', 'rtl');
         node.setAttribute('title', t('pick.translated'));
