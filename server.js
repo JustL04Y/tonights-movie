@@ -55,7 +55,7 @@ const CACHE_TTL_MS = Math.max(5, CACHE_TTL_MINUTES) * 60 * 1000;
 // Film details can be reused from an older cache file, but only for a week so
 // ratings and metadata do not drift forever on lists that are never re-read.
 const SEED_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7;
-const CACHE_VERSION = 3;
+const CACHE_VERSION = 4;
 // Concurrency vs. memory: every in-flight film page holds 1–2 MB of HTML
 // (plus undici buffers and parse temporaries). 32 concurrent pages peaks
 // well past the ~256 MB V8 heap allowed inside Render's free 512 MB
